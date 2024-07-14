@@ -1,8 +1,8 @@
 package com.example.connectify.di
 
 import android.content.Context
-import com.example.connectify.feature_post.data.data_source.remote.PostApi
-import com.example.connectify.feature_post.data.data_source.repository.PostRepositoryImpl
+import com.example.connectify.feature_post.data.remote.PostApi
+import com.example.connectify.feature_post.data.repository.PostRepositoryImpl
 import com.example.connectify.feature_post.domain.repository.PostRepository
 import com.example.connectify.feature_post.domain.use_case.CreatePostUseCase
 import com.example.connectify.feature_post.domain.use_case.GetPostsForFollowsUseCase

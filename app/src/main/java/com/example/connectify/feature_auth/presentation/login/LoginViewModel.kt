@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.core.domain.states.PasswordTextFieldState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
@@ -24,8 +25,8 @@ class LoginViewModel @Inject constructor(
     private val _emailState = mutableStateOf(StandardTextFieldState())
     val emailState: State<StandardTextFieldState> = _emailState
 
-    private val _passwordState = mutableStateOf(StandardTextFieldState())
-    val passwordState: State<StandardTextFieldState> = _passwordState
+    private val _passwordState = mutableStateOf(PasswordTextFieldState())
+    val passwordState: State<PasswordTextFieldState> = _passwordState
 
     private val _loginState = mutableStateOf(LoginState())
     val loginState: State<LoginState> = _loginState
@@ -46,18 +47,19 @@ class LoginViewModel @Inject constructor(
                 )
             }
             is LoginEvent.TogglePasswordVisibility -> {
-                _loginState.value = loginState.value.copy(
-                    isPasswordVisible = !loginState.value.isPasswordVisible
+                _passwordState.value = passwordState.value.copy(
+                    isPasswordVisible = !passwordState.value.isPasswordVisible
                 )
             }
             is LoginEvent.Login -> {
                 viewModelScope.launch {
+                    _emailState.value = emailState.value.copy(error = null)
+                    _passwordState.value = passwordState.value.copy(error = null)
                     _loginState.value = loginState.value.copy(isLoading = true)
                     val loginResult = loginUseCase(
                         email = emailState.value.text,
                         password = passwordState.value.text
                     )
-                    _loginState.value = loginState.value.copy(isLoading = false)
                     if(loginResult.emailError != null) {
                         _emailState.value = emailState.value.copy(
                             error = loginResult.emailError
@@ -73,15 +75,21 @@ class LoginViewModel @Inject constructor(
                             _eventFlow.emit(
                                 UiEvent.Navigate(Screen.MainFeedScreen.route)
                             )
+                            _loginState.value = loginState.value.copy(isLoading = false)
+                            _emailState.value = StandardTextFieldState()
+                            _passwordState.value = PasswordTextFieldState()
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(
                                 UiEvent.ShowSnackbar(
-                                    loginResult.result.uiText ?: UiText.unknownError()
+                                    uiText = loginResult.result.uiText ?: UiText.unknownError()
                                 )
                             )
+                            _loginState.value = loginState.value.copy(isLoading = false)
                         }
-                        null -> {}
+                        null -> {
+                            _loginState.value = loginState.value.copy(isLoading = false)
+                        }
                     }
                 }
             }

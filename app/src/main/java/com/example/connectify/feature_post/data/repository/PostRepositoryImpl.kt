@@ -1,4 +1,4 @@
-package com.example.connectify.feature_post.data.data_source.repository
+package com.example.connectify.feature_post.data.repository
 
 import android.content.ContentResolver
 import android.content.Context
@@ -14,9 +14,9 @@ import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
-import com.example.connectify.feature_post.data.data_source.paging.PostSource
-import com.example.connectify.feature_post.data.data_source.remote.PostApi
-import com.example.connectify.feature_post.data.data_source.remote.request.CreatePostRequest
+import com.example.connectify.feature_post.data.paging.PostSource
+import com.example.connectify.feature_post.data.remote.PostApi
+import com.example.connectify.feature_post.data.remote.request.CreatePostRequest
 import com.example.connectify.feature_post.domain.repository.PostRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +35,10 @@ class PostRepositoryImpl(
     private val gson: Gson,
 ) : PostRepository {
 
-    override suspend fun getPostsForFollows(page: Int, pageSize: Int): Resource<List<Post>> {
+    override suspend fun getPostsForFollows(
+        page: Int,
+        pageSize: Int
+    ): Resource<List<Post>> {
         return try {
             val posts = api.getPostsForFollows(
                 page = page,
@@ -63,8 +66,8 @@ class PostRepositoryImpl(
             val response = api.createPost(
                 postData = MultipartBody.Part
                     .createFormData(
-                        "post_data",
-                        gson.toJson(request)
+                        name = "post_data",
+                        value = gson.toJson(request)
                     ),
                 postImage = MultipartBody.Part
                     .createFormData(

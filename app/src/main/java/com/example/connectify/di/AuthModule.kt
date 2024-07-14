@@ -1,7 +1,7 @@
 package com.example.connectify.di
 
 import android.content.SharedPreferences
-import com.example.connectify.feature_auth.data.data_source.remote.AuthApi
+import com.example.connectify.feature_auth.data.remote.AuthApi
 import com.example.connectify.feature_auth.data.repository.AuthRepositoryImpl
 import com.example.connectify.feature_auth.domain.repository.AuthRepository
 import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase

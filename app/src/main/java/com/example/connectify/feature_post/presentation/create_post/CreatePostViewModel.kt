@@ -63,7 +63,7 @@ class CreatePostViewModel @Inject constructor(
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(UiEvent.ShowSnackbar(
-                                result.uiText ?: UiText.unknownError()
+                                uiText = result.uiText ?: UiText.unknownError()
                             ))
                         }
                     }

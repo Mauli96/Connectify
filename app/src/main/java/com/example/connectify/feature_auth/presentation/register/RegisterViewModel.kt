@@ -108,7 +108,7 @@ class RegisterViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(
-                        UiEvent.ShowSnackbar(registerResult.result.uiText ?: UiText.unknownError())
+                        UiEvent.ShowSnackbar(uiText = registerResult.result.uiText ?: UiText.unknownError())
                     )
                     _registerState.value = RegisterState(isLoading = false)
                 }

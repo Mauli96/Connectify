@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
@@ -23,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +48,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.CropActivityResultContract
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.feature_post.presentation.util.PostConstants
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
@@ -56,8 +57,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun CreatePostScreen(
     navController: NavController,
-    onNavigateUp: () -> Unit = {},
-    onNavigate: (String) -> Unit = {},
     scaffoldState: ScaffoldState,
     viewModel: CreatePostViewModel = hiltViewModel()
 ) {
@@ -90,9 +89,8 @@ fun CreatePostScreen(
                     }
                 }
                 is UiEvent.NavigateUp -> {
-                    onNavigateUp()
+                    navController.navigateUp()
                 }
-
                 is UiEvent.Navigate -> TODO()
             }
         }
@@ -162,6 +160,7 @@ fun CreatePostScreen(
                 },
                 singleLine = false,
                 maxLines = 5,
+                maxLength = PostConstants.MAX_POST_DESCRIPTION_LENGTH,
                 onValueChange = {
                     viewModel.onEvent(CreatePostEvent.EnterDescription(it))
                 }

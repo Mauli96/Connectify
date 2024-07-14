@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Person
@@ -57,7 +58,8 @@ fun LoginScreen(
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
+                        message = event.uiText.asString(context),
+                        duration = SnackbarDuration.Short
                     )
                 }
                 is UiEvent.Navigate -> {
@@ -119,7 +121,7 @@ fun LoginScreen(
                     else -> ""
                 },
                 leadingIcon = Icons.Default.Key,
-                showPasswordToggle = state.isPasswordVisible,
+                showPasswordToggle = passwordState.isPasswordVisible,
                 onPasswordToggleClick = {
                     viewModel.onEvent(LoginEvent.TogglePasswordVisibility)
                 }

@@ -1,10 +1,10 @@
-package com.example.connectify.feature_post.data.data_source.paging
+package com.example.connectify.feature_post.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.util.Constants
-import com.example.connectify.feature_post.data.data_source.remote.PostApi
+import com.example.connectify.feature_post.data.remote.PostApi
 import retrofit2.HttpException
 import java.io.IOException
 

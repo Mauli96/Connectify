@@ -41,6 +41,7 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.feature_auth.presentation.util.AuthError
 import com.example.connectify.core.util.Constants
+import com.example.connectify.core.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -60,8 +61,8 @@ fun RegisterScreen(
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        event.uiText.asString(context),
-                        duration = SnackbarDuration.Long
+                        message = event.uiText.asString(context),
+                        duration = SnackbarDuration.Short
                     )
                 }
                 else -> Unit
@@ -193,7 +194,9 @@ fun RegisterScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .clickable {
-                    navController.popBackStack()
+                    navController.navigate(
+                        Screen.LoginScreen.route
+                    )
                 }
         )
     }

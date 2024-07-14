@@ -1,4 +1,4 @@
-package com.example.connectify.feature_post.data.data_source.remote
+package com.example.connectify.feature_post.data.remote
 
 import com.example.connectify.core.data.dto.response.BasicApiResponse
 import com.example.connectify.core.domain.models.Post
