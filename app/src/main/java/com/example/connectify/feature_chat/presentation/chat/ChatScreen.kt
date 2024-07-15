@@ -11,7 +11,8 @@ import androidx.navigation.NavController
 
 @Composable
 fun ChatScreen(
-    navController: NavController
+    onNavigate: (String) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),

@@ -4,8 +4,10 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.feature_activity.presentation.activity.ActivityScreen
 import com.example.connectify.feature_chat.presentation.chat.ChatScreen
@@ -31,11 +33,14 @@ fun Navigation(
         startDestination = Screen.SplashScreen.route
     ) {
         composable(Screen.SplashScreen.route) {
-            SplashScreen(navController = navController)
+            SplashScreen(
+                onPopBackStack = navController::popBackStack,
+                onNavigate = navController::navigate
+            )
         }
         composable(Screen.LoginScreen.route) {
             LoginScreen(
-                navController = navController,
+                onNavigate = navController::navigate,
                 scaffoldState = scaffoldState
             )
         }
@@ -46,35 +51,69 @@ fun Navigation(
             )
         }
         composable(Screen.MainFeedScreen.route) {
-            MainFeedScreen(navController = navController)
+            MainFeedScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+                scaffoldState = scaffoldState
+            )
         }
         composable(Screen.ChatScreen.route) {
-            ChatScreen(navController = navController)
+            ChatScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+            )
         }
         composable(Screen.ActivityScreen.route) {
-            ActivityScreen(navController = navController)
+            ActivityScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+            )
         }
-        composable(Screen.ProfileScreen.route) {
-            ProfileScreen(navController = navController)
+        composable(
+            route = Screen.ProfileScreen.route + "?userId={userId}",
+            arguments = listOf(
+                navArgument(name = "userId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+            ProfileScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+                scaffoldState = scaffoldState
+            )
         }
         composable(Screen.CreatePostScreen.route) {
             CreatePostScreen(
-                navController = navController,
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
                 scaffoldState = scaffoldState
             )
         }
         composable(Screen.EditProfileScreen.route) {
-            EditProfileScreen(navController = navController)
+            EditProfileScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+            )
         }
         composable(Screen.SearchScreen.route) {
-            SearchScreen(navController = navController)
+            SearchScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+            )
         }
         composable(Screen.PersonListScreen.route) {
-            PersonListScreen(navController = navController)
+            PersonListScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+            )
         }
         composable(Screen.PostDetailScreen.route) {
             PostDetailScreen(
-                navController = navController,
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
                 post = Post(
                     username = "mauli.waghmore",
                     imageUrl = "",

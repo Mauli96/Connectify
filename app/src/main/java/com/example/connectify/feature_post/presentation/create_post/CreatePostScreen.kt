@@ -56,7 +56,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CreatePostScreen(
-    navController: NavController,
+    onNavigate: (String) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
     scaffoldState: ScaffoldState,
     viewModel: CreatePostViewModel = hiltViewModel()
 ) {
@@ -89,7 +90,7 @@ fun CreatePostScreen(
                     }
                 }
                 is UiEvent.NavigateUp -> {
-                    navController.navigateUp()
+                    onNavigateUp()
                 }
                 is UiEvent.Navigate -> TODO()
             }
@@ -100,7 +101,7 @@ fun CreatePostScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         StandardToolbar(
-            navController = navController,
+            onNavigateUp = onNavigateUp,
             showBackArrow = true,
             title = {
                 Text(

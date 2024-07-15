@@ -52,7 +52,8 @@ import com.example.connectify.core.util.Screen
 
 @Composable
 fun PostDetailScreen(
-    navController: NavController,
+    onNavigate: (String) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
     post: Post
 ) {
 
@@ -60,7 +61,7 @@ fun PostDetailScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         StandardToolbar(
-            navController = navController,
+            onNavigateUp = onNavigateUp,
             title = {
                 Text(
                     text = stringResource(id = R.string.your_feed),
@@ -133,7 +134,7 @@ fun PostDetailScreen(
                                     ),
                                     modifier = Modifier
                                         .clickable {
-                                            navController.navigate(Screen.PersonListScreen.route)
+                                            onNavigate(Screen.PersonListScreen.route)
                                         },
                                     style = MaterialTheme.typography.labelSmall
                                 )

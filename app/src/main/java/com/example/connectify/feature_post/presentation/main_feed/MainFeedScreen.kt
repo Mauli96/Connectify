@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.MaterialTheme
@@ -20,14 +21,16 @@ import com.example.connectify.core.util.Screen
 
 @Composable
 fun MainFeedScreen(
-    navController: NavController,
+    onNavigate: (String) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
+    scaffoldState: ScaffoldState,
     viewModel: MainFeedViewModel = hiltViewModel()
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         StandardToolbar(
-            navController = navController,
+            onNavigateUp = onNavigateUp,
             title = {
                 Text(
                     text = stringResource(id = R.string.your_feed),
@@ -37,7 +40,7 @@ fun MainFeedScreen(
             modifier = Modifier.fillMaxWidth(),
             navActions = {
                 IconButton(onClick = {
-                    navController.navigate(Screen.SearchScreen.route)
+                    onNavigate(Screen.SearchScreen.route)
                 }) {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -57,10 +60,10 @@ fun MainFeedScreen(
                 commentCount = 19
             ),
             onPostClick = {
-                navController.navigate(Screen.PostDetailScreen.route)
+                onNavigate(Screen.PostDetailScreen.route)
             },
             onLikeByClick = {
-                navController.navigate(Screen.PersonListScreen.route)
+                onNavigate(Screen.PersonListScreen.route)
             }
         )
     }

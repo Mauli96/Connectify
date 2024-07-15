@@ -18,7 +18,7 @@ import com.example.connectify.R
 @Composable
 fun StandardToolbar(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    onNavigateUp: () -> Unit = {},
     showBackArrow: Boolean = false,
     title: @Composable () -> Unit = {},
     navActions: @Composable RowScope.() -> Unit = {},
@@ -29,7 +29,7 @@ fun StandardToolbar(
         navigationIcon = if(showBackArrow) {
             {
                 IconButton(onClick = {
-                    navController.navigateUp()
+                    onNavigateUp()
                 }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,

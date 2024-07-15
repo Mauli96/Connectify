@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
+    onNavigate: (String) -> Unit = {},
     scaffoldState: ScaffoldState,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
@@ -63,9 +63,9 @@ fun LoginScreen(
                     )
                 }
                 is UiEvent.Navigate -> {
-                    navController.navigate(event.route)
+                    onNavigate(event.route)
                 }
-                UiEvent.NavigateUp -> TODO()
+                is UiEvent.NavigateUp -> TODO()
             }
         }
     }
@@ -167,9 +167,7 @@ fun LoginScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .clickable {
-                    navController.navigate(
-                        Screen.RegisterScreen.route
-                    )
+                    onNavigate(Screen.RegisterScreen.route)
                 }
         )
     }

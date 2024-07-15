@@ -22,13 +22,14 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 @ExperimentalMaterialApi
 @Composable
 fun PersonListScreen(
-    navController: NavController
+    onNavigate: (String) -> Unit = {},
+    onNavigateUp: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         StandardToolbar(
-            navController = navController,
+            onNavigateUp = onNavigateUp,
             showBackArrow = true,
             title = {
                 Text(
@@ -45,6 +46,7 @@ fun PersonListScreen(
             items(10) {
                 UserProfileItem(
                     user = User(
+                        userId = "6689706018e6bc04477642e9",
                         profilePictureUrl = "",
                         username = "mauli.waghmore",
                         description = "✨ Less is more | Simplicity lover\n" + "\uD83C\uDF3F Embracing minimalism\n" + "\uD83D\uDDA4 Black and white aesthetic\n" + "\uD83E\uDDD8\u200D♂\uFE0F Mindful living",
