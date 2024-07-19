@@ -9,7 +9,7 @@ data class Profile(
     val postCount: Int,
     val profilePictureUrl: String,
     val bannerUrl: String?,
-    val topSkills: List<String>,
+    val topSkills: List<Skill>,
     val gitHubUrl: String?,
     val instagramUrl: String?,
     val linkedInUrl: String?,

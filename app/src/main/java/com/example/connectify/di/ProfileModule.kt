@@ -4,7 +4,10 @@ import com.example.connectify.feature_profile.data.remote.ProfileApi
 import com.example.connectify.feature_profile.data.repository.ProfileRepositoryImpl
 import com.example.connectify.feature_profile.domain.repository.ProfileRepository
 import com.example.connectify.feature_profile.domain.use_case.GetProfileUseCase
+import com.example.connectify.feature_profile.domain.use_case.GetSkillsUseCase
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
+import com.example.connectify.feature_profile.domain.use_case.UpdateProfileUseCase
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,15 +34,17 @@ object ProfileModule {
 
     @Provides
     @Singleton
-    fun provideProfileRepository(api: ProfileApi): ProfileRepository {
-        return ProfileRepositoryImpl(api)
+    fun provideProfileRepository(api: ProfileApi, gson: Gson): ProfileRepository {
+        return ProfileRepositoryImpl(api, gson)
     }
 
     @Provides
     @Singleton
     fun provideProfileUseCase(repository: ProfileRepository): ProfileUseCases {
         return ProfileUseCases(
-            getProfile = GetProfileUseCase(repository)
+            getProfile = GetProfileUseCase(repository),
+            getSkills = GetSkillsUseCase(repository),
+            updateProfile = UpdateProfileUseCase(repository)
         )
     }
 }

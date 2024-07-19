@@ -29,14 +29,11 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
@@ -155,7 +152,7 @@ fun ProfileScreen(
                         ),
                         isOwnProfile = profile.isOwnProfile,
                         onEditClick = {
-                            onNavigate(Screen.EditProfileScreen.route)
+                            onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
                         }
                     )
                 }
@@ -204,10 +201,10 @@ fun ProfileScreen(
                             translationX = (1f - toolbarState.expandedRatio) *
                                     -iconHorizontalCenterLength
                         },
-                    topSkillUrls = profile.topSkills,
-                    shouldShowGitHub = profile.gitHubUrl != null,
-                    shouldShowInstagram = profile.instagramUrl != null,
-                    shouldShowLinkedIn = profile.linkedInUrl != null,
+                    topSkills = profile.topSkills,
+                    shouldShowGitHub = !profile.gitHubUrl.isNullOrBlank(),
+                    shouldShowInstagram = !profile.instagramUrl.isNullOrBlank(),
+                    shouldShowLinkedIn = !profile.linkedInUrl.isNullOrBlank(),
                     bannerUrl = profile.bannerUrl
                 )
                 Image(

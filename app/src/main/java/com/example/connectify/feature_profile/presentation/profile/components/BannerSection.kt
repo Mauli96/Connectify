@@ -23,12 +23,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
+import com.example.connectify.feature_profile.domain.models.Skill
 
 @Composable
 fun BannerSection(
@@ -38,7 +41,7 @@ fun BannerSection(
     leftIconModifier: Modifier = Modifier,
     rightIconModifier: Modifier = Modifier,
     bannerUrl: String? = null,
-    topSkillUrls: List<String> = emptyList(),
+    topSkills: List<Skill> = emptyList(),
     shouldShowGitHub: Boolean = false,
     shouldShowInstagram: Boolean = false,
     shouldShowLinkedIn: Boolean = false,
@@ -81,16 +84,17 @@ fun BannerSection(
                 .align(Alignment.BottomStart)
                 .padding(SpaceSmall)
         ) {
-            topSkillUrls.forEach { skillUrl ->
+            topSkills.forEach { skill ->
                 Spacer(modifier = Modifier.width(SpaceSmall))
                 Image(
-                    painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(data = skillUrl)
-                            .apply(block = fun ImageRequest.Builder.() {
+                    painter = rememberAsyncImagePainter(ImageRequest.Builder(LocalContext.current)
+                        .data(data = skill.imageUrl).apply(block = fun ImageRequest.Builder.() {
                             crossfade(true)
-                        }).build()
-                    ),
+                        }).build(), imageLoader = ImageLoader.Builder(LocalContext.current)
+                        .components {
+                            add(SvgDecoder.Factory())
+                        }
+                        .build()),
                     contentDescription = null,
                     modifier = Modifier.height(iconSize)
                 )
