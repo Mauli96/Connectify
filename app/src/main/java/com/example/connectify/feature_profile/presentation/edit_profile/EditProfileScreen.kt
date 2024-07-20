@@ -104,8 +104,10 @@ fun EditProfileScreen(
                         message = event.uiText.asString(context)
                     )
                 }
+                is UiEvent.NavigateUp -> {
+                    onNavigateUp()
+                }
                 is UiEvent.Navigate -> Unit
-                is UiEvent.NavigateUp -> Unit
             }
         }
     }
@@ -141,14 +143,14 @@ fun EditProfileScreen(
             BannerEditSection(
                 bannerImage = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = profileState.profile?.bannerUrl)
+                        .data(data = viewModel.bannerUri.value ?: profileState.profile?.bannerUrl)
                         .apply(block = fun ImageRequest.Builder.() {
                             crossfade(true)
                         }).build()
                 ),
                 profileImage = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = profileState.profile?.profilePictureUrl)
+                        .data(data = viewModel.profileUri.value ?: profileState.profile?.profilePictureUrl)
                         .apply(block = fun ImageRequest.Builder.() {
                             crossfade(true)
                         }).build()
@@ -279,13 +281,14 @@ fun EditProfileScreen(
                     mainAxisSpacing = SpaceMedium,
                     crossAxisSpacing = SpaceMedium
                 ) {
-                    viewModel.skills.value.skills.forEach {
+                    viewModel.skills.value.skills.forEach { skill ->
                         Chip(
-                            text = it.name,
-                            selected = it in viewModel.skills.value.selectedSkills
-                        ) {
-
-                        }
+                            text = skill.name,
+                            selected = skill in viewModel.skills.value.selectedSkills,
+                            onChipClick = {
+                                viewModel.onEvent(EditProfileEvent.SetSkillSelected(skill))
+                            }
+                        )
                     }
                 }
             }

@@ -6,6 +6,7 @@ import com.example.connectify.feature_profile.domain.repository.ProfileRepositor
 import com.example.connectify.feature_profile.domain.use_case.GetProfileUseCase
 import com.example.connectify.feature_profile.domain.use_case.GetSkillsUseCase
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
+import com.example.connectify.feature_profile.domain.use_case.SetSkillSelectedUseCase
 import com.example.connectify.feature_profile.domain.use_case.UpdateProfileUseCase
 import com.google.gson.Gson
 import dagger.Module
@@ -44,7 +45,8 @@ object ProfileModule {
         return ProfileUseCases(
             getProfile = GetProfileUseCase(repository),
             getSkills = GetSkillsUseCase(repository),
-            updateProfile = UpdateProfileUseCase(repository)
+            updateProfile = UpdateProfileUseCase(repository),
+            setSkillUseCase = SetSkillSelectedUseCase()
         )
     }
 }

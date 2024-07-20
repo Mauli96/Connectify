@@ -34,7 +34,7 @@ import com.example.connectify.core.util.TestTags
 fun StandardTextField(
     text: String = "",
     hint: String = "",
-    maxLength: Int = 40,
+    maxLength: Int = 400,
     error: String = "",
     style: TextStyle = TextStyle(
         color = MaterialTheme.colorScheme.onBackground

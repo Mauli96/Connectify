@@ -29,6 +29,7 @@ import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.domain.models.Skill
@@ -85,7 +86,7 @@ fun BannerSection(
                 .padding(SpaceSmall)
         ) {
             topSkills.forEach { skill ->
-                Spacer(modifier = Modifier.width(SpaceSmall))
+                Spacer(modifier = Modifier.width(SpaceMedium))
                 Image(
                     painter = rememberAsyncImagePainter(ImageRequest.Builder(LocalContext.current)
                         .data(data = skill.imageUrl).apply(block = fun ImageRequest.Builder.() {
