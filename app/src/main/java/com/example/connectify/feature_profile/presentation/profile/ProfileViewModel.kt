@@ -5,7 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
+import com.example.connectify.core.presentation.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
@@ -18,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
+    private val getOwnUserId: GetOwnUserIdUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -30,6 +35,34 @@ class ProfileViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val _pagingState = mutableStateOf<PagingState<Post>>(PagingState())
+    val pagingState: State<PagingState<Post>> = _pagingState
+
+    private val paginator = DefaultPaginator(
+        onLoadUpdated = { isLoading ->
+            _pagingState.value = pagingState.value.copy(
+                isLoading = isLoading
+            )
+        },
+        onRequest = { page ->
+            val userId = savedStateHandle.get<String>("userId") ?: getOwnUserId()
+            profileUseCases.getPostsForProfile(
+                userId = userId,
+                page = page
+            )
+        },
+        onSuccess = { posts ->
+            _pagingState.value = pagingState.value.copy(
+                items = pagingState.value.items + posts,
+                endReached = posts.isEmpty(),
+                isLoading = false
+            )
+        },
+        onError = { uiText ->
+            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+        }
+    )
+
     fun setExpandedRatio(ratio: Float) {
         _toolbarState.value = _toolbarState.value.copy(expandedRatio = ratio)
     }
@@ -38,12 +71,16 @@ class ProfileViewModel @Inject constructor(
         _toolbarState.value = _toolbarState.value.copy(toolbarOffsetY = value)
     }
 
-    fun getProfile(userId: String) {
+    init {
+        loadNextPosts()
+    }
+
+    fun getProfile(userId: String?) {
         viewModelScope.launch {
             _state.value = state.value.copy(
                 isLoading = true
             )
-            val result = profileUseCases.getProfile(userId)
+            val result = profileUseCases.getProfile(userId = userId ?: getOwnUserId())
             when(result) {
                 is Resource.Success -> {
                     _state.value = state.value.copy(
@@ -60,6 +97,12 @@ class ProfileViewModel @Inject constructor(
                     ))
                 }
             }
+        }
+    }
+
+    fun loadNextPosts() {
+        viewModelScope.launch {
+            paginator.loadNextItems()
         }
     }
 }

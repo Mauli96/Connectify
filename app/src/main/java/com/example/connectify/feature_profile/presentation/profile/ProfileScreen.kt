@@ -33,33 +33,35 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.connectify.R
-import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
-import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
-import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.toPx
+import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
+import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
-    userId: String,
+    scaffoldState: ScaffoldState,
+    userId: String? = null,
+    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    scaffoldState: ScaffoldState,
     profilePictureSize: Dp = ProfilePictureSizeLarge,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    val pagingState = viewModel.pagingState.value
     val lazyListState = rememberLazyListState()
     val toolbarState = viewModel.toolbarState.value
 
@@ -84,6 +86,7 @@ fun ProfileScreen(
     }
 
     val state = viewModel.state.value
+
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(
@@ -111,17 +114,14 @@ fun ProfileScreen(
     LaunchedEffect(key1 = true) {
         viewModel.getProfile(userId)
         viewModel.eventFlow.collectLatest { event ->
-            when(event) {
+            when (event) {
                 is UiEvent.ShowSnackbar -> {
-                    GlobalScope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context)
-                        )
-                    }
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.uiText.asString(context)
+                    )
                 }
-                else -> {
-                    null
-                }
+                is UiEvent.Navigate -> TODO()
+                is UiEvent.NavigateUp -> TODO()
             }
         }
     }
@@ -156,6 +156,7 @@ fun ProfileScreen(
                             followingCount = profile.followingCount,
                             postCount = profile.postCount
                         ),
+                        isFollowing = profile.isFollowing,
                         isOwnProfile = profile.isOwnProfile,
                         onEditClick = {
                             onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
@@ -163,21 +164,23 @@ fun ProfileScreen(
                     )
                 }
             }
-            items(10) {
+            items(pagingState.items.size) { i ->
+                val post = pagingState.items[i]
+                if (i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
+                    viewModel.loadNextPosts()
+                }
+
                 Post(
-                    post = Post(
-                        username = "mauli.waghmore",
-                        imageUrl = "",
-                        profilePictureUrl = "",
-                        description = "Are you ready to take control of your financial future? Discover proven strategies to grow your wealth, manage your expenses, and invest wisely. Whether you're just starting out or looking to optimize your current financial plan, our expert tips and advice will help you unlock your financial potential. From budgeting techniques to investment insights, we've got everything you need to make your money work for you. Start your journey towards financial freedom today!",
-                        likeCount = 70,
-                        commentCount = 19
-                    ),
+                    post = post,
+                    imageLoader = imageLoader,
                     showProfileImage = false,
                     onPostClick = {
-                        onNavigate(Screen.PostDetailScreen.route)
+                        onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
                     }
                 )
+            }
+            item {
+                Spacer(modifier = Modifier.height(90.dp))
             }
         }
         Column(
@@ -207,6 +210,7 @@ fun ProfileScreen(
                             translationX = (1f - toolbarState.expandedRatio) *
                                     -iconHorizontalCenterLength
                         },
+                    imageLoader = imageLoader,
                     topSkills = profile.topSkills,
                     shouldShowGitHub = !profile.gitHubUrl.isNullOrBlank(),
                     shouldShowInstagram = !profile.instagramUrl.isNullOrBlank(),
@@ -215,11 +219,8 @@ fun ProfileScreen(
                 )
                 Image(
                     painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(data = profile.profilePictureUrl)
-                            .apply(block = fun ImageRequest.Builder.() {
-                                crossfade(true)
-                            }).build()
+                        model = profile.profilePictureUrl,
+                        imageLoader = imageLoader
                     ),
                     contentDescription = stringResource(id = R.string.profile),
                     modifier = Modifier

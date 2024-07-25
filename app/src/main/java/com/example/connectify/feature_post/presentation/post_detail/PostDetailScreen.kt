@@ -3,59 +3,89 @@ package com.example.connectify.feature_post.presentation.post_detail
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
-import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.components.ActionRow
+import com.example.connectify.core.presentation.components.SendTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.MediumGray
-import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
-import com.example.connectify.core.presentation.ui.theme.TextWhite
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.presentation.util.showKeyboard
 import com.example.connectify.core.util.Screen
+import com.example.connectify.feature_post.presentation.post_detail.components.Comment
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PostDetailScreen(
+    scaffoldState: ScaffoldState,
+    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    post: Post
+    viewModel: PostDetailViewModel = hiltViewModel(),
+    shouldShowKeyboard: Boolean = false
 ) {
+
+    val state = viewModel.state.value
+
+    val focusRequester = remember {
+        FocusRequester()
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(key1 = true) {
+        if(shouldShowKeyboard) {
+            context.showKeyboard()
+            focusRequester.requestFocus()
+        }
+        viewModel.eventFlow.collectLatest { event ->
+            when(event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.uiText.asString(context)
+                    )
+                }
+                is UiEvent.Navigate -> TODO()
+                is UiEvent.NavigateUp -> TODO()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -73,7 +103,7 @@ fun PostDetailScreen(
         )
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .background(MaterialTheme.colorScheme.surface),
         ) {
             item {
@@ -95,166 +125,123 @@ fun PostDetailScreen(
                                 .shadow(5.dp)
                                 .background(MediumGray)
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.kermit),
-                                contentDescription = "Post image",
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(SpaceLarge)
-                            ) {
-                                ActionRow(
-                                    username = post.username,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onLikeClick = { isLiked ->
-
-                                    },
-                                    onCommentClick = {
-
-                                    },
-                                    onShareClick = {
-
-                                    },
-                                    onUsernameClick = { username ->
-
-                                    }
-                                )
-                                Spacer(modifier = Modifier.height(SpaceSmall))
-                                Text(
-                                    text = post.description,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                                Spacer(modifier = Modifier.height(SpaceMedium))
-                                Text(
-                                    text = stringResource(
-                                        id = R.string.liked_by_x_people,
-                                        post.likeCount
+                            state.post?.let { post ->
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        model = state.post.imageUrl,
+                                        imageLoader = imageLoader
                                     ),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = "Post image",
                                     modifier = Modifier
-                                        .clickable {
-                                            onNavigate(Screen.PersonListScreen.route)
-                                        },
-                                    style = MaterialTheme.typography.labelSmall
+                                        .fillMaxWidth()
+                                        .aspectRatio(16f / 9f)
                                 )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(SpaceLarge)
+                                ) {
+                                    ActionRow(
+                                        username = post.username,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onLikeClick = {
+                                            viewModel.onEvent(PostDetailEvent.LikePost)
+                                        },
+                                        onCommentClick = {
+                                            context.showKeyboard()
+                                            focusRequester.requestFocus()
+                                        },
+                                        onShareClick = {
+
+                                        },
+                                        onUsernameClick = {
+                                            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                                        },
+                                        isLiked = state.post.isLiked
+                                    )
+                                    Spacer(modifier = Modifier.height(SpaceSmall))
+                                    Text(
+                                        text = post.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                    Spacer(modifier = Modifier.height(SpaceMedium))
+                                    Text(
+                                        text = stringResource(
+                                            id = R.string.liked_by_x_people,
+                                            post.likeCount
+                                        ),
+                                        modifier = Modifier
+                                            .clickable {
+                                                onNavigate(Screen.PersonListScreen.route)
+                                            },
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
                             }
                         }
                         Image(
-                            painter = painterResource(id = R.drawable.mauli),
+                            painter = rememberAsyncImagePainter(
+                                model = state.post?.profilePictureUrl,
+                                imageLoader = imageLoader
+                            ),
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .size(ProfilePictureSizeMedium)
                                 .clip(CircleShape)
                                 .align(Alignment.TopCenter)
                         )
+                        if(state.isLoadingPost) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(SpaceLarge))
             }
-            items(5) {
-                Comment(
+            items(state.comments) { comment ->
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = SpaceLarge,
-                            vertical = SpaceSmall
-                        ),
-                    comment = Comment(
-                        username = "mauli.waghmore",
-                        comment = "Financial literacy is such an important topic! Whether you're saving for a rainy day, investing for the future, or simply trying to budget better, understanding how to manage money effectively can make a huge difference. 💰📈 What are some of your best money management tips or resources?"
-                    ),
-                    onLikeClick = {}
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun Comment(
-    modifier: Modifier = Modifier,
-    comment: Comment = Comment(),
-    onLikeClick: (Boolean) -> Unit
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(5.dp),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSurface
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(SpaceMedium),
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.mauli),
-                        contentDescription = null,
+                    Comment(
                         modifier = Modifier
-                            .clip(CircleShape)
-                            .size(ProfilePictureSizeExtraSmall)
-                    )
-                    Spacer(modifier = Modifier.width(SpaceSmall))
-                    Text(
-                        text = comment.username,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-                Text(
-                    text = "2 days ago",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            Spacer(modifier = Modifier.height(SpaceSmall))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = comment.comment,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.weight(9f)
-                )
-                Spacer(modifier = Modifier.width(SpaceMedium))
-                IconButton(
-                    onClick = {
-                        onLikeClick(comment.isLiked)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        tint = if(comment.isLiked) {
-                            Color.Red
-                        } else {
-                            TextWhite
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = SpaceLarge,
+                                vertical = SpaceSmall
+                            ),
+                        imageLoader = imageLoader,
+                        comment = comment,
+                        onLikeClick = {
+                            viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
                         },
-                        contentDescription = if (comment.isLiked) {
-                            stringResource(id = R.string.unlike)
-                        } else stringResource(id = R.string.like)
+                        onLikedByClick = {
+
+                        }
                     )
+                    if(state.isLoadingComments) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(SpaceMedium))
-            Text(
-                text = stringResource(id = R.string.liked_by_x_people, comment.likeCount),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
         }
+        SendTextField(
+            state = viewModel.commentTextFieldState.value,
+            onValueChange = {
+                viewModel.onEvent(PostDetailEvent.EnteredComment(it))
+            },
+            onSend = {
+                viewModel.onEvent(PostDetailEvent.Comment)
+            },
+            hint = stringResource(id = R.string.enter_a_comment),
+            isLoading = viewModel.commentState.value.isLoading,
+            focusRequester = focusRequester
+        )
     }
 }

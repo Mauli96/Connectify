@@ -56,6 +56,7 @@ class AuthRepositoryImpl(
                 response.data?.let { authResponse ->
                     sharedPreferences.edit()
                         .putString(Constants.KEY_JWT_TOKEN, authResponse.token)
+                        .putString(Constants.KEY_USER_ID, authResponse.userId)
                         .apply()
                 }
                 Resource.Success(Unit)

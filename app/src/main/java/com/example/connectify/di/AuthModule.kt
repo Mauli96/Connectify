@@ -26,8 +26,8 @@ object AuthModule {
     fun provideAuthApi(client: OkHttpClient): AuthApi {
         return Retrofit.Builder()
             .baseUrl(AuthApi.BASE_URL)
-            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
             .build()
             .create(AuthApi::class.java)
     }

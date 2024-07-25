@@ -1,12 +1,16 @@
 package com.example.connectify.di
 
+import com.example.connectify.feature_post.data.remote.PostApi
 import com.example.connectify.feature_profile.data.remote.ProfileApi
-import com.example.connectify.feature_profile.data.repository.ProfileRepositoryImpl
-import com.example.connectify.feature_profile.domain.repository.ProfileRepository
+import com.example.connectify.core.data.repository.ProfileRepositoryImpl
+import com.example.connectify.core.domain.repository.ProfileRepository
+import com.example.connectify.feature_profile.domain.use_case.GetPostsForProfileUseCase
 import com.example.connectify.feature_profile.domain.use_case.GetProfileUseCase
 import com.example.connectify.feature_profile.domain.use_case.GetSkillsUseCase
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
+import com.example.connectify.feature_profile.domain.use_case.SearchUserUseCase
 import com.example.connectify.feature_profile.domain.use_case.SetSkillSelectedUseCase
+import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
 import com.example.connectify.feature_profile.domain.use_case.UpdateProfileUseCase
 import com.google.gson.Gson
 import dagger.Module
@@ -35,8 +39,8 @@ object ProfileModule {
 
     @Provides
     @Singleton
-    fun provideProfileRepository(api: ProfileApi, gson: Gson): ProfileRepository {
-        return ProfileRepositoryImpl(api, gson)
+    fun provideProfileRepository(profileApi: ProfileApi, postApi: PostApi, gson: Gson): ProfileRepository {
+        return ProfileRepositoryImpl(profileApi, postApi, gson)
     }
 
     @Provides
@@ -46,7 +50,10 @@ object ProfileModule {
             getProfile = GetProfileUseCase(repository),
             getSkills = GetSkillsUseCase(repository),
             updateProfile = UpdateProfileUseCase(repository),
-            setSkillUseCase = SetSkillSelectedUseCase()
+            setSkillUseCase = SetSkillSelectedUseCase(),
+            getPostsForProfile = GetPostsForProfileUseCase(repository),
+            searchUser = SearchUserUseCase(repository),
+            toggleFollowStateForUser = ToggleFollowStateForUserUseCase(repository)
         )
     }
 }

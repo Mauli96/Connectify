@@ -16,6 +16,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.connectify.R
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,7 @@ import com.example.connectify.core.util.TestTags
 
 @Composable
 fun StandardTextField(
+    modifier: Modifier = Modifier,
     text: String = "",
     hint: String = "",
     maxLength: Int = 400,
@@ -42,12 +45,12 @@ fun StandardTextField(
     singleLine: Boolean = true,
     maxLines: Int = 1,
     leadingIcon: ImageVector? = null,
-    modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPasswordToggleDisplayed: Boolean = keyboardType == KeyboardType.Password,
     showPasswordToggle: Boolean = false,
     onPasswordToggleClick: (Boolean) -> Unit = {},
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    focusRequester: FocusRequester = FocusRequester()
 ) {
     Column(
         modifier = modifier
@@ -120,6 +123,7 @@ fun StandardTextField(
                 .semantics {
                     testTag = TestTags.STANDARD_TEXT_FIELD
                 }
+                .focusRequester(focusRequester = focusRequester),
         )
         if(error.isNotEmpty()) {
             Text(

@@ -5,17 +5,18 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import coil.ImageLoader
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.connectify.core.domain.models.Post
-import com.example.connectify.feature_activity.presentation.activity.ActivityScreen
+import com.example.connectify.feature_activity.presentation.ActivityScreen
 import com.example.connectify.feature_chat.presentation.chat.ChatScreen
 import com.example.connectify.feature_post.presentation.create_post.CreatePostScreen
 import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.example.connectify.feature_auth.presentation.login.LoginScreen
 import com.example.connectify.feature_post.presentation.main_feed.MainFeedScreen
-import com.example.connectify.feature_post.presentation.post_detail.PersonListScreen
+import com.example.connectify.feature_post.presentation.person_list.PersonListScreen
 import com.example.connectify.feature_post.presentation.post_detail.PostDetailScreen
 import com.example.connectify.feature_profile.presentation.profile.ProfileScreen
 import com.example.connectify.feature_auth.presentation.register.RegisterScreen
@@ -26,7 +27,8 @@ import com.example.connectify.feature_auth.presentation.splash.SplashScreen
 @Composable
 fun Navigation(
     navController: NavHostController,
-    scaffoldState: ScaffoldState
+    scaffoldState: ScaffoldState,
+    imageLoader: ImageLoader
 ) {
     NavHost(
         navController = navController,
@@ -54,7 +56,8 @@ fun Navigation(
             MainFeedScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
             )
         }
         composable(Screen.ChatScreen.route) {
@@ -80,10 +83,11 @@ fun Navigation(
             )
         ) {
             ProfileScreen(
-                userId = it.arguments?.getString("userId") ?: "",
+                userId = it.arguments?.getString("userId"),
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
             )
         }
         composable(Screen.CreatePostScreen.route) {
@@ -111,6 +115,7 @@ fun Navigation(
             SearchScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
+                imageLoader = imageLoader
             )
         }
         composable(Screen.PersonListScreen.route) {
@@ -119,18 +124,21 @@ fun Navigation(
                 onNavigateUp = navController::navigateUp,
             )
         }
-        composable(Screen.PostDetailScreen.route) {
+        composable(
+            route = Screen.PostDetailScreen.route + "/{postId}",
+            arguments = listOf(
+                navArgument(
+                    name = "postId"
+                ) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
             PostDetailScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
-                post = Post(
-                    username = "mauli.waghmore",
-                    imageUrl = "",
-                    profilePictureUrl = "",
-                    description = "Are you ready to take control of your financial future? Discover proven strategies to grow your wealth, manage your expenses, and invest wisely. Whether you're just starting out or looking to optimize your current financial plan, our expert tips and advice will help you unlock your financial potential. From budgeting techniques to investment insights, we've got everything you need to make your money work for you. Start your journey towards financial freedom today!",
-                    likeCount = 70,
-                    commentCount = 19
-                )
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
             )
         }
     }

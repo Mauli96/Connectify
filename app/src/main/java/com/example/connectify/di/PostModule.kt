@@ -1,17 +1,19 @@
 package com.example.connectify.di
 
-import android.content.Context
 import com.example.connectify.feature_post.data.remote.PostApi
 import com.example.connectify.feature_post.data.repository.PostRepositoryImpl
 import com.example.connectify.feature_post.domain.repository.PostRepository
+import com.example.connectify.feature_post.domain.use_case.CreateCommentUseCase
 import com.example.connectify.feature_post.domain.use_case.CreatePostUseCase
+import com.example.connectify.feature_post.domain.use_case.GetCommentsForPostUseCase
+import com.example.connectify.feature_post.domain.use_case.GetPostDetailsUseCase
 import com.example.connectify.feature_post.domain.use_case.GetPostsForFollowsUseCase
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
+import com.example.connectify.feature_post.domain.use_case.ToggleLikeForParentUseCase
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -26,8 +28,8 @@ object PostModule {
     @Singleton
     fun providePostApi(client: OkHttpClient): PostApi {
         return Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(PostApi.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
             .create(PostApi::class.java)
@@ -47,7 +49,11 @@ object PostModule {
     fun providePostUseCase(repository: PostRepository): PostUseCases {
         return PostUseCases(
             getPostsForFollows = GetPostsForFollowsUseCase(repository),
-            createPostUseCase = CreatePostUseCase(repository)
+            createPost = CreatePostUseCase(repository),
+            getPostDetails = GetPostDetailsUseCase(repository),
+            getCommentsForPost = GetCommentsForPostUseCase(repository),
+            createComment = CreateCommentUseCase(repository),
+            toggleLikeForParent = ToggleLikeForParentUseCase(repository)
         )
     }
 }

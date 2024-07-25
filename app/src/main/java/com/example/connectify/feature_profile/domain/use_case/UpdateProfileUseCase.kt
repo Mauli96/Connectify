@@ -6,7 +6,7 @@ import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_profile.domain.models.UpdateProfileData
-import com.example.connectify.feature_profile.domain.repository.ProfileRepository
+import com.example.connectify.core.domain.repository.ProfileRepository
 import com.example.connectify.feature_profile.domain.util.ProfileConstants
 
 class UpdateProfileUseCase(

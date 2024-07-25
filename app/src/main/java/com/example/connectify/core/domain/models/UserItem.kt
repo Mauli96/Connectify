@@ -1,4 +1,4 @@
-package com.example.connectify.feature_profile.domain.models
+package com.example.connectify.core.domain.models
 
 data class UserItem(
     val userId: String,

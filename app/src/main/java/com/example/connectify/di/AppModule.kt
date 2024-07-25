@@ -3,6 +3,10 @@ package com.example.connectify.di
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import coil.ComponentRegistry
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.util.Constants
 import com.google.gson.Gson
 import dagger.Module
@@ -10,6 +14,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
 
 @Module
@@ -27,20 +32,28 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideJwtToken(sharedPreferences: SharedPreferences): String {
-        return sharedPreferences.getString(Constants.KEY_JWT_TOKEN, "") ?: ""
-    }
-
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(token: String): OkHttpClient {
+    fun provideOkHttpClient(sharedPreferences: SharedPreferences): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor {
+                val token = sharedPreferences.getString(Constants.KEY_JWT_TOKEN, "")
                 val modifiedRequest = it.request().newBuilder()
                     .addHeader("Authorization", "Bearer $token")
                     .build()
                 it.proceed(modifiedRequest)
             }
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+            )
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageLoader(app: Application): ImageLoader {
+        return ImageLoader.Builder(app)
+            .crossfade(true)
             .build()
     }
 
@@ -48,5 +61,11 @@ object AppModule {
     @Singleton
     fun provideGson(): Gson {
         return Gson()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetOwnUserIdUseCase(sharedPreferences: SharedPreferences): GetOwnUserIdUseCase {
+        return GetOwnUserIdUseCase(sharedPreferences)
     }
 }

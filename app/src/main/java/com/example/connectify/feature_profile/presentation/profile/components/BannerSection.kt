@@ -36,6 +36,7 @@ import com.example.connectify.feature_profile.domain.models.Skill
 
 @Composable
 fun BannerSection(
+    imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     imageModifier: Modifier = Modifier,
     iconSize: Dp = 35.dp,
@@ -55,11 +56,8 @@ fun BannerSection(
     ) {
         Image(
             painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(data = bannerUrl)
-                    .apply(block = fun ImageRequest.Builder.() {
-                    crossfade(true)
-                }).build()
+                model = bannerUrl,
+                imageLoader = imageLoader
             ),
             contentDescription = stringResource(id = R.string.banner_image),
             contentScale = ContentScale.Crop,
@@ -88,14 +86,10 @@ fun BannerSection(
             topSkills.forEach { skill ->
                 Spacer(modifier = Modifier.width(SpaceMedium))
                 Image(
-                    painter = rememberAsyncImagePainter(ImageRequest.Builder(LocalContext.current)
-                        .data(data = skill.imageUrl).apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                        }).build(), imageLoader = ImageLoader.Builder(LocalContext.current)
-                        .components {
-                            add(SvgDecoder.Factory())
-                        }
-                        .build()),
+                    painter = rememberAsyncImagePainter(
+                        model = skill.imageUrl,
+                        imageLoader = imageLoader
+                    ),
                     contentDescription = null,
                     modifier = Modifier.height(iconSize)
                 )

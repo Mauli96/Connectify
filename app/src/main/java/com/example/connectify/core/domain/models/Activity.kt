@@ -1,9 +1,12 @@
 package com.example.connectify.core.domain.models
 
-import com.example.connectify.feature_activity.presentation.util.ActivityAction
+import com.example.connectify.feature_activity.presentation.util.ActivityType
 
 data class Activity(
+    val id: String,
+    val userId: String,
+    val parentId: String,
     val username: String,
-    val actionType: ActivityAction,
+    val activityType: ActivityType,
     val formattedTime: String,
 )

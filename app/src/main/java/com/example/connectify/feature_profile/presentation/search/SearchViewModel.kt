@@ -1,30 +1,116 @@
 package com.example.connectify.feature_profile.presentation.search
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.Resource
+import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
+import com.example.connectify.feature_profile.domain.util.ProfileConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor() : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val profileUseCases: ProfileUseCases
+) : ViewModel() {
 
-    //first state whether the search is happening or not
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching = _isSearching.asStateFlow()
+    private val _searchFieldState = mutableStateOf(StandardTextFieldState())
+    val searchFieldState: State<StandardTextFieldState> = _searchFieldState
 
-    //second state the text typed by the user
-    private val _searchText = MutableStateFlow("")
-    val searchText = _searchText.asStateFlow()
+    private val _searchState = mutableStateOf(SearchState())
+    val searchState: State<SearchState> = _searchState
 
-    fun onSearchTextChange(text: String) {
-        _searchText.value = text
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    private var searchJob: Job? = null
+
+    fun onEvent(event: SearchEvent) {
+        when(event) {
+            is SearchEvent.Query -> {
+                searchUser(event.query)
+            }
+            is SearchEvent.ToggleFollow -> {
+                toggleFollowStateForUser(event.userId)
+            }
+            is SearchEvent.OnToggleSearch -> {
+                searchUser(event.query)
+            }
+        }
     }
 
-    fun onToogleSearch() {
-        _isSearching.value = !_isSearching.value
-        if (!_isSearching.value) {
-            onSearchTextChange("")
+    private fun toggleFollowStateForUser(userId: String) {
+        viewModelScope.launch {
+            val isFollowing = searchState.value.userItems.find {
+                it.userId == userId
+            }?.isFollowing == true
+            _searchState.value = searchState.value.copy(
+                userItems = searchState.value.userItems.map {
+                    if(it.userId == userId) {
+                        it.copy(isFollowing = !it.isFollowing)
+                    } else it
+                }
+            )
+            val result = profileUseCases.toggleFollowStateForUser(
+                userId = userId,
+                isFollowing = isFollowing
+            )
+            when(result) {
+                is Resource.Success -> Unit
+                is Resource.Error -> {
+                    _searchState.value = searchState.value.copy(
+                        userItems = searchState.value.userItems.map {
+                            if(it.userId == userId) {
+                                it.copy(isFollowing = isFollowing)
+                            } else it
+                        }
+                    )
+                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                        uiText = result.uiText ?: UiText.unknownError()
+                    ))
+                }
+            }
+        }
+    }
+
+    private fun searchUser(query: String) {
+        _searchFieldState.value = searchFieldState.value.copy(
+            text = query
+        )
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(ProfileConstants.SEARCH_DELAY)
+            _searchState.value = searchState.value.copy(
+                isLoading = true
+            )
+            val result = profileUseCases.searchUser(query)
+            when(result) {
+                is Resource.Success -> {
+                    _searchState.value = searchState.value.copy(
+                        userItems = result.data ?: emptyList(),
+                        isLoading = false
+                    )
+                }
+                is Resource.Error -> {
+                    _searchFieldState.value = searchFieldState.value.copy(
+                        error = SearchError(
+                            message = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                    _searchState.value = searchState.value.copy(
+                        isLoading = false
+                    )
+                }
+            }
         }
     }
 }

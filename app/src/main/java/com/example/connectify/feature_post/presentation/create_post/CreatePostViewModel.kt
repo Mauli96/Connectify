@@ -50,7 +50,7 @@ class CreatePostViewModel @Inject constructor(
             is CreatePostEvent.PostImage -> {
                 viewModelScope.launch {
                     _isLoading.value = true
-                    val result = postUseCases.createPostUseCase(
+                    val result = postUseCases.createPost(
                         description = descriptionState.value.text,
                         imageUri = chosenImageUri.value
                     )

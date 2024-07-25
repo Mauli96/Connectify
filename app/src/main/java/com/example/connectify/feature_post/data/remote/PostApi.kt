@@ -2,7 +2,12 @@ package com.example.connectify.feature_post.data.remote
 
 import com.example.connectify.core.data.dto.response.BasicApiResponse
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.feature_post.data.remote.request.CreateCommentRequest
+import com.example.connectify.feature_post.data.remote.request.LikeUpdateRequest
+import com.example.connectify.feature_post.data.remote.response.CommentDto
 import okhttp3.MultipartBody
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -36,8 +41,29 @@ interface PostApi {
         @Query("postId") postId: String
     ): BasicApiResponse<Post>
 
+    @GET("/api/comment/get")
+    suspend fun getCommentsForPost(
+        @Query("postId") postId: String
+    ): List<CommentDto>
+
+    @POST("/api/comment/create")
+    suspend fun createComment(
+        @Body request: CreateCommentRequest
+    ): BasicApiResponse<Unit>
+
+    @POST("/api/like")
+    suspend fun likeParent(
+        @Body request: LikeUpdateRequest
+    ): BasicApiResponse<Unit>
+
+    @DELETE("/api/unlike")
+    suspend fun unlikeParent(
+        @Query("parentId") parentId: String,
+        @Query("parentType") parentType: Int
+    ): BasicApiResponse<Unit>
+
 
     companion object {
-        const val BASE_URL = "http://192.168.0.210:8001/"
+        const val BASE_URL = "http://192.168.0.209:8001/"
     }
 }

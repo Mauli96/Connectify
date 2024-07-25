@@ -1,8 +1,8 @@
-package com.example.connectify.feature_profile.data.remote.response
+package com.example.connectify.core.data.dto.response
 
-import com.example.connectify.feature_profile.domain.models.UserItem
+import com.example.connectify.core.domain.models.UserItem
 
-data class UserResponseItem(
+data class UserItemDto(
     val userId: String,
     val username: String,
     val profilePictureUrl: String,

@@ -1,7 +1,13 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ScaffoldState
@@ -10,22 +16,28 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.util.Screen
 
 @Composable
 fun MainFeedScreen(
+    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
     scaffoldState: ScaffoldState,
     viewModel: MainFeedViewModel = hiltViewModel()
 ) {
+    val pagingState = viewModel.pagingState.value
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -39,9 +51,11 @@ fun MainFeedScreen(
             },
             modifier = Modifier.fillMaxWidth(),
             navActions = {
-                IconButton(onClick = {
-                    onNavigate(Screen.SearchScreen.route)
-                }) {
+                IconButton(
+                    onClick = {
+                        onNavigate(Screen.SearchScreen.route)
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "",
@@ -50,21 +64,37 @@ fun MainFeedScreen(
                 }
             }
         )
-        Post(
-            post = com.example.connectify.core.domain.models.Post(
-                username = "mauli.waghmore",
-                imageUrl = "",
-                profilePictureUrl = "",
-                description = "Are you ready to take control of your financial future? Discover proven strategies to grow your wealth, manage your expenses, and invest wisely. Whether you're just starting out or looking to optimize your current financial plan, our expert tips and advice will help you unlock your financial potential. From budgeting techniques to investment insights, we've got everything you need to make your money work for you. Start your journey towards financial freedom today!",
-                likeCount = 70,
-                commentCount = 19
-            ),
-            onPostClick = {
-                onNavigate(Screen.PostDetailScreen.route)
-            },
-            onLikeByClick = {
-                onNavigate(Screen.PersonListScreen.route)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            LazyColumn {
+                items(pagingState.items.size) { i ->
+                    val post = pagingState.items[i]
+                    if (i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
+                        viewModel.loadNextPosts()
+                    }
+                    Post(
+                        post = post,
+                        imageLoader = imageLoader,
+                        onPostClick = {
+                            onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+                        }
+                    )
+                    if (i < pagingState.items.size - 1) {
+                        Spacer(modifier = Modifier.height(SpaceLarge))
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(90.dp))
+                }
             }
-        )
+            if (pagingState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Center),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }

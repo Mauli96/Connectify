@@ -16,8 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
+import com.example.connectify.core.domain.models.UserItem
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -27,7 +31,8 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserProfileItem(
-    user: User,
+    user: UserItem,
+    imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     actionIcon: @Composable () -> Unit = {},
     onItemClick: () -> Unit = {},
@@ -51,7 +56,10 @@ fun UserProfileItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(id = R.drawable.mauli),
+                painter = rememberAsyncImagePainter(
+                    model = user.profilePictureUrl,
+                    imageLoader = imageLoader
+                ),
                 contentDescription = null,
                 modifier = Modifier
                     .size(ProfilePictureSizeSmall)
@@ -71,7 +79,7 @@ fun UserProfileItem(
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 Text(
-                    text = user.description,
+                    text = user.bio,
                     style = MaterialTheme.typography.bodySmall,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
