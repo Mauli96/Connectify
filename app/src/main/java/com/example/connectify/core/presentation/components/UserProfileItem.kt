@@ -36,7 +36,8 @@ fun UserProfileItem(
     modifier: Modifier = Modifier,
     actionIcon: @Composable () -> Unit = {},
     onItemClick: () -> Unit = {},
-    onActionItemClick: () -> Unit = {}
+    onActionItemClick: () -> Unit = {},
+    ownUserId: String = ""
 ) {
     Card(
         modifier = modifier,
@@ -68,8 +69,8 @@ fun UserProfileItem(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.8f)
                     .padding(horizontal = SpaceSmall)
+                    .weight(1f)
             ) {
                 Text(
                     text = user.username,
@@ -85,12 +86,14 @@ fun UserProfileItem(
                     maxLines = 2
                 )
             }
-            IconButton(
-                onClick = onActionItemClick,
-                modifier = Modifier.size(IconSizeMedium)
+            if(ownUserId != user.userId) {
+                IconButton(
+                    onClick = onActionItemClick,
+                    modifier = Modifier.size(IconSizeMedium)
 
-            ) {
-                actionIcon()
+                ) {
+                    actionIcon()
+                }
             }
         }
     }

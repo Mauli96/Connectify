@@ -118,26 +118,43 @@ fun Navigation(
                 imageLoader = imageLoader
             )
         }
-        composable(Screen.PersonListScreen.route) {
+        composable(
+            route = Screen.PersonListScreen.route + "/{parentId}",
+            arguments = listOf(
+                navArgument("parentId") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
             PersonListScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
             )
         }
         composable(
-            route = Screen.PostDetailScreen.route + "/{postId}",
+            route = Screen.PostDetailScreen.route + "/{postId}?shouldShowKeyboard={shouldShowKeyboard}",
             arguments = listOf(
                 navArgument(
                     name = "postId"
                 ) {
                     type = NavType.StringType
+                },
+                navArgument(
+                    name = "shouldShowKeyboard"
+                ) {
+                    type = NavType.BoolType
+                    defaultValue = false
                 }
             )
         ) {
+            val shouldShowKeyboard = it.arguments?.getBoolean("shouldShowKeyboard") ?: false
             PostDetailScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
                 scaffoldState = scaffoldState,
+                shouldShowKeyboard = shouldShowKeyboard,
                 imageLoader = imageLoader
             )
         }

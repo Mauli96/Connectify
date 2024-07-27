@@ -1,6 +1,7 @@
 package com.example.connectify.feature_post.data.remote
 
 import com.example.connectify.core.data.dto.response.BasicApiResponse
+import com.example.connectify.core.data.dto.response.UserItemDto
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.feature_post.data.remote.request.CreateCommentRequest
 import com.example.connectify.feature_post.data.remote.request.LikeUpdateRequest
@@ -61,6 +62,11 @@ interface PostApi {
         @Query("parentId") parentId: String,
         @Query("parentType") parentType: Int
     ): BasicApiResponse<Unit>
+
+    @GET("/api/like/parent")
+    suspend fun getLikesForParent(
+        @Query("parentId") parentId: String
+    ): List<UserItemDto>
 
 
     companion object {

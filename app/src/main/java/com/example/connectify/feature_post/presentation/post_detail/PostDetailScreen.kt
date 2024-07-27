@@ -112,7 +112,7 @@ fun PostDetailScreen(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
                 ) {
-                    Spacer(modifier = Modifier.height(SpaceLarge))
+                    Spacer(modifier = Modifier.height(SpaceSmall))
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -143,7 +143,7 @@ fun PostDetailScreen(
                                         .padding(SpaceLarge)
                                 ) {
                                     ActionRow(
-                                        username = post.username,
+                                        username = state.post.username,
                                         modifier = Modifier.fillMaxWidth(),
                                         onLikeClick = {
                                             viewModel.onEvent(PostDetailEvent.LikePost)
@@ -173,7 +173,7 @@ fun PostDetailScreen(
                                         ),
                                         modifier = Modifier
                                             .clickable {
-                                                onNavigate(Screen.PersonListScreen.route)
+                                                onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                                             },
                                         style = MaterialTheme.typography.labelSmall
                                     )
@@ -219,7 +219,7 @@ fun PostDetailScreen(
                             viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
                         },
                         onLikedByClick = {
-
+                            onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                         }
                     )
                     if(state.isLoadingComments) {

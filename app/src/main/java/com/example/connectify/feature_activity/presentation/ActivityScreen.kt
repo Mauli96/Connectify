@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -77,6 +78,10 @@ fun ActivityScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(SpaceSmall))
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(90.dp))
                 }
             }
         }

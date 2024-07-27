@@ -5,6 +5,7 @@ import androidx.core.net.toFile
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.domain.models.UserItem
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
@@ -195,6 +196,23 @@ class PostRepositoryImpl(
                     Resource.Error(UiText.DynamicString(msg))
                 } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
             }
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun getLikesForParent(parentId: String): Resource<List<UserItem>> {
+        return try {
+            val response = api.getLikesForParent(
+                parentId = parentId,
+            )
+            Resource.Success(response.map { it.toUserItem() })
         } catch(e: IOException) {
             Resource.Error(
                 uiText = UiText.StringResource(R.string.error_couldnt_reach_server)

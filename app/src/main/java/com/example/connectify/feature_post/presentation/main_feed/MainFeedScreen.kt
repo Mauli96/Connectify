@@ -26,6 +26,7 @@ import com.example.connectify.R
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.Screen
 
 @Composable
@@ -79,17 +80,23 @@ fun MainFeedScreen(
                         imageLoader = imageLoader,
                         onPostClick = {
                             onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+                        },
+                        onLikeClick = {
+                            viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
+                        },
+                        onCommentClick = {
+                            onNavigate(Screen.PostDetailScreen.route + "/${post.id}?shouldShowKeyboard=true")
                         }
                     )
-                    if (i < pagingState.items.size - 1) {
-                        Spacer(modifier = Modifier.height(SpaceLarge))
+                    if(i < pagingState.items.size - 1) {
+                        Spacer(modifier = Modifier.height(SpaceSmall))
                     }
                 }
                 item {
-                    Spacer(modifier = Modifier.height(90.dp))
+                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
-            if (pagingState.isLoading) {
+            if(pagingState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Center),
                     color = MaterialTheme.colorScheme.primary

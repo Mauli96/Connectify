@@ -56,4 +56,10 @@ object ProfileModule {
             toggleFollowStateForUser = ToggleFollowStateForUserUseCase(repository)
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideToggleFollowForUserUseCase(repository: ProfileRepository): ToggleFollowStateForUserUseCase {
+        return ToggleFollowStateForUserUseCase(repository)
+    }
 }

@@ -59,9 +59,9 @@ fun Post(
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     showProfileImage: Boolean = true,
-    onLikeByClick: () -> Unit = {},
     onPostClick: () -> Unit = {},
-    onCommentClick: () -> Unit ={},
+    onLikeClick: () -> Unit = {},
+    onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onUsernameClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
@@ -106,7 +106,7 @@ fun Post(
                     username = post.username,
                     modifier = Modifier.fillMaxWidth(),
                     isLiked = post.isLiked,
-                    onLikeClick = onLikeByClick,
+                    onLikeClick = onLikeClick,
                     onCommentClick = onCommentClick,
                     onShareClick = onShareClick,
                     onUsernameClick = onUsernameClick,
@@ -140,10 +140,6 @@ fun Post(
                             id = R.string.liked_by_x_people,
                             post.likeCount
                         ),
-                        modifier = Modifier
-                            .clickable {
-                                onLikeByClick()
-                            },
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.labelMedium
                     )

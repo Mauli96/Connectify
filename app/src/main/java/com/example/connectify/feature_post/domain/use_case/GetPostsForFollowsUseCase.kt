@@ -11,10 +11,7 @@ class GetPostsForFollowsUseCase(
     private val repository: PostRepository
 ) {
 
-    suspend operator fun invoke(
-        page: Int,
-        pageSize: Int = Constants.DEFAULT_PAGE_SIZE
-    ): Resource<List<Post>> {
-        return repository.getPostsForFollows(page, pageSize)
+    suspend operator fun invoke(page: Int): Resource<List<Post>> {
+        return repository.getPostsForFollows(page)
     }
 }

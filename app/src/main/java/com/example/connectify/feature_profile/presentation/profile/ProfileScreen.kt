@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -112,16 +114,18 @@ fun ProfileScreen(
 
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
+//        viewModel.setExpandedRatio(1f)
         viewModel.getProfile(userId)
         viewModel.eventFlow.collectLatest { event ->
-            when (event) {
+            when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
                         message = event.uiText.asString(context)
                     )
                 }
-                is UiEvent.Navigate -> TODO()
-                is UiEvent.NavigateUp -> TODO()
+                else -> {
+                    null
+                }
             }
         }
     }
@@ -133,8 +137,7 @@ fun ProfileScreen(
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface),
+                .fillMaxSize(),
             state = lazyListState
         ) {
             item {
@@ -166,7 +169,7 @@ fun ProfileScreen(
             }
             items(pagingState.items.size) { i ->
                 val post = pagingState.items[i]
-                if (i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
+                if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
                     viewModel.loadNextPosts()
                 }
 
@@ -176,6 +179,12 @@ fun ProfileScreen(
                     showProfileImage = false,
                     onPostClick = {
                         onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+                    },
+                    onLikeClick = {
+                        viewModel.onEvent(ProfileEvent.LikePost(post.id))
+                    },
+                    onCommentClick = {
+                        onNavigate(Screen.PostDetailScreen.route + "/${post.id}?shouldShowKeyboard=true")
                     }
                 )
             }
@@ -245,6 +254,12 @@ fun ProfileScreen(
                         )
                 )
             }
+        }
+        if(state.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Center),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

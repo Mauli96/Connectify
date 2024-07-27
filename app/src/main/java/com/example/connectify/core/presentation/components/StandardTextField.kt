@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.connectify.R
 import androidx.compose.ui.res.stringResource
@@ -71,17 +72,22 @@ fun StandardTextField(
                     style = MaterialTheme.typography.bodyMedium
                 )
             },
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
             isError = error != "",
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType
             ),
-            visualTransformation = if (!showPasswordToggle && isPasswordToggleDisplayed) {
+            visualTransformation = if(!showPasswordToggle && isPasswordToggleDisplayed) {
                 PasswordVisualTransformation()
             } else {
                 VisualTransformation.None
             },
             singleLine = singleLine,
-            leadingIcon = if (leadingIcon != null) {
+            leadingIcon = if(leadingIcon != null) {
                 val icon: @Composable () -> Unit = {
                     Icon(
                         imageVector = leadingIcon,

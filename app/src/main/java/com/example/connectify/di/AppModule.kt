@@ -8,6 +8,8 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.util.Constants
+import com.example.connectify.core.util.DefaultPostLiker
+import com.example.connectify.core.util.PostLiker
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -54,7 +56,16 @@ object AppModule {
     fun provideImageLoader(app: Application): ImageLoader {
         return ImageLoader.Builder(app)
             .crossfade(true)
+            .components {
+                add(SvgDecoder.Factory(true))
+            }
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePostLiker(): PostLiker {
+        return DefaultPostLiker()
     }
 
     @Provides

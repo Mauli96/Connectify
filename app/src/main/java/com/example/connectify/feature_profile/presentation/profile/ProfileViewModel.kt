@@ -10,8 +10,11 @@ import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.presentation.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
+import com.example.connectify.core.util.ParentType
+import com.example.connectify.core.util.PostLiker
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,8 +25,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
+    private val postUseCases: PostUseCases,
     private val getOwnUserId: GetOwnUserIdUseCase,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val postLiker: PostLiker
 ) : ViewModel() {
 
     private val _toolbarState = mutableStateOf(ProfileToolbarState())
@@ -55,7 +60,6 @@ class ProfileViewModel @Inject constructor(
             _pagingState.value = pagingState.value.copy(
                 items = pagingState.value.items + posts,
                 endReached = posts.isEmpty(),
-                isLoading = false
             )
         },
         onError = { uiText ->
@@ -73,6 +77,39 @@ class ProfileViewModel @Inject constructor(
 
     init {
         loadNextPosts()
+    }
+
+    fun onEvent(event: ProfileEvent) {
+        when(event) {
+            is ProfileEvent.LikePost -> {
+                viewModelScope.launch {
+                    toggleLikeForParent(
+                        parentId = event.postId
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleLikeForParent(parentId: String) {
+        viewModelScope.launch {
+            postLiker.toggleLike(
+                posts = pagingState.value.items,
+                parentId = parentId,
+                onRequest = { isLiked ->
+                    postUseCases.toggleLikeForParent(
+                        parentId = parentId,
+                        parentType = ParentType.Post.type,
+                        isLiked = isLiked
+                    )
+                },
+                onStateUpdated = { posts ->
+                    _pagingState.value = pagingState.value.copy(
+                        items = posts,
+                    )
+                }
+            )
+        }
     }
 
     fun getProfile(userId: String?) {

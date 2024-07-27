@@ -3,14 +3,16 @@ package com.example.connectify.feature_post.domain.repository
 import android.net.Uri
 import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.domain.models.UserItem
+import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 
 interface PostRepository {
 
     suspend fun getPostsForFollows(
-        page: Int,
-        pageSize: Int
+        page: Int = 0,
+        pageSize: Int = Constants.DEFAULT_PAGE_SIZE
     ): Resource<List<Post>>
 
     suspend fun createPost(
@@ -36,4 +38,6 @@ interface PostRepository {
         parentId: String,
         parentType: Int
     ): SimpleResource
+
+    suspend fun getLikesForParent(parentId: String): Resource<List<UserItem>>
 }
