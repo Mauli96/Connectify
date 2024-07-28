@@ -49,6 +49,7 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.presentation.util.showKeyboard
 import com.example.connectify.core.util.Screen
+import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.feature_post.presentation.post_detail.components.Comment
 import kotlinx.coroutines.flow.collectLatest
 
@@ -81,8 +82,9 @@ fun PostDetailScreen(
                         message = event.uiText.asString(context)
                     )
                 }
-                is UiEvent.Navigate -> TODO()
-                is UiEvent.NavigateUp -> TODO()
+                else -> {
+                    null
+                }
             }
         }
     }
@@ -145,6 +147,9 @@ fun PostDetailScreen(
                                     ActionRow(
                                         username = state.post.username,
                                         modifier = Modifier.fillMaxWidth(),
+                                        onUsernameClick = {
+                                            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                                        },
                                         onLikeClick = {
                                             viewModel.onEvent(PostDetailEvent.LikePost)
                                         },
@@ -153,10 +158,7 @@ fun PostDetailScreen(
                                             focusRequester.requestFocus()
                                         },
                                         onShareClick = {
-
-                                        },
-                                        onUsernameClick = {
-                                            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                                            context.sendSharePostIntent(post.id)
                                         },
                                         isLiked = state.post.isLiked
                                     )

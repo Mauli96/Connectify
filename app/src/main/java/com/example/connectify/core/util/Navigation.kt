@@ -1,5 +1,6 @@
 package com.example.connectify.core.util
 
+import android.content.Intent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
@@ -9,6 +10,7 @@ import coil.ImageLoader
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.feature_activity.presentation.ActivityScreen
 import com.example.connectify.feature_chat.presentation.chat.ChatScreen
@@ -43,12 +45,19 @@ fun Navigation(
         composable(Screen.LoginScreen.route) {
             LoginScreen(
                 onNavigate = navController::navigate,
+                onLogin = {
+                    navController.popBackStack(
+                        route = Screen.LoginScreen.route,
+                        inclusive = true
+                    )
+                    navController.navigate(Screen.MainFeedScreen.route)
+                },
                 scaffoldState = scaffoldState
             )
         }
         composable(Screen.RegisterScreen.route) {
             RegisterScreen(
-                navController = navController,
+                onNavigate = navController::navigate,
                 scaffoldState = scaffoldState
             )
         }
@@ -64,6 +73,7 @@ fun Navigation(
             ChatScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
+                imageLoader = imageLoader
             )
         }
         composable(Screen.ActivityScreen.route) {
@@ -86,6 +96,9 @@ fun Navigation(
                 userId = it.arguments?.getString("userId"),
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
+                onLogout = {
+                    navController.navigate(Screen.LoginScreen.route)
+                },
                 scaffoldState = scaffoldState,
                 imageLoader = imageLoader
             )
@@ -94,7 +107,8 @@ fun Navigation(
             CreatePostScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
             )
         }
         composable(
@@ -108,7 +122,8 @@ fun Navigation(
             EditProfileScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
             )
         }
         composable(Screen.SearchScreen.route) {
@@ -146,6 +161,12 @@ fun Navigation(
                 ) {
                     type = NavType.BoolType
                     defaultValue = false
+                }
+            ),
+            deepLinks = listOf(
+                navDeepLink {
+                    action = Intent.ACTION_VIEW
+                    uriPattern = "https://connectify.com/{postId}"
                 }
             )
         ) {

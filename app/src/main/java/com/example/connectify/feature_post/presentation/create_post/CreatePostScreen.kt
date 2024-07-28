@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.connectify.R
@@ -56,6 +57,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CreatePostScreen(
+    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
     scaffoldState: ScaffoldState,
@@ -92,7 +94,9 @@ fun CreatePostScreen(
                 is UiEvent.NavigateUp -> {
                     onNavigateUp()
                 }
-                is UiEvent.Navigate -> TODO()
+                else -> {
+                    null
+                }
             }
         }
     }
@@ -138,9 +142,8 @@ fun CreatePostScreen(
                 imageUri?.let { uri ->
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(uri)
-                                .build()
+                            model = uri,
+                            imageLoader = imageLoader
                         ),
                         contentDescription = stringResource(id = R.string.post_image),
                         modifier = Modifier.matchParentSize()

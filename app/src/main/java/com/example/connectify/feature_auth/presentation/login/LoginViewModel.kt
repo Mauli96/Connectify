@@ -72,9 +72,7 @@ class LoginViewModel @Inject constructor(
                     }
                     when(loginResult.result) {
                         is Resource.Success -> {
-                            _eventFlow.emit(
-                                UiEvent.Navigate(Screen.MainFeedScreen.route)
-                            )
+                            _eventFlow.emit(UiEvent.OnLogin)
                             _loginState.value = loginState.value.copy(isLoading = false)
                             _emailState.value = StandardTextFieldState()
                             _passwordState.value = PasswordTextFieldState()

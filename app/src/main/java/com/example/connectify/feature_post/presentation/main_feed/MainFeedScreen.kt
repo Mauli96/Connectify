@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,6 +29,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.Screen
+import com.example.connectify.core.util.sendSharePostIntent
 
 @Composable
 fun MainFeedScreen(
@@ -38,6 +40,7 @@ fun MainFeedScreen(
     viewModel: MainFeedViewModel = hiltViewModel()
 ) {
     val pagingState = viewModel.pagingState.value
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -81,12 +84,18 @@ fun MainFeedScreen(
                         onPostClick = {
                             onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
                         },
+                        onUsernameClick = {
+                            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                        },
                         onLikeClick = {
                             viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
                         },
                         onCommentClick = {
                             onNavigate(Screen.PostDetailScreen.route + "/${post.id}?shouldShowKeyboard=true")
-                        }
+                        },
+                        onShareClick = {
+                            context.sendSharePostIntent(post.id)
+                        },
                     )
                     if(i < pagingState.items.size - 1) {
                         Spacer(modifier = Modifier.height(SpaceSmall))

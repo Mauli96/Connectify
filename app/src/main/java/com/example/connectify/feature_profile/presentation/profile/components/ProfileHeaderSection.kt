@@ -12,7 +12,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,7 +35,8 @@ fun ProfileHeaderSection(
     modifier: Modifier = Modifier,
     isOwnProfile: Boolean = true,
     isFollowing: Boolean = true,
-    onEditClick: () -> Unit = {}
+    onEditClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -66,6 +69,17 @@ fun ProfileHeaderSection(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(id = R.string.edit),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                Spacer(modifier = Modifier.width(SpaceSmall))
+                IconButton(
+                    onClick = onLogoutClick,
+                    modifier = Modifier.size(30.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = stringResource(id = R.string.log_out),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }

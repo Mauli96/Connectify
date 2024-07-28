@@ -3,17 +3,23 @@ package com.example.connectify.feature_profile.presentation.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -32,8 +39,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -42,10 +51,12 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
+import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
@@ -60,6 +71,7 @@ fun ProfileScreen(
     imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
+    onLogout: () -> Unit = {},
     profilePictureSize: Dp = ProfilePictureSizeLarge,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -163,7 +175,10 @@ fun ProfileScreen(
                         isOwnProfile = profile.isOwnProfile,
                         onEditClick = {
                             onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
-                        }
+                        },
+                        onLogoutClick = {
+                            viewModel.onEvent(ProfileEvent.ShowLogoutDialog)
+                        },
                     )
                 }
             }
@@ -185,6 +200,9 @@ fun ProfileScreen(
                     },
                     onCommentClick = {
                         onNavigate(Screen.PostDetailScreen.route + "/${post.id}?shouldShowKeyboard=true")
+                    },
+                    onShareClick = {
+                        context.sendSharePostIntent(post.id)
                     }
                 )
             }
@@ -253,6 +271,48 @@ fun ProfileScreen(
                             shape = CircleShape
                         )
                 )
+            }
+        }
+        if(state.isLogoutDialogVisible) {
+            Dialog(onDismissRequest = {
+                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
+            }) {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .padding(SpaceMedium)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.log_out_of_your_account),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.align(End)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.cancel),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.clickable {
+                                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(SpaceMedium))
+                        Text(
+                            text = stringResource(id = R.string.log_out),
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.clickable {
+                                viewModel.onEvent(ProfileEvent.Logout)
+                                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
+                                onLogout()
+                            }
+                        )
+                    }
+                }
             }
         }
         if(state.isLoading) {

@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.connectify.R
@@ -62,6 +63,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun EditProfileScreen(
     scaffoldState: ScaffoldState,
+    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
     viewModel: EditProfileViewModel = hiltViewModel(),
@@ -107,7 +109,9 @@ fun EditProfileScreen(
                 is UiEvent.NavigateUp -> {
                     onNavigateUp()
                 }
-                is UiEvent.Navigate -> Unit
+                else -> {
+                    null
+                }
             }
         }
     }
@@ -142,18 +146,12 @@ fun EditProfileScreen(
         ) {
             BannerEditSection(
                 bannerImage = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = viewModel.bannerUri.value ?: profileState.profile?.bannerUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                        }).build()
+                    model = viewModel.bannerUri.value ?: profileState.profile?.bannerUrl,
+                    imageLoader = imageLoader
                 ),
                 profileImage = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = viewModel.profileUri.value ?: profileState.profile?.profilePictureUrl)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                        }).build()
+                    model = viewModel.profileUri.value ?: profileState.profile?.profilePictureUrl,
+                    imageLoader = imageLoader
                 ),
                 profilePictureSize = profilePictureSize,
                 onBannerImageClick = {

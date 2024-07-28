@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterScreen(
-    navController: NavController,
+    onNavigate: (String) -> Unit = {},
     scaffoldState: ScaffoldState,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
@@ -194,7 +194,7 @@ fun RegisterScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .clickable {
-                    navController.navigate(
+                    onNavigate(
                         Screen.LoginScreen.route
                     )
                 }

@@ -1,5 +1,6 @@
 package com.example.connectify.di
 
+import android.content.SharedPreferences
 import com.example.connectify.feature_post.data.remote.PostApi
 import com.example.connectify.feature_profile.data.remote.ProfileApi
 import com.example.connectify.core.data.repository.ProfileRepositoryImpl
@@ -11,6 +12,7 @@ import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import com.example.connectify.feature_profile.domain.use_case.SearchUserUseCase
 import com.example.connectify.feature_profile.domain.use_case.SetSkillSelectedUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
+import com.example.connectify.feature_profile.domain.use_case.LogoutUseCase
 import com.example.connectify.feature_profile.domain.use_case.UpdateProfileUseCase
 import com.google.gson.Gson
 import dagger.Module
@@ -39,8 +41,8 @@ object ProfileModule {
 
     @Provides
     @Singleton
-    fun provideProfileRepository(profileApi: ProfileApi, postApi: PostApi, gson: Gson): ProfileRepository {
-        return ProfileRepositoryImpl(profileApi, postApi, gson)
+    fun provideProfileRepository(profileApi: ProfileApi, postApi: PostApi, gson: Gson, sharedPreferences: SharedPreferences): ProfileRepository {
+        return ProfileRepositoryImpl(profileApi, postApi, gson, sharedPreferences)
     }
 
     @Provides
@@ -53,7 +55,8 @@ object ProfileModule {
             setSkillUseCase = SetSkillSelectedUseCase(),
             getPostsForProfile = GetPostsForProfileUseCase(repository),
             searchUser = SearchUserUseCase(repository),
-            toggleFollowStateForUser = ToggleFollowStateForUserUseCase(repository)
+            toggleFollowStateForUser = ToggleFollowStateForUserUseCase(repository),
+            logout = LogoutUseCase(repository)
         )
     }
 

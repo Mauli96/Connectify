@@ -1,5 +1,6 @@
 package com.example.connectify.core.presentation.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -60,5 +61,17 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         color = TextWhite
+    ),
+    titleMedium = TextStyle(
+        fontFamily = quicksand,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        color = TextWhite
+    ),
+    titleSmall = TextStyle(
+        fontFamily = quicksand,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        color = GreenAccent
     )
 )

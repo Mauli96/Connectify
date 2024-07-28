@@ -88,6 +88,19 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
+            ProfileEvent.ShowLogoutDialog -> {
+                _state.value = state.value.copy(
+                    isLogoutDialogVisible = true
+                )
+            }
+            is ProfileEvent.DismissLogoutDialog -> {
+                _state.value = state.value.copy(
+                    isLogoutDialogVisible = false
+                )
+            }
+            is ProfileEvent.Logout -> {
+                profileUseCases.logout()
+            }
         }
     }
 

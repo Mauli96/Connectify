@@ -74,8 +74,7 @@ fun PersonListScreen(
             title = {
                 Text(
                     text = stringResource(id = R.string.liked_by),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
         )

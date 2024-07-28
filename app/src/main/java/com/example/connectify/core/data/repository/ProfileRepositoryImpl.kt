@@ -1,5 +1,6 @@
 package com.example.connectify.core.data.repository
 
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.net.toFile
 import com.example.connectify.R
@@ -15,6 +16,7 @@ import com.example.connectify.feature_profile.domain.models.Profile
 import com.example.connectify.feature_profile.domain.models.Skill
 import com.example.connectify.feature_profile.domain.models.UpdateProfileData
 import com.example.connectify.core.domain.repository.ProfileRepository
+import com.example.connectify.core.util.Constants
 import com.google.gson.Gson
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -24,7 +26,8 @@ import java.io.IOException
 class ProfileRepositoryImpl(
     private val profileApi: ProfileApi,
     private val postApi: PostApi,
-    private val gson: Gson
+    private val gson: Gson,
+    private val sharedPreferences: SharedPreferences
 ) : ProfileRepository {
 
     override suspend fun getProfile(userId: String): Resource<Profile> {
@@ -197,5 +200,12 @@ class ProfileRepositoryImpl(
                 uiText = UiText.StringResource(R.string.oops_something_went_wrong)
             )
         }
+    }
+
+    override fun logout() {
+        sharedPreferences.edit()
+            .putString(Constants.KEY_JWT_TOKEN, "")
+            .putString(Constants.KEY_USER_ID, "")
+            .apply()
     }
 }
