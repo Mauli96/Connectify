@@ -89,6 +89,7 @@ class PostDetailViewModel @Inject constructor(
         isLiked: Boolean
     ) {
         viewModelScope.launch {
+
             isUserLoggedIn = authenticate() is Resource.Success
             if(!isUserLoggedIn) {
                 _eventFlow.emit(UiEvent.ShowSnackbar(

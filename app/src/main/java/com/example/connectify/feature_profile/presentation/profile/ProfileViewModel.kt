@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
+import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
 import com.example.connectify.core.presentation.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
@@ -27,6 +28,7 @@ class ProfileViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
     private val postUseCases: PostUseCases,
     private val getOwnUserId: GetOwnUserIdUseCase,
+    private val toggleFollowStateForUserUseCase: ToggleFollowStateForUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val postLiker: PostLiker
 ) : ViewModel() {
@@ -88,7 +90,10 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
-            ProfileEvent.ShowLogoutDialog -> {
+            is ProfileEvent.ToggleFollowStateForUser -> {
+                toggleFollowStateForUser(event.userId)
+            }
+            is ProfileEvent.ShowLogoutDialog -> {
                 _state.value = state.value.copy(
                     isLogoutDialogVisible = true
                 )
@@ -122,6 +127,36 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             )
+        }
+    }
+
+    private fun toggleFollowStateForUser(userId: String) {
+        viewModelScope.launch {
+            val isFollowing = state.value.profile?.isFollowing == true
+
+            _state.value = _state.value.copy(
+                profile = state.value.profile?.copy(
+                    isFollowing = !isFollowing
+                )
+            )
+
+            val result = toggleFollowStateForUserUseCase(
+                userId = userId,
+                isFollowing = isFollowing
+            )
+            when(result) {
+                is Resource.Success -> Unit
+                is Resource.Error -> {
+                    _state.value = _state.value.copy(
+                        profile = state.value.profile?.copy(
+                            isFollowing = isFollowing
+                        )
+                    )
+                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                        uiText = result.uiText ?: UiText.unknownError()
+                    ))
+                }
+            }
         }
     }
 

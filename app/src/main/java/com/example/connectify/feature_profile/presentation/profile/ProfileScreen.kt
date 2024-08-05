@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -39,14 +40,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
@@ -60,9 +59,7 @@ import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
@@ -108,7 +105,9 @@ fun ProfileScreen(
                 source: NestedScrollSource
             ): Offset {
                 val delta = available.y
-                if (delta > 0f && lazyListState.firstVisibleItemIndex != 0) {
+                val shouldNotScroll = delta > 0f && lazyListState.firstVisibleItemIndex != 0 ||
+                        viewModel.pagingState.value.items.isEmpty()
+                if(shouldNotScroll) {
                     return Offset.Zero
                 }
                 val newOffset = viewModel.toolbarState.value.toolbarOffsetY + delta
@@ -126,7 +125,6 @@ fun ProfileScreen(
 
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
-//        viewModel.setExpandedRatio(1f)
         viewModel.getProfile(userId)
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
@@ -173,12 +171,9 @@ fun ProfileScreen(
                         ),
                         isFollowing = profile.isFollowing,
                         isOwnProfile = profile.isOwnProfile,
-                        onEditClick = {
-                            onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
-                        },
-                        onLogoutClick = {
-                            viewModel.onEvent(ProfileEvent.ShowLogoutDialog)
-                        },
+                        onFollowClick = {
+                            viewModel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
+                        }
                     )
                 }
             }
@@ -242,7 +237,17 @@ fun ProfileScreen(
                     shouldShowGitHub = !profile.gitHubUrl.isNullOrBlank(),
                     shouldShowInstagram = !profile.instagramUrl.isNullOrBlank(),
                     shouldShowLinkedIn = !profile.linkedInUrl.isNullOrBlank(),
-                    bannerUrl = profile.bannerUrl
+                    bannerUrl = profile.bannerUrl,
+                    isOwnProfile = profile.isOwnProfile,
+                    onEditClick = {
+                        onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
+                    },
+                    onLogoutClick = {
+                        viewModel.onEvent(ProfileEvent.ShowLogoutDialog)
+                    },
+                    onNavigateUp = {
+                        onNavigateUp()
+                    }
                 )
                 Image(
                     painter = rememberAsyncImagePainter(
@@ -274,7 +279,8 @@ fun ProfileScreen(
             }
         }
         if(state.isLogoutDialogVisible) {
-            Dialog(onDismissRequest = {
+            Dialog(
+                onDismissRequest = {
                 viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
             }) {
                 Column(
@@ -318,7 +324,9 @@ fun ProfileScreen(
         if(state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Center),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp,
+                trackColor = Color.White
             )
         }
     }

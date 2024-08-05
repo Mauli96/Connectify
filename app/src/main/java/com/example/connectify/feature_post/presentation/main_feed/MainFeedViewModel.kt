@@ -42,7 +42,6 @@ class MainFeedViewModel @Inject constructor(
             _pagingState.value = pagingState.value.copy(
                 items = pagingState.value.items + posts,
                 endReached = posts.isEmpty(),
-                isLoading = false
             )
         },
         onError = { uiText ->

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -15,7 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,16 +38,17 @@ fun SendTextField(
     state: StandardTextFieldState,
     onValueChange: (String) -> Unit,
     maxLength: Int = 1000,
-    maxLines: Int = 3,
+    maxLines: Int = 5,
     onSend: () -> Unit,
     hint: String = "",
     canSendMessage: Boolean = true,
     isLoading: Boolean = false,
+    backgroundColor: Color,
     focusRequester: FocusRequester = FocusRequester()
 ) {
     Row(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
+            .background(backgroundColor)
             .fillMaxWidth()
             .padding(
                 start = SpaceLarge,
@@ -60,14 +62,15 @@ fun SendTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .height(48.dp)
                 .shadow(16.dp)
                 .focusRequester(focusRequester = focusRequester),
             value = state.text,
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colorScheme.background,
-                cursorColor = MaterialTheme.colorScheme.onBackground,
-                textColor = MaterialTheme.colorScheme.onBackground,
-                disabledLabelColor = MaterialTheme.colorScheme.background,
+                backgroundColor = Color.White,
+                cursorColor = Color.Black,
+                textColor = Color.Black,
+                disabledLabelColor = Color.Black,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -82,7 +85,7 @@ fun SendTextField(
             placeholder = {
                 Text(
                     text = hint,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.labelLarge,
                 )
             },
         )
@@ -102,10 +105,10 @@ fun SendTextField(
                     .size(30.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Send,
-                    tint = if (state.error == null && canSendMessage) {
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    tint = if(state.error == null && canSendMessage) {
                         MaterialTheme.colorScheme.primary
-                    } else MaterialTheme.colorScheme.background,
+                    } else Color.White,
                     contentDescription = stringResource(id = R.string.send_comment),
                     modifier = Modifier
                         .size(30.dp)

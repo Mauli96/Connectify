@@ -24,13 +24,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
@@ -115,182 +118,194 @@ fun EditProfileScreen(
             }
         }
     }
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        StandardToolbar(
-            onNavigateUp = onNavigateUp,
-            showBackArrow = true,
-            navActions = {
-                IconButton(onClick = {
-                    viewModel.onEvent(EditProfileEvent.UpdateProfile)
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = stringResource(id = R.string.save_changes),
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            },
-            title = {
-                Text(
-                    text = stringResource(id = R.string.edit_your_profile),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-        )
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+            modifier = Modifier.fillMaxSize()
         ) {
-            BannerEditSection(
-                bannerImage = rememberAsyncImagePainter(
-                    model = viewModel.bannerUri.value ?: profileState.profile?.bannerUrl,
-                    imageLoader = imageLoader
-                ),
-                profileImage = rememberAsyncImagePainter(
-                    model = viewModel.profileUri.value ?: profileState.profile?.profilePictureUrl,
-                    imageLoader = imageLoader
-                ),
-                profilePictureSize = profilePictureSize,
-                onBannerImageClick = {
-                    bannerImageLauncher.launch("image/*")
+            StandardToolbar(
+                onNavigateUp = onNavigateUp,
+                showBackArrow = true,
+                navActions = {
+                    IconButton(onClick = {
+                        viewModel.onEvent(EditProfileEvent.UpdateProfile)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(id = R.string.save_changes),
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
                 },
-                onProfilePictureClick = {
-                    profilePictureLauncher.launch("image/*")
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.edit_your_profile),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             )
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(SpaceLarge)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                StandardTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = viewModel.usernameState.value.text,
-                    hint = stringResource(id = R.string.username),
-                    error = when(viewModel.usernameState.value.error) {
-                        is EditProfileError.FieldEmpty -> {
-                            stringResource(id = R.string.this_field_cant_be_empty)
-                        }
-                        else -> ""
-                    },
-                    leadingIcon = Icons.Default.Person,
-                    onValueChange = {
-                        viewModel.onEvent(
-                            EditProfileEvent.EnteredUsername(it)
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                StandardTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = viewModel.githubTextFieldState.value.text,
-                    hint = stringResource(id = R.string.github_profile_url),
-                    error = when(viewModel.githubTextFieldState.value.error) {
-                        is EditProfileError.FieldEmpty -> {
-                            stringResource(id = R.string.this_field_cant_be_empty)
-                        }
-                        else -> ""
-                    },
-                    leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_github_icon_1),
-                    onValueChange = {
-                        viewModel.onEvent(
-                            EditProfileEvent.EnteredGitHubUrl(it)
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                StandardTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = viewModel.instagramTextFieldState.value.text,
-                    hint = stringResource(id = R.string.instagram_profile_url),
-                    error = when(viewModel.instagramTextFieldState.value.error) {
-                        is EditProfileError.FieldEmpty -> {
-                            stringResource(id = R.string.this_field_cant_be_empty)
-                        }
-                        else -> ""
-                    },
-                    leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_instagram_glyph_1),
-                    onValueChange = {
-                        viewModel.onEvent(
-                            EditProfileEvent.EnteredInstagramUrl(it)
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                StandardTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = viewModel.linkedInTextFieldState.value.text,
-                    hint = stringResource(id = R.string.linked_in_profile_url),
-                    error = when(viewModel.linkedInTextFieldState.value.error) {
-                        is EditProfileError.FieldEmpty -> {
-                            stringResource(id = R.string.this_field_cant_be_empty)
-                        }
-                        else -> ""
-                    },
-                    leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_linkedin_icon_1),
-                    onValueChange = {
-                        viewModel.onEvent(
-                            EditProfileEvent.EnteredLinkedInUrl(it)
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                StandardTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = viewModel.bioState.value.text,
-                    hint = stringResource(id = R.string.your_bio),
-                    error = when(viewModel.bioState.value.error) {
-                        is EditProfileError.FieldEmpty -> {
-                            stringResource(id = R.string.this_field_cant_be_empty)
-                        }
-                        else -> ""
-                    },
-                    singleLine = false,
-                    maxLines = 3,
-                    leadingIcon = Icons.Default.Description,
-                    onValueChange = {
-                        viewModel.onEvent(
-                            EditProfileEvent.EnteredBio(it)
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                Text(
-                    text = stringResource(id = R.string.select_top_3_skills),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 20.sp
+                BannerEditSection(
+                    bannerImage = rememberAsyncImagePainter(
+                        model = viewModel.bannerUri.value ?: profileState.profile?.bannerUrl,
+                        imageLoader = imageLoader
                     ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(CenterHorizontally)
+                    profileImage = rememberAsyncImagePainter(
+                        model = viewModel.profileUri.value ?: profileState.profile?.profilePictureUrl,
+                        imageLoader = imageLoader
+                    ),
+                    profilePictureSize = profilePictureSize,
+                    onBannerImageClick = {
+                        bannerImageLauncher.launch("image/*")
+                    },
+                    onProfilePictureClick = {
+                        profilePictureLauncher.launch("image/*")
+                    }
                 )
-                Spacer(modifier = Modifier.height(SpaceLarge))
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    mainAxisAlignment = MainAxisAlignment.Center,
-                    mainAxisSpacing = SpaceMedium,
-                    crossAxisSpacing = SpaceMedium
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(SpaceLarge)
                 ) {
-                    viewModel.skills.value.skills.forEach { skill ->
-                        Chip(
-                            text = skill.name,
-                            selected = skill in viewModel.skills.value.selectedSkills,
-                            onChipClick = {
-                                viewModel.onEvent(EditProfileEvent.SetSkillSelected(skill))
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    StandardTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = viewModel.usernameState.value.text,
+                        hint = stringResource(id = R.string.username),
+                        error = when(viewModel.usernameState.value.error) {
+                            is EditProfileError.FieldEmpty -> {
+                                stringResource(id = R.string.this_field_cant_be_empty)
                             }
-                        )
+                            else -> ""
+                        },
+                        leadingIcon = Icons.Default.Person,
+                        onValueChange = {
+                            viewModel.onEvent(
+                                EditProfileEvent.EnteredUsername(it)
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    StandardTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = viewModel.githubTextFieldState.value.text,
+                        hint = stringResource(id = R.string.github_profile_url),
+                        error = when(viewModel.githubTextFieldState.value.error) {
+                            is EditProfileError.FieldEmpty -> {
+                                stringResource(id = R.string.this_field_cant_be_empty)
+                            }
+                            else -> ""
+                        },
+                        leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_github_icon_1),
+                        onValueChange = {
+                            viewModel.onEvent(
+                                EditProfileEvent.EnteredGitHubUrl(it)
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    StandardTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = viewModel.instagramTextFieldState.value.text,
+                        hint = stringResource(id = R.string.instagram_profile_url),
+                        error = when(viewModel.instagramTextFieldState.value.error) {
+                            is EditProfileError.FieldEmpty -> {
+                                stringResource(id = R.string.this_field_cant_be_empty)
+                            }
+                            else -> ""
+                        },
+                        leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_instagram_glyph_1),
+                        onValueChange = {
+                            viewModel.onEvent(
+                                EditProfileEvent.EnteredInstagramUrl(it)
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    StandardTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = viewModel.linkedInTextFieldState.value.text,
+                        hint = stringResource(id = R.string.linked_in_profile_url),
+                        error = when(viewModel.linkedInTextFieldState.value.error) {
+                            is EditProfileError.FieldEmpty -> {
+                                stringResource(id = R.string.this_field_cant_be_empty)
+                            }
+                            else -> ""
+                        },
+                        leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_linkedin_icon_1),
+                        onValueChange = {
+                            viewModel.onEvent(
+                                EditProfileEvent.EnteredLinkedInUrl(it)
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    StandardTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = viewModel.bioState.value.text,
+                        hint = stringResource(id = R.string.your_bio),
+                        error = when(viewModel.bioState.value.error) {
+                            is EditProfileError.FieldEmpty -> {
+                                stringResource(id = R.string.this_field_cant_be_empty)
+                            }
+                            else -> ""
+                        },
+                        singleLine = false,
+                        maxLines = 3,
+                        leadingIcon = Icons.Default.Description,
+                        onValueChange = {
+                            viewModel.onEvent(
+                                EditProfileEvent.EnteredBio(it)
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    Text(
+                        text = stringResource(id = R.string.select_top_3_skills),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 20.sp
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(SpaceLarge))
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        mainAxisAlignment = MainAxisAlignment.Center,
+                        mainAxisSpacing = SpaceMedium,
+                        crossAxisSpacing = SpaceMedium
+                    ) {
+                        viewModel.skills.value.skills.forEach { skill ->
+                            Chip(
+                                text = skill.name,
+                                selected = skill in viewModel.skills.value.selectedSkills,
+                                onChipClick = {
+                                    viewModel.onEvent(EditProfileEvent.SetSkillSelected(skill))
+                                }
+                            )
+                        }
                     }
                 }
-            }
 
+            }
+        }
+        if(profileState.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Center),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp,
+                trackColor = Color.White
+            )
         }
     }
 }
@@ -316,7 +331,9 @@ fun BannerEditSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(bannerHeight)
-                .clickable { onBannerImageClick() }
+                .clickable {
+                    onBannerImageClick()
+                }
         )
         Image(
             painter = profileImage,
@@ -330,8 +347,9 @@ fun BannerEditSection(
                     color = MaterialTheme.colorScheme.onSurface,
                     shape = CircleShape
                 )
-                .clickable { onProfilePictureClick() }
-
+                .clickable {
+                    onProfilePictureClick()
+                }
         )
     }
 }

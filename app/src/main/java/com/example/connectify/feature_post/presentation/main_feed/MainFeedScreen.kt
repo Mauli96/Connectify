@@ -8,14 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,9 +34,13 @@ import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
+import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainFeedScreen(
     imageLoader: ImageLoader,
@@ -41,6 +51,11 @@ fun MainFeedScreen(
 ) {
     val pagingState = viewModel.pagingState.value
     val context = LocalContext.current
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = pagingState.isLoading,
+        onRefresh = viewModel::loadNextPosts
+    )
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -62,7 +77,7 @@ fun MainFeedScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "",
+                        contentDescription = "Search for user",
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
@@ -71,6 +86,7 @@ fun MainFeedScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .pullRefresh(pullRefreshState)
         ) {
             LazyColumn {
                 items(pagingState.items.size) { i ->
@@ -105,12 +121,13 @@ fun MainFeedScreen(
                     Spacer(modifier = Modifier.height(100.dp))
                 }
             }
-            if(pagingState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Center),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            PullRefreshIndicator(
+                refreshing = pagingState.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }

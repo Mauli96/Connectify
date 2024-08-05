@@ -16,18 +16,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -195,8 +197,10 @@ fun PostDetailScreen(
                         )
                         if(state.isLoadingPost) {
                             CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center),
-                                color = MaterialTheme.colorScheme.primary
+                                modifier = Modifier.align(Center),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 2.dp,
+                                trackColor = Color.White
                             )
                         }
                     }
@@ -226,8 +230,10 @@ fun PostDetailScreen(
                     )
                     if(state.isLoadingComments) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = MaterialTheme.colorScheme.primary
+                            modifier = Modifier.align(Center),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp,
+                            trackColor = Color.White
                         )
                     }
                 }
@@ -243,6 +249,7 @@ fun PostDetailScreen(
             },
             hint = stringResource(id = R.string.enter_a_comment),
             isLoading = viewModel.commentState.value.isLoading,
+            backgroundColor = MaterialTheme.colorScheme.surface,
             focusRequester = focusRequester
         )
     }

@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,15 +56,18 @@ fun ProfileStats(
                     backgroundColor = if(isFollowing) {
                         Color.Red
                     } else MaterialTheme.colorScheme.primary
-                )
+                ),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Text(
                     text = if(isFollowing) {
                         stringResource(id = R.string.unfollow)
                     } else stringResource(id = R.string.follow),
-                    color = if(isFollowing) {
-                        Color.White
-                    } else MaterialTheme.colorScheme.onPrimary
+                    style = if(isFollowing) {
+                        MaterialTheme.typography.bodyLarge
+                    } else {
+                        MaterialTheme.typography.labelLarge
+                    }
                 )
             }
         }

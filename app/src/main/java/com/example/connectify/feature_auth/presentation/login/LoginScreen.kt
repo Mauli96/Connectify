@@ -63,9 +63,6 @@ fun LoginScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
-                is UiEvent.Navigate -> {
-                    onNavigate(event.route)
-                }
                 is UiEvent.OnLogin -> {
                     onLogin()
                 }

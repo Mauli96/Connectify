@@ -24,6 +24,7 @@ import com.example.connectify.feature_profile.presentation.profile.ProfileScreen
 import com.example.connectify.feature_auth.presentation.register.RegisterScreen
 import com.example.connectify.feature_profile.presentation.search.SearchScreen
 import com.example.connectify.feature_auth.presentation.splash.SplashScreen
+import com.example.connectify.feature_chat.presentation.message.MessageScreen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -76,6 +77,13 @@ fun Navigation(
                 imageLoader = imageLoader
             )
         }
+        composable(Screen.MessageScreen.route) {
+            MessageScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+                imageLoader = imageLoader
+            )
+        }
         composable(Screen.ActivityScreen.route) {
             ActivityScreen(
                 onNavigate = navController::navigate,
@@ -97,6 +105,10 @@ fun Navigation(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
                 onLogout = {
+                    navController.popBackStack(
+                        route = Screen.MainFeedScreen.route,
+                        inclusive = true
+                    )
                     navController.navigate(Screen.LoginScreen.route)
                 },
                 scaffoldState = scaffoldState,

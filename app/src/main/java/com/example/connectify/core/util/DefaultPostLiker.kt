@@ -17,7 +17,7 @@ class DefaultPostLiker : PostLiker {
             if(post.id == parentId) {
                 post.copy(
                     isLiked = !post.isLiked,
-                    likeCount = if (currentlyLiked) {
+                    likeCount = if(currentlyLiked) {
                         post.likeCount - 1
                     } else post.likeCount + 1
                 )

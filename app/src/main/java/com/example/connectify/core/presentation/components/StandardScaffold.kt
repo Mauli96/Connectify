@@ -10,9 +10,9 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
@@ -41,7 +41,7 @@ fun StandardScaffold(
         ),
         BottomNavItem(
             route = Screen.ChatScreen.route,
-            icon = Icons.Outlined.Message,
+            icon = Icons.AutoMirrored.Outlined.Message,
             contentDescription = "Message"
         ),
         BottomNavItem(route = "-"),

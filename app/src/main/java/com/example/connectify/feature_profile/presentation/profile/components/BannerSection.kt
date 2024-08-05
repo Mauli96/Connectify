@@ -11,29 +11,40 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
 import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.domain.models.Skill
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BannerSection(
     imageLoader: ImageLoader,
@@ -47,10 +58,18 @@ fun BannerSection(
     shouldShowGitHub: Boolean = false,
     shouldShowInstagram: Boolean = false,
     shouldShowLinkedIn: Boolean = false,
+    isOwnProfile: Boolean = false,
+    onNavigateUp: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {},
     onGitHubClick: () -> Unit = {},
     onInstagramClick: () -> Unit = {},
     onLinkedInClick: () -> Unit = {}
 ) {
+    var showDropDownMenu by remember {
+        mutableStateOf(false)
+    }
+
     BoxWithConstraints(
         modifier = modifier
     ) {
@@ -63,6 +82,73 @@ fun BannerSection(
             contentScale = ContentScale.Crop,
             modifier = imageModifier
                 .fillMaxSize()
+        )
+        TopAppBar(
+            title = { /*TODO*/ },
+            navigationIcon = {
+                if(!isOwnProfile) {
+                    IconButton(
+                        onClick = {
+                            onNavigateUp()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Navigate Back",
+                            tint = Color.White
+                        )
+                    }
+                }
+            },
+            actions = {
+                if(isOwnProfile) {
+                    IconButton(
+                        onClick = {
+                           showDropDownMenu = !showDropDownMenu
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = "More Items",
+                            tint = Color.White
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showDropDownMenu,
+                        onDismissRequest = {
+                            showDropDownMenu = !showDropDownMenu
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp),
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "Edit Profile",
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            },
+                            onClick = {
+                                onEditClick()
+                                showDropDownMenu = !showDropDownMenu
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "Logout",
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            },
+                            onClick = {
+                                onLogoutClick()
+                                showDropDownMenu = !showDropDownMenu
+                            }
+                        )
+                    }
+                }
+            },
+            backgroundColor = Color.Transparent
         )
         Box(
             modifier = Modifier
