@@ -46,10 +46,8 @@ fun Comment(
 ) {
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(5.dp),
-        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSurface
+            containerColor = MaterialTheme.colorScheme.background
         ),
     ) {
         Column(

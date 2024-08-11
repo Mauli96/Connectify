@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -83,23 +84,14 @@ fun PersonListScreen(
                 .fillMaxSize()
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(SpaceLarge)
+                modifier = Modifier.fillMaxSize()
             ) {
                 items(state.users) { user ->
                     UserProfileItem(
                         user = user,
                         imageLoader = imageLoader,
-                        actionIcon = {
-                            Icon(
-                                imageVector = if(user.isFollowing) {
-                                    Icons.Default.Check
-                                } else Icons.Default.PersonAdd,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(IconSizeMedium)
-                            )
-                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        isFollowing = user.isFollowing,
                         onItemClick = {
                             onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
                         },
@@ -108,7 +100,6 @@ fun PersonListScreen(
                         },
                         ownUserId = viewModel.ownUserId.value
                     )
-                    Spacer(modifier = Modifier.height(SpaceMedium))
                 }
             }
             if(state.isLoading) {

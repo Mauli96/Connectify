@@ -26,7 +26,6 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 fun OwnMessage(
     message: String,
     formattedTime: String,
-    modifier: Modifier = Modifier,
     color: Color = DarkerGreen,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,

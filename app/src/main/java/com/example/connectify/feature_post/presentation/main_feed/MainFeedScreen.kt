@@ -1,5 +1,6 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -58,7 +60,8 @@ fun MainFeedScreen(
     )
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         StandardToolbar(
             onNavigateUp = onNavigateUp,
@@ -113,12 +116,10 @@ fun MainFeedScreen(
                             context.sendSharePostIntent(post.id)
                         },
                     )
-                    if(i < pagingState.items.size - 1) {
-                        Spacer(modifier = Modifier.height(SpaceSmall))
+                    Spacer(modifier = Modifier.height(SpaceSmall))
+                    if(i == pagingState.items.size - 1) {
+                        Spacer(modifier = Modifier.height(50.dp))
                     }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
             PullRefreshIndicator(

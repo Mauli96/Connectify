@@ -43,12 +43,10 @@ fun ChatItem(
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        backgroundColor = MaterialTheme.colorScheme.surface,
+        backgroundColor = MaterialTheme.colorScheme.background,
         onClick = {
             onItemClick(item)
-        },
-        elevation = 5.dp
+        }
     ) {
         Row(
             modifier = Modifier

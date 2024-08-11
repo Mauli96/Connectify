@@ -1,5 +1,6 @@
 package com.example.connectify.feature_profile.presentation.profile
 
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,6 +51,7 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -173,20 +175,27 @@ fun ProfileScreen(
                         isOwnProfile = profile.isOwnProfile,
                         onFollowClick = {
                             viewModel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
+                        },
+                        onMessageClick = {
+                            val encodedProfilePictureUrl = Base64.encodeToString(profile.profilePictureUrl.encodeToByteArray(), 0)
+                            onNavigate(
+                                Screen.MessageScreen.route + "/${profile.userId}/${profile.username}/${encodedProfilePictureUrl}"
+                            )
                         }
                     )
                 }
+            }
+            item {
+                Spacer(modifier = Modifier.height(SpaceMedium))
             }
             items(pagingState.items.size) { i ->
                 val post = pagingState.items[i]
                 if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
                     viewModel.loadNextPosts()
                 }
-
                 Post(
                     post = post,
                     imageLoader = imageLoader,
-                    showProfileImage = false,
                     onPostClick = {
                         onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
                     },
@@ -200,9 +209,10 @@ fun ProfileScreen(
                         context.sendSharePostIntent(post.id)
                     }
                 )
-            }
-            item {
-                Spacer(modifier = Modifier.height(90.dp))
+                Spacer(modifier = Modifier.height(SpaceSmall))
+                if(i == pagingState.items.size - 1) {
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
             }
         }
         Column(
@@ -286,16 +296,21 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier
                         .background(
-                            color = MaterialTheme.colorScheme.surface,
+                            color = MaterialTheme.colorScheme.background,
                             shape = MaterialTheme.shapes.medium
                         )
                         .padding(SpaceMedium)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.log_out_of_your_account),
+                        text = stringResource(id = R.string.log_out),
                         style = MaterialTheme.typography.titleMedium
                     )
-                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    Spacer(modifier = Modifier.height(SpaceSmall))
+                    Text(
+                        text = stringResource(id = R.string.log_out_of_your_account),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(SpaceLarge))
                     Row(
                         horizontalArrangement = Arrangement.End,
                         modifier = Modifier.align(End)

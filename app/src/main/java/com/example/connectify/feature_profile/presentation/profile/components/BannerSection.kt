@@ -123,10 +123,18 @@ fun BannerSection(
                     ) {
                         DropdownMenuItem(
                             text = {
-                                Text(
-                                    text = "Edit Profile",
-                                    style = MaterialTheme.typography.labelLarge
-                                )
+                                Row {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.edit_icon),
+                                        contentDescription = "Edit Profile",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(SpaceSmall))
+                                    Text(
+                                        text = "Edit Profile",
+                                        style = MaterialTheme.typography.displaySmall
+                                    )
+                                }
                             },
                             onClick = {
                                 onEditClick()
@@ -135,10 +143,18 @@ fun BannerSection(
                         )
                         DropdownMenuItem(
                             text = {
-                                Text(
-                                    text = "Logout",
-                                    style = MaterialTheme.typography.labelLarge
-                                )
+                                Row {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.logout_icon),
+                                        contentDescription = "Edit Profile",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(SpaceSmall))
+                                    Text(
+                                        text = "Logout",
+                                        style = MaterialTheme.typography.displaySmall
+                                    )
+                                }
                             },
                             onClick = {
                                 onLogoutClick()

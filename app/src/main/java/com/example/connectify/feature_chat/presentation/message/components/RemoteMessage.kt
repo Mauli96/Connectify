@@ -22,7 +22,6 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 fun RemoteMessage(
     message: String,
     formattedTime: String,
-    modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.surface,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,

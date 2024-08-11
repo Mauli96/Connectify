@@ -10,15 +10,13 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -36,23 +34,23 @@ fun StandardScaffold(
     bottomNavItem: List<BottomNavItem> = listOf(
         BottomNavItem(
             route = Screen.MainFeedScreen.route,
-            icon = Icons.Outlined.Home,
+            icon = painterResource(id = R.drawable.home_icon),
             contentDescription = "Home"
         ),
         BottomNavItem(
             route = Screen.ChatScreen.route,
-            icon = Icons.AutoMirrored.Outlined.Message,
+            icon = painterResource(id = R.drawable.message_icon),
             contentDescription = "Message"
         ),
         BottomNavItem(route = "-"),
         BottomNavItem(
             route = Screen.ActivityScreen.route,
-            icon = Icons.Outlined.Notifications,
+            icon = painterResource(id = R.drawable.notification_icon),
             contentDescription = "Activity"
         ),
         BottomNavItem(
             route = Screen.ProfileScreen.route,
-            icon = Icons.Outlined.Person,
+            icon = painterResource(id = R.drawable.person_icon),
             contentDescription = "Profile"
         ),
     ),
@@ -65,12 +63,12 @@ fun StandardScaffold(
             if(showBottomBar) {
                 BottomAppBar(
                     modifier = Modifier.fillMaxWidth(),
-                    backgroundColor = MaterialTheme.colorScheme.surface,
+                    backgroundColor = MaterialTheme.colorScheme.background,
                     cutoutShape = CircleShape,
                     elevation = 5.dp
                 ) {
                     BottomNavigation(
-                        backgroundColor = MaterialTheme.colorScheme.surface
+                        backgroundColor = MaterialTheme.colorScheme.background
                     ) {
                         bottomNavItem.forEachIndexed { i, bottomNavItem ->
                             StandardBottomNavItem(

@@ -25,6 +25,8 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.feature_activity.presentation.util.ActivityType
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.TextWhite
+import com.example.connectify.core.presentation.ui.theme.quicksand
 import com.example.connectify.core.util.Screen
 
 @Composable
@@ -39,10 +41,8 @@ fun ActivityItem(
                 start = SpaceSmall,
                 end = SpaceSmall
             ),
-        elevation = CardDefaults.cardElevation(5.dp),
-        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSurface
+            containerColor = MaterialTheme.colorScheme.background
         ),
     ) {
         Row(
@@ -74,7 +74,12 @@ fun ActivityItem(
                 }
             }
             val annotatedText = buildAnnotatedString {
-                val boldStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                val boldStyle = SpanStyle(
+                    fontFamily = quicksand,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                    color = TextWhite
+                )
                 pushStringAnnotation(
                     tag = "username",
                     annotation = "username"
@@ -95,10 +100,7 @@ fun ActivityItem(
             }
             ClickableText(
                 text = annotatedText,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onBackground
-                ),
+                style = MaterialTheme.typography.bodyLarge,
                 onClick = { offset ->
                     annotatedText.getStringAnnotations(
                         tag = "username",
@@ -125,8 +127,7 @@ fun ActivityItem(
             Text(
                 text = activity.formattedTime,
                 textAlign = TextAlign.Right,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }

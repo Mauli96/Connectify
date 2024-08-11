@@ -11,16 +11,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,10 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -45,9 +39,9 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.HintGray
-import com.example.connectify.core.presentation.ui.theme.MediumGray
-import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMedium
+import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.TextWhite
@@ -58,7 +52,6 @@ fun Post(
     post: Post,
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
-    showProfileImage: Boolean = true,
     onPostClick: () -> Unit = {},
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
@@ -69,19 +62,11 @@ fun Post(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(SpaceMedium)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .offset(
-                    y = if (showProfileImage) {
-                        ProfilePictureSizeMedium / 2f
-                    } else 0.dp
-                )
-                .clip(MaterialTheme.shapes.medium)
-                .shadow(5.dp)
-                .background(MediumGray)
+                .background(DarkGray)
                 .clickable {
                     onPostClick()
                 }
@@ -104,6 +89,8 @@ fun Post(
             ) {
                 ActionRow(
                     username = post.username,
+                    profilePictureUrl = post.profilePictureUrl,
+                    imageLoader = imageLoader,
                     modifier = Modifier.fillMaxWidth(),
                     isLiked = post.isLiked,
                     onLikeClick = onLikeClick,
@@ -154,25 +141,14 @@ fun Post(
                 }
             }
         }
-        if(showProfileImage) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = post.profilePictureUrl,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(ProfilePictureSizeMedium)
-                    .clip(CircleShape)
-                    .align(Alignment.TopCenter)
-            )
-        }
     }
 }
 
 @Composable
 fun ActionRow(
     modifier: Modifier = Modifier,
+    profilePictureUrl: String,
+    imageLoader: ImageLoader,
     isLiked: Boolean = false,
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
@@ -182,19 +158,42 @@ fun ActionRow(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = username,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .clickable {
-                    onUsernameClick()
-                }
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = profilePictureUrl,
+                    imageLoader = imageLoader
+                ),
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .padding(horizontal = SpaceSmall)
+                    .size(ProfilePictureSizeExtraSmall)
+                    .clip(CircleShape)
+            )
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .width(120.dp)
+            ) {
+                Text(
+                    text = username,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .clickable {
+                            onUsernameClick()
+                        }
+                )
+            }
+        }
         EngagementButtons(
             isLiked = isLiked,
             onLikeClick = onLikeClick,
@@ -225,7 +224,7 @@ fun EngagementButtons(
             modifier = Modifier.size(iconSize)
         ) {
             Icon(
-                imageVector = Icons.Filled.Favorite,
+                painter =  painterResource(id = R.drawable.like_icon),
                 tint = if(isLiked) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -235,7 +234,8 @@ fun EngagementButtons(
                     stringResource(id = R.string.unlike)
                 } else {
                     stringResource(id = R.string.like)
-                }
+                },
+                modifier = Modifier.size(20.dp)
             )
         }
         Spacer(modifier = Modifier.width(SpaceMedium))
@@ -246,8 +246,9 @@ fun EngagementButtons(
             modifier = Modifier.size(iconSize)
         ) {
             Icon(
-                imageVector = Icons.Filled.Comment,
-                contentDescription = stringResource(id = R.string.comment)
+                painter = painterResource(id = R.drawable.comment_icon),
+                contentDescription = stringResource(id = R.string.comment),
+                modifier = Modifier.size(20.dp)
             )
         }
         Spacer(modifier = Modifier.width(SpaceMedium))
@@ -257,8 +258,9 @@ fun EngagementButtons(
             modifier = Modifier.size(iconSize)
         ) {
             Icon(
-                imageVector = Icons.Filled.Share,
-                contentDescription = stringResource(id = R.string.share)
+                painter = painterResource(id = R.drawable.share_icon),
+                contentDescription = stringResource(id = R.string.share),
+                modifier = Modifier.size(20.dp)
             )
         }
     }

@@ -74,12 +74,12 @@ fun ActivityScreen(
                                 parentId = activity.parentId,
                                 username = activity.username
                             ),
-                            onNavigate = onNavigate
+                            onNavigate = onNavigate,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     Spacer(modifier = Modifier.height(SpaceSmall))
                 }
-
                 item {
                     Spacer(modifier = Modifier.height(90.dp))
                 }

@@ -29,7 +29,7 @@ val Typography = Typography(
         fontFamily = quicksand,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        color = TextGray
+        color = TextWhite
     ),
     titleLarge = TextStyle(
         fontFamily = quicksand,
@@ -71,7 +71,7 @@ val Typography = Typography(
         fontFamily = quicksand,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        color = Color.Black
+        color = DarkGray
     ),
     labelMedium = TextStyle( //h2
         fontFamily = quicksand,
@@ -84,5 +84,11 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         color = TextWhite
+    ),
+    displaySmall = TextStyle(
+        fontFamily = quicksand,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        color = DarkGray
     ),
 )

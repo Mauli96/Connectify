@@ -20,7 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.Search
@@ -28,10 +28,14 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,6 +46,7 @@ import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.util.showKeyboard
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_profile.domain.util.ProfileConstants
 
@@ -51,14 +56,26 @@ fun SearchScreen(
     imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val state = viewModel.searchState.value
+
+    val focusRequester = remember {
+        FocusRequester()
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(key1 = true) {
+        context.showKeyboard()
+        focusRequester.requestFocus()
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             Row(
                 modifier = Modifier
@@ -72,7 +89,7 @@ fun SearchScreen(
                     onClick = { onNavigateUp() }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(IconSizeMedium)
@@ -82,13 +99,14 @@ fun SearchScreen(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
+                        .height(50.dp)
+                        .focusRequester(focusRequester = focusRequester),
                     value = viewModel.searchFieldState.value.text,
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = MaterialTheme.colorScheme.secondary,
-                        cursorColor = MaterialTheme.colorScheme.onSecondary,
-                        textColor = MaterialTheme.colorScheme.onSecondary,
-                        disabledLabelColor = MaterialTheme.colorScheme.secondary,
+                        backgroundColor = Color.White,
+                        cursorColor = MaterialTheme.colorScheme.onPrimary,
+                        textColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledLabelColor = MaterialTheme.colorScheme.onPrimary,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
@@ -102,14 +120,14 @@ fun SearchScreen(
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.search),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.labelLarge
                         )
                     },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onBackground,
+                            tint = MaterialTheme.colorScheme.background,
                             modifier = Modifier.size(IconSizeMedium)
                         )
                     },
@@ -123,7 +141,7 @@ fun SearchScreen(
                                 Icon(
                                     imageVector = Icons.Outlined.Close,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    tint = MaterialTheme.colorScheme.background,
                                     modifier = Modifier.size(IconSizeMedium)
                                 )
                             }
@@ -133,8 +151,8 @@ fun SearchScreen(
             }
             Column(
                 modifier = Modifier
+                    .padding(top = SpaceSmall)
                     .fillMaxSize()
-                    .padding(SpaceLarge)
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
@@ -143,22 +161,10 @@ fun SearchScreen(
                         UserProfileItem(
                             user = user,
                             imageLoader = imageLoader,
-                            actionIcon = {
-                                IconButton(
-                                    onClick = {
-                                        viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
-                                    },
-                                    modifier = Modifier
-                                        .size(IconSizeMedium)
-                                ) {
-                                    Icon(
-                                        imageVector = if(user.isFollowing) {
-                                            Icons.Default.PersonRemove
-                                        } else Icons.Default.PersonAdd,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onBackground,
-                                    )
-                                }
+                            modifier = Modifier.fillMaxWidth(),
+                            isFollowing = user.isFollowing,
+                            onActionItemClick = {
+                                viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
                             },
                             onItemClick = {
                                 onNavigate(
@@ -166,12 +172,11 @@ fun SearchScreen(
                                 )
                             }
                         )
-                        Spacer(modifier = Modifier.height(SpaceMedium))
                     }
                 }
             }
         }
-        if (state.isLoading) {
+        if(state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Center),
                 color = MaterialTheme.colorScheme.primary,

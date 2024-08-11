@@ -54,7 +54,7 @@ fun ProfileStats(
                 onClick = onFollowClick,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = if(isFollowing) {
-                        Color.Red
+                        Color.White
                     } else MaterialTheme.colorScheme.primary
                 ),
                 shape = MaterialTheme.shapes.medium
@@ -63,11 +63,7 @@ fun ProfileStats(
                     text = if(isFollowing) {
                         stringResource(id = R.string.unfollow)
                     } else stringResource(id = R.string.follow),
-                    style = if(isFollowing) {
-                        MaterialTheme.typography.bodyLarge
-                    } else {
-                        MaterialTheme.typography.labelLarge
-                    }
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }

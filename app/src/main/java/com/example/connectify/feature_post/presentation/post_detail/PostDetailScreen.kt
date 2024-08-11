@@ -10,12 +10,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,12 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
-import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.presentation.components.ActionRow
 import com.example.connectify.core.presentation.components.SendTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
-import com.example.connectify.core.presentation.ui.theme.MediumGray
-import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMedium
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -108,7 +102,7 @@ fun PostDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .background(MaterialTheme.colorScheme.surface),
+                .background(MaterialTheme.colorScheme.background),
         ) {
             item {
                 Column(
@@ -124,10 +118,9 @@ fun PostDetailScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(y = ProfilePictureSizeMedium / 2f)
                                 .clip(MaterialTheme.shapes.medium)
                                 .shadow(5.dp)
-                                .background(MediumGray)
+                                .background(DarkGray)
                         ) {
                             state.post?.let { post ->
                                 Image(
@@ -148,6 +141,8 @@ fun PostDetailScreen(
                                 ) {
                                     ActionRow(
                                         username = state.post.username,
+                                        profilePictureUrl = state.post.profilePictureUrl,
+                                        imageLoader = imageLoader,
                                         modifier = Modifier.fillMaxWidth(),
                                         onUsernameClick = {
                                             onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
@@ -184,17 +179,6 @@ fun PostDetailScreen(
                                 }
                             }
                         }
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = state.post?.profilePictureUrl,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .size(ProfilePictureSizeMedium)
-                                .clip(CircleShape)
-                                .align(Alignment.TopCenter)
-                        )
                         if(state.isLoadingPost) {
                             CircularProgressIndicator(
                                 modifier = Modifier.align(Center),
@@ -205,7 +189,7 @@ fun PostDetailScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(SpaceLarge))
+                Spacer(modifier = Modifier.height(SpaceMedium))
             }
             items(state.comments) { comment ->
                 Box(
@@ -214,11 +198,7 @@ fun PostDetailScreen(
                 ) {
                     Comment(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = SpaceLarge,
-                                vertical = SpaceSmall
-                            ),
+                            .fillMaxWidth(),
                         imageLoader = imageLoader,
                         comment = comment,
                         onLikeClick = {
@@ -249,7 +229,7 @@ fun PostDetailScreen(
             },
             hint = stringResource(id = R.string.enter_a_comment),
             isLoading = viewModel.commentState.value.isLoading,
-            backgroundColor = MaterialTheme.colorScheme.surface,
+            backgroundColor = MaterialTheme.colorScheme.background,
             focusRequester = focusRequester
         )
     }

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
@@ -21,11 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.example.connectify.R
 import com.example.connectify.core.domain.models.UserItem
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
@@ -39,17 +44,15 @@ fun UserProfileItem(
     user: UserItem,
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
-    actionIcon: @Composable () -> Unit = {},
+    isFollowing: Boolean = false,
     onItemClick: () -> Unit = {},
     onActionItemClick: () -> Unit = {},
     ownUserId: String = ""
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        backgroundColor = MaterialTheme.colorScheme.surface,
+        backgroundColor = MaterialTheme.colorScheme.background,
         onClick = onItemClick,
-        elevation = 5.dp
     ) {
         Row(
             modifier = Modifier
@@ -95,11 +98,21 @@ fun UserProfileItem(
                 )
             }
             if(ownUserId != user.userId) {
-                IconButton(
+                Button(
                     onClick = onActionItemClick,
-                    modifier = Modifier.size(IconSizeMedium)
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if(isFollowing) {
+                            Color.White
+                        } else MaterialTheme.colorScheme.primary
+                    ),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    actionIcon()
+                    Text(
+                        text = if(isFollowing) {
+                            stringResource(id = R.string.unfollow)
+                        } else stringResource(id = R.string.follow),
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             }
         }
