@@ -66,6 +66,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
+import com.example.connectify.core.util.openUrlInBrowser
 import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
@@ -320,6 +321,15 @@ fun ProfileScreen(
                     shouldShowLinkedIn = !profile.linkedInUrl.isNullOrBlank(),
                     bannerUrl = profile.bannerUrl,
                     isOwnProfile = profile.isOwnProfile,
+                    onGitHubClick = {
+                        context.openUrlInBrowser(profile.gitHubUrl ?: return@BannerSection)
+                    },
+                    onInstagramClick = {
+                        context.openUrlInBrowser(profile.instagramUrl ?: return@BannerSection)
+                    },
+                    onLinkedInClick = {
+                        context.openUrlInBrowser(profile.linkedInUrl ?: return@BannerSection)
+                    },
                     onEditClick = {
                         onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
                     },
