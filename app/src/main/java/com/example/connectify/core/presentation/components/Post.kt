@@ -3,6 +3,7 @@ package com.example.connectify.core.presentation.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,9 +21,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,18 +49,21 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.TextWhite
 import com.example.connectify.core.util.Constants
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Post(
     post: Post,
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
+    scope: CoroutineScope = rememberCoroutineScope(),
     onPostClick: () -> Unit = {},
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onUsernameClick: () -> Unit = {},
-    onDeleteClick: () -> Unit = {}
+    onLongPress: (String) -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -67,8 +73,17 @@ fun Post(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(DarkGray)
-                .clickable {
-                    onPostClick()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            onPostClick()
+                        },
+                        onLongPress = {
+                            scope.launch {
+                                onLongPress(post.id)
+                            }
+                        }
+                    )
                 }
         ) {
             Image(

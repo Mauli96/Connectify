@@ -98,7 +98,9 @@ class RegisterViewModel @Inject constructor(
             when(registerResult.result) {
                 is Resource.Success -> {
                     _eventFlow.emit(
-                        UiEvent.ShowSnackbar(UiText.StringResource(R.string.success_registeration))
+                        UiEvent.ShowSnackbar(
+                            UiText.StringResource(R.string.success_registeration)
+                        )
                     )
                     _onRegister.emit(Unit)
                     _registerState.value = RegisterState(isLoading = false)

@@ -11,8 +11,8 @@ import com.example.connectify.core.util.SimpleResource
 interface PostRepository {
 
     suspend fun getPostsForFollows(
-        page: Int = 0,
-        pageSize: Int = Constants.DEFAULT_PAGE_SIZE
+        page: Int,
+        pageSize: Int
     ): Resource<List<Post>>
 
     suspend fun createPost(
@@ -40,4 +40,6 @@ interface PostRepository {
     ): SimpleResource
 
     suspend fun getLikesForParent(parentId: String): Resource<List<UserItem>>
+
+    suspend fun deletePost(postId: String): SimpleResource
 }

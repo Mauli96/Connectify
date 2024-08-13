@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -29,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
-import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 
@@ -43,18 +42,16 @@ fun SendTextField(
     hint: String = "",
     canSendMessage: Boolean = true,
     isLoading: Boolean = false,
-    backgroundColor: Color,
     focusRequester: FocusRequester = FocusRequester()
 ) {
     Row(
         modifier = Modifier
-            .background(backgroundColor)
+            .background(Color.Transparent)
             .fillMaxWidth()
             .padding(
-                start = SpaceLarge,
-                end = SpaceLarge,
-                top = SpaceSmall,
-                bottom = SpaceLarge
+                start = SpaceMedium,
+                end = SpaceMedium,
+                bottom = SpaceSmall
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -108,7 +105,7 @@ fun SendTextField(
                                 painter = painterResource(id = R.drawable.send_icon),
                                 contentDescription = stringResource(id = R.string.send_comment),
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .size(25.dp)
                             )
                         }
                     }

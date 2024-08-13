@@ -17,7 +17,7 @@ data class MessageDto(
             fromId = fromId,
             toId = toId,
             text = text,
-            formattedTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
                 .format(timestamp),
             chatId = chatId,
         )

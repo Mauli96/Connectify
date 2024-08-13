@@ -6,5 +6,7 @@ data class ProfileState(
     val profile: Profile? = null,
     val isLoading: Boolean = false,
     val isLogoutDialogVisible: Boolean = false,
-    val showDropDownMenu: Boolean = false
+    val showDropDownMenu: Boolean = false,
+    val isBottomSheetVisible: Boolean = false,
+    val deletePostId: String = ""
 )

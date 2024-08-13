@@ -5,6 +5,7 @@ import com.example.connectify.feature_post.data.repository.PostRepositoryImpl
 import com.example.connectify.feature_post.domain.repository.PostRepository
 import com.example.connectify.feature_post.domain.use_case.CreateCommentUseCase
 import com.example.connectify.feature_post.domain.use_case.CreatePostUseCase
+import com.example.connectify.feature_post.domain.use_case.DeletePostUseCase
 import com.example.connectify.feature_post.domain.use_case.GetCommentsForPostUseCase
 import com.example.connectify.feature_post.domain.use_case.GetLikesForParentUseCase
 import com.example.connectify.feature_post.domain.use_case.GetPostDetailsUseCase
@@ -55,7 +56,8 @@ object PostModule {
             getCommentsForPost = GetCommentsForPostUseCase(repository),
             createComment = CreateCommentUseCase(repository),
             toggleLikeForParent = ToggleLikeForParentUseCase(repository),
-            getLikesForParent = GetLikesForParentUseCase(repository)
+            getLikesForParent = GetLikesForParentUseCase(repository),
+            deletePost = DeletePostUseCase(repository)
         )
     }
 }

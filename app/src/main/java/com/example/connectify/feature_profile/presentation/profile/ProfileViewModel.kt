@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
@@ -90,8 +91,26 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
+            is ProfileEvent.DeletePost -> {
+                deletePost(event.postId)
+            }
             is ProfileEvent.ToggleFollowStateForUser -> {
                 toggleFollowStateForUser(event.userId)
+            }
+            is ProfileEvent.ShowBottomSheet -> {
+                _state.value = state.value.copy(
+                    isBottomSheetVisible = true
+                )
+            }
+            is ProfileEvent.DismissBottomSheet -> {
+                _state.value = state.value.copy(
+                    isBottomSheetVisible = false
+                )
+            }
+            is ProfileEvent.DeletePostId -> {
+                _state.value = state.value.copy(
+                    deletePostId = event.postId
+                )
             }
             is ProfileEvent.ShowLogoutDialog -> {
                 _state.value = state.value.copy(
@@ -105,6 +124,31 @@ class ProfileViewModel @Inject constructor(
             }
             is ProfileEvent.Logout -> {
                 profileUseCases.logout()
+            }
+        }
+    }
+
+    private fun deletePost(postId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deletePost(postId)
+            when(result) {
+                is Resource.Success -> {
+                    _pagingState.value = pagingState.value.copy(
+                        items = pagingState.value.items.filter {
+                            it.id != postId
+                        }
+                    )
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(result.uiText ?: UiText.unknownError())
+                    )
+                }
             }
         }
     }

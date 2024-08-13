@@ -91,4 +91,6 @@
     <string name="delete_post">Delete post</string>
     <string name="successfully_deleted_post">Successfully deleted post</string>
     <string name="message_screen">Messages</string>
+    <string name="success_login">Successfully logged in</string>
+    <string name="delete">Delete</string>
 </resources>

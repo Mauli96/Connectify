@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,7 +41,9 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_auth.presentation.util.AuthError
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -53,15 +56,19 @@ fun LoginScreen(
     val passwordState = viewModel.passwordState.value
     val state = viewModel.loginState.value
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context),
-                        duration = SnackbarDuration.Short
-                    )
+                    keyboardController?.hide()
+                    GlobalScope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            message = event.uiText.asString(context),
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                 }
                 is UiEvent.OnLogin -> {
                     onLogin()

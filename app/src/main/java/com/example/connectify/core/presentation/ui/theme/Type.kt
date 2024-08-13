@@ -47,7 +47,7 @@ val Typography = Typography(
         fontFamily = quicksand,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-        color = GreenAccent
+        color = Color.Red
     ),
     bodyLarge = TextStyle(
         fontFamily = quicksand,

@@ -119,9 +119,6 @@ class MessageViewModel @Inject constructor(
         _state.value = state.value.copy(
             canSendMessage = false
         )
-        viewModelScope.launch {
-            _messageUpdatedEvent.emit(MessageUpdateEvent.MessageSent)
-        }
     }
 
     fun onEvent(event: MessageEvent) {
@@ -143,6 +140,5 @@ class MessageViewModel @Inject constructor(
     sealed class MessageUpdateEvent {
         object SingleMessageUpdate: MessageUpdateEvent()
         object MessagePageLoaded: MessageUpdateEvent()
-        object MessageSent: MessageUpdateEvent()
     }
 }

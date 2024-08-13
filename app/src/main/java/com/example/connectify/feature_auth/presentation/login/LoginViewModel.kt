@@ -2,8 +2,10 @@ package com.example.connectify.feature_auth.presentation.login
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.R
 import com.example.connectify.core.domain.states.PasswordTextFieldState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
@@ -72,6 +74,9 @@ class LoginViewModel @Inject constructor(
                     }
                     when(loginResult.result) {
                         is Resource.Success -> {
+                            UiEvent.ShowSnackbar(
+                                UiText.StringResource(R.string.success_login)
+                            )
                             _eventFlow.emit(UiEvent.OnLogin)
                             _loginState.value = loginState.value.copy(isLoading = false)
                             _emailState.value = StandardTextFieldState()

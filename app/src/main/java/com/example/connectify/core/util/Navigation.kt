@@ -50,6 +50,9 @@ fun Navigation(
                     navController.popBackStack(
                         route = Screen.LoginScreen.route,
                         inclusive = true
+                    ) ||  navController.popBackStack(
+                        route = Screen.RegisterScreen.route,
+                        inclusive = true
                     )
                     navController.navigate(Screen.MainFeedScreen.route)
                 },
@@ -59,7 +62,8 @@ fun Navigation(
         composable(Screen.RegisterScreen.route) {
             RegisterScreen(
                 onNavigate = navController::navigate,
-                scaffoldState = scaffoldState
+                scaffoldState = scaffoldState,
+                onPopBackStack = navController::popBackStack
             )
         }
         composable(Screen.MainFeedScreen.route) {

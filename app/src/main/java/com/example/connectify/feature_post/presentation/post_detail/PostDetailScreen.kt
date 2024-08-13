@@ -229,7 +229,6 @@ fun PostDetailScreen(
             },
             hint = stringResource(id = R.string.enter_a_comment),
             isLoading = viewModel.commentState.value.isLoading,
-            backgroundColor = MaterialTheme.colorScheme.background,
             focusRequester = focusRequester
         )
     }

@@ -16,13 +16,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 
 @Composable
 fun RemoteMessage(
     message: String,
     formattedTime: String,
-    color: Color = MaterialTheme.colorScheme.surface,
+    color: Color = HintGray,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
     triangleHeight: Dp = 30.dp

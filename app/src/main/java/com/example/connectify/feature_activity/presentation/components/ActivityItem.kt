@@ -2,8 +2,10 @@ package com.example.connectify.feature_activity.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -101,6 +103,7 @@ fun ActivityItem(
             ClickableText(
                 text = annotatedText,
                 style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
                 onClick = { offset ->
                     annotatedText.getStringAnnotations(
                         tag = "username",
@@ -124,6 +127,7 @@ fun ActivityItem(
                     }
                 }
             )
+            Spacer(modifier = Modifier.width(SpaceSmall))
             Text(
                 text = activity.formattedTime,
                 textAlign = TextAlign.Right,

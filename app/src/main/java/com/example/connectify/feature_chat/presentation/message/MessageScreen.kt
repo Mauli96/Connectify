@@ -33,6 +33,7 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtra
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediumSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.feature_chat.domain.model.Message
 import com.example.connectify.feature_chat.presentation.message.components.OwnMessage
 import com.example.connectify.feature_chat.presentation.message.components.RemoteMessage
@@ -56,9 +57,8 @@ fun MessageScreen(
     val pagingState = viewModel.pagingState.value
     val state = viewModel.state.value
     val lazyListState = rememberLazyListState()
-    val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(key1 = pagingState, key2 = keyboardController) {
+    LaunchedEffect(key1 = pagingState) {
         viewModel.messageReceived.collect { event ->
             when(event) {
                 is MessageViewModel.MessageUpdateEvent.SingleMessageUpdate,
@@ -67,9 +67,6 @@ fun MessageScreen(
                         return@collect
                     }
                     lazyListState.scrollToItem(pagingState.items.size - 1)
-                }
-                is MessageViewModel.MessageUpdateEvent.MessageSent -> {
-                    keyboardController?.hide()
                 }
             }
         }
@@ -103,6 +100,7 @@ fun MessageScreen(
             modifier = Modifier.weight(1f)
         ) {
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier
                     .weight(1f)
                     .padding(SpaceMedium)
@@ -115,16 +113,15 @@ fun MessageScreen(
                     if(message.fromId == remoteUserId) {
                         RemoteMessage(
                             message = message.text,
-                            formattedTime = message.formattedTime,
-
+                            formattedTime = message.formattedTime
                         )
-                        Spacer(modifier = Modifier.height(SpaceMedium))
+                        Spacer(modifier = Modifier.height(SpaceSmall))
                     } else {
                         OwnMessage(
                             message = message.text,
-                            formattedTime = message.formattedTime,
+                            formattedTime = message.formattedTime
                         )
-                        Spacer(modifier = Modifier.height(SpaceMedium))
+                        Spacer(modifier = Modifier.height(SpaceSmall))
                     }
                     Spacer(modifier = Modifier.height(SpaceMedium))
                 }
@@ -138,8 +135,7 @@ fun MessageScreen(
                 onSend = {
                     viewModel.onEvent(MessageEvent.SendMessage)
                 },
-                hint = stringResource(id = R.string.enter_a_message),
-                backgroundColor = MaterialTheme.colorScheme.background
+                hint = stringResource(id = R.string.enter_a_message)
             )
         }
     }

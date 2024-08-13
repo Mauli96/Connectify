@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,13 +19,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -41,6 +49,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -63,6 +72,7 @@ import com.example.connectify.feature_profile.presentation.profile.components.Ba
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     scaffoldState: ScaffoldState,
@@ -77,6 +87,8 @@ fun ProfileScreen(
     val pagingState = viewModel.pagingState.value
     val lazyListState = rememberLazyListState()
     val toolbarState = viewModel.toolbarState.value
+
+    val bottomSheetState = rememberModalBottomSheetState()
 
     val iconHorizontalCenterLength =
         (LocalConfiguration.current.screenWidthDp.dp.toPx() / 4f -
@@ -207,11 +219,70 @@ fun ProfileScreen(
                     },
                     onShareClick = {
                         context.sendSharePostIntent(post.id)
+                    },
+                    onLongPress = { id ->
+                        viewModel.onEvent(ProfileEvent.ShowBottomSheet)
+                        viewModel.onEvent(ProfileEvent.DeletePostId(id))
                     }
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 if(i == pagingState.items.size - 1) {
                     Spacer(modifier = Modifier.height(50.dp))
+                }
+                if(state.isBottomSheetVisible) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                        },
+                        sheetState = bottomSheetState,
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.delete_post),
+                                style = MaterialTheme.typography.titleMedium,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(SpaceMedium))
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(
+                                    onClick = {
+                                        viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                                    },
+                                    colors = ButtonColors(
+                                        containerColor = Color.White,
+                                        contentColor = MaterialTheme.colorScheme.onBackground,
+                                        disabledContentColor = MaterialTheme.colorScheme.onBackground,
+                                        disabledContainerColor = MaterialTheme.colorScheme.onBackground
+                                    ),
+                                    shape = RoundedCornerShape(0.dp),
+                                    modifier = Modifier.weight(0.5f)
+                                ) {
+                                    Text(text = stringResource(id = R.string.cancel))
+                                }
+                                Button(
+                                    onClick = {
+                                        viewModel.onEvent(ProfileEvent.DeletePost(state.deletePostId))
+                                        viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                                    },
+                                    colors = ButtonColors(
+                                        containerColor = Color.Red,
+                                        contentColor = MaterialTheme.colorScheme.onBackground,
+                                        disabledContentColor = MaterialTheme.colorScheme.onBackground,
+                                        disabledContainerColor = MaterialTheme.colorScheme.onBackground
+                                    ),
+                                    shape = RoundedCornerShape(0.dp),
+                                    modifier = Modifier.weight(0.5f)
+                                ) {
+                                    Text(text = stringResource(id = R.string.delete))
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
