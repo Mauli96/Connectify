@@ -42,7 +42,7 @@ class ChatViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(UiEvent.ShowSnackbar(
-                        result.uiText ?: UiText.unknownError()
+                        uiText = result.uiText ?: UiText.unknownError()
                     ))
                     _state.value = state.value.copy(isLoading = false)
                 }

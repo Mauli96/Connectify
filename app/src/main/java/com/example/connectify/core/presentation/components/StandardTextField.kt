@@ -4,23 +4,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.connectify.R
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -29,8 +27,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
-import com.example.connectify.core.presentation.ui.theme.TextWhite
+import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.util.TestTags
 
 @Composable
@@ -41,11 +39,12 @@ fun StandardTextField(
     maxLength: Int = 400,
     error: String = "",
     style: TextStyle = TextStyle(
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onPrimary
     ),
     singleLine: Boolean = true,
     maxLines: Int = 1,
-    leadingIcon: ImageVector? = null,
+    minLines: Int = 1,
+    leadingIcon: Painter? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPasswordToggleDisplayed: Boolean = keyboardType == KeyboardType.Password,
     showPasswordToggle: Boolean = false,
@@ -65,17 +64,28 @@ fun StandardTextField(
                 }
             },
             maxLines = maxLines,
+            minLines = minLines,
             textStyle = style,
             placeholder = {
                 Text(
                     text = hint,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.displaySmall
                 )
             },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                disabledTextColor = MaterialTheme.colorScheme.onPrimary,
+                errorTextColor = MaterialTheme.colorScheme.onPrimary,
+                cursorColor = MaterialTheme.colorScheme.onPrimary,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                errorContainerColor = Color.White,
+                focusedLabelColor = Color.Transparent,
+                unfocusedLabelColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent,
+                disabledBorderColor = Color.Transparent
             ),
             isError = error != "",
             keyboardOptions = KeyboardOptions(
@@ -90,10 +100,10 @@ fun StandardTextField(
             leadingIcon = if(leadingIcon != null) {
                 val icon: @Composable () -> Unit = {
                     Icon(
-                        imageVector = leadingIcon,
+                        painter = leadingIcon,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(IconSizeMedium)
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(IconSizeSmall)
                     )
                 }
                 icon
@@ -118,7 +128,7 @@ fun StandardTextField(
                             } else {
                                 stringResource(id = R.string.password_hidden_content_description)
                             },
-                            tint = MaterialTheme.colorScheme.onBackground,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }

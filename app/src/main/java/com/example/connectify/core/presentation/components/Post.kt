@@ -4,8 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,10 +24,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +53,7 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -65,6 +75,7 @@ fun Post(
     onUsernameClick: () -> Unit = {},
     onLongPress: (String) -> Unit = {}
 ) {
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -91,7 +102,7 @@ fun Post(
                     model = post.imageUrl,
                     imageLoader = imageLoader
                 ),
-                contentDescription = "Post image",
+                contentDescription = stringResource(id = R.string.post_image),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -131,7 +142,7 @@ fun Post(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = Constants.MAX_POST_DESCRIPTION_LINES
                 )
-                Spacer(modifier = Modifier.height(SpaceMedium))
+                Spacer(modifier = Modifier.height(SpaceSmall))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -184,12 +195,12 @@ fun ActionRow(
                     model = profilePictureUrl,
                     imageLoader = imageLoader
                 ),
-                contentDescription = "Profile Picture",
+                contentDescription = stringResource(id = R.string.profile_image),
                 modifier = Modifier
-                    .padding(horizontal = SpaceSmall)
                     .size(ProfilePictureSizeExtraSmall)
                     .clip(CircleShape)
             )
+            Spacer(modifier = Modifier.width(SpaceSmall))
             Box(
                 modifier = Modifier
                     .height(20.dp)
@@ -250,7 +261,7 @@ fun EngagementButtons(
                 } else {
                     stringResource(id = R.string.like)
                 },
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(IconSizeSmall)
             )
         }
         Spacer(modifier = Modifier.width(SpaceMedium))
@@ -263,7 +274,7 @@ fun EngagementButtons(
             Icon(
                 painter = painterResource(id = R.drawable.comment_icon),
                 contentDescription = stringResource(id = R.string.comment),
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(IconSizeSmall)
             )
         }
         Spacer(modifier = Modifier.width(SpaceMedium))
@@ -275,7 +286,7 @@ fun EngagementButtons(
             Icon(
                 painter = painterResource(id = R.drawable.share_icon),
                 contentDescription = stringResource(id = R.string.share),
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(IconSizeSmall)
             )
         }
     }

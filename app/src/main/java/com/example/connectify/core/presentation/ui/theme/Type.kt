@@ -90,5 +90,5 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         color = DarkGray
-    ),
+    )
 )

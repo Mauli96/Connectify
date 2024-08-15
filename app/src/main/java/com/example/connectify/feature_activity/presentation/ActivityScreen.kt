@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +24,8 @@ import androidx.paging.compose.itemKey
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.feature_activity.presentation.components.ActivityItem
@@ -35,6 +38,7 @@ fun ActivityScreen(
 ) {
     val state = viewModel.state.value
     val activities = viewModel.activities.collectAsLazyPagingItems()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -78,7 +82,12 @@ fun ActivityScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    Spacer(modifier = Modifier.height(SpaceSmall))
+                    Divider(
+                        thickness = 1.dp,
+                        color = HintGray,
+                        modifier = Modifier
+                            .height(0.5.dp)
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.height(90.dp))

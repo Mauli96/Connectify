@@ -42,7 +42,9 @@ class MessageViewModel @Inject constructor(
 
     private val paginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
-            _pagingState.value = pagingState.value.copy(isLoading = isLoading)
+            _pagingState.value = pagingState.value.copy(
+                isLoading = isLoading
+            )
         },
         onRequest = { nextPage ->
             savedStateHandle.get<String>("chatId")?.let { chatId ->
@@ -58,7 +60,6 @@ class MessageViewModel @Inject constructor(
             _pagingState.value = pagingState.value.copy(
                 items = pagingState.value.items + messages,
                 endReached = messages.isEmpty(),
-                isLoading = false
             )
             viewModelScope.launch {
                 _messageUpdatedEvent.emit(MessageUpdateEvent.MessagePageLoaded)
@@ -110,7 +111,7 @@ class MessageViewModel @Inject constructor(
 
     private fun sendMessage() {
         val toId = savedStateHandle.get<String>("remoteUserId") ?: return
-        if (messageTextFieldState.value.text.isBlank()) {
+        if(messageTextFieldState.value.text.isBlank()) {
             return
         }
         val chatId = savedStateHandle.get<String>("chatId")

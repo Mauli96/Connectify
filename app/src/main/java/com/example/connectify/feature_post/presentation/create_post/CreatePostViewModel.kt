@@ -9,6 +9,7 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
+import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +60,7 @@ class CreatePostViewModel @Inject constructor(
                             _eventFlow.emit(UiEvent.ShowSnackbar(
                                 uiText = UiText.StringResource(R.string.post_created)
                             ))
-                            _eventFlow.emit(UiEvent.NavigateUp)
+                            _eventFlow.emit(UiEvent.Navigate(Screen.MainFeedScreen.route))
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(UiEvent.ShowSnackbar(

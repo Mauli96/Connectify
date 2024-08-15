@@ -92,7 +92,7 @@ fun PostDetailScreen(
             onNavigateUp = onNavigateUp,
             title = {
                 Text(
-                    text = stringResource(id = R.string.your_feed),
+                    text = stringResource(id = R.string.post),
                     style = MaterialTheme.typography.titleLarge
                 )
             },

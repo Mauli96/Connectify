@@ -22,8 +22,6 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -35,11 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,17 +43,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.connectify.R
-import com.example.connectify.core.presentation.components.StandardTextField
+import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
-import com.example.connectify.feature_profile.presentation.edit_profile.components.Chip
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.CropActivityResultContract
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.feature_profile.presentation.edit_profile.components.Chip
 import com.example.connectify.feature_profile.presentation.util.EditProfileError
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
@@ -173,18 +168,20 @@ fun EditProfileScreen(
                         .padding(SpaceLarge)
                 ) {
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    StandardTextField(
+                    Text(
+                        text = stringResource(id = R.string.username),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
                         text = viewModel.usernameState.value.text,
-                        hint = stringResource(id = R.string.username),
                         error = when(viewModel.usernameState.value.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
                             else -> ""
                         },
-                        leadingIcon = Icons.Default.Person,
                         onValueChange = {
                             viewModel.onEvent(
                                 EditProfileEvent.EnteredUsername(it)
@@ -192,18 +189,20 @@ fun EditProfileScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    StandardTextField(
+                    Text(
+                        text = stringResource(id = R.string.github_profile_url),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
                         text = viewModel.githubTextFieldState.value.text,
-                        hint = stringResource(id = R.string.github_profile_url),
                         error = when(viewModel.githubTextFieldState.value.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
                             else -> ""
                         },
-                        leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_github_icon_1),
                         onValueChange = {
                             viewModel.onEvent(
                                 EditProfileEvent.EnteredGitHubUrl(it)
@@ -211,18 +210,20 @@ fun EditProfileScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    StandardTextField(
+                    Text(
+                        text = stringResource(id = R.string.instagram_profile_url),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
                         text = viewModel.instagramTextFieldState.value.text,
-                        hint = stringResource(id = R.string.instagram_profile_url),
                         error = when(viewModel.instagramTextFieldState.value.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
                             else -> ""
                         },
-                        leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_instagram_glyph_1),
                         onValueChange = {
                             viewModel.onEvent(
                                 EditProfileEvent.EnteredInstagramUrl(it)
@@ -230,18 +231,20 @@ fun EditProfileScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    StandardTextField(
+                    Text(
+                        text = stringResource(id = R.string.linked_in_profile_url),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
                         text = viewModel.linkedInTextFieldState.value.text,
-                        hint = stringResource(id = R.string.linked_in_profile_url),
                         error = when(viewModel.linkedInTextFieldState.value.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
                             else -> ""
                         },
-                        leadingIcon = ImageVector.vectorResource(id = R.drawable.ic_linkedin_icon_1),
                         onValueChange = {
                             viewModel.onEvent(
                                 EditProfileEvent.EnteredLinkedInUrl(it)
@@ -249,11 +252,14 @@ fun EditProfileScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceMedium))
-                    StandardTextField(
+                    Text(
+                        text = stringResource(id = R.string.your_bio),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
                         text = viewModel.bioState.value.text,
-                        hint = stringResource(id = R.string.your_bio),
                         error = when(viewModel.bioState.value.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
@@ -262,7 +268,7 @@ fun EditProfileScreen(
                         },
                         singleLine = false,
                         maxLines = 3,
-                        leadingIcon = Icons.Default.Description,
+                        minLines = 3,
                         onValueChange = {
                             viewModel.onEvent(
                                 EditProfileEvent.EnteredBio(it)

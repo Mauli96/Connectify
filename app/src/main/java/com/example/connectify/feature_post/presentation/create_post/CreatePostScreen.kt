@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -24,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,8 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -40,6 +44,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
@@ -49,6 +54,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.CropActivityResultContract
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_post.presentation.util.PostConstants
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
 import kotlinx.coroutines.GlobalScope
@@ -90,6 +96,9 @@ fun CreatePostScreen(
                             message = event.uiText.asString(context)
                         )
                     }
+                }
+                is UiEvent.Navigate -> {
+                    onNavigate(event.route)
                 }
                 is UiEvent.NavigateUp -> {
                     onNavigateUp()
@@ -164,6 +173,7 @@ fun CreatePostScreen(
                 },
                 singleLine = false,
                 maxLines = 5,
+                minLines = 3,
                 maxLength = PostConstants.MAX_POST_DESCRIPTION_LENGTH,
                 onValueChange = {
                     viewModel.onEvent(CreatePostEvent.EnterDescription(it))

@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +38,8 @@ import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -57,8 +62,25 @@ fun MainFeedScreen(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = pagingState.isLoading,
-        onRefresh = viewModel::loadNextPosts
+        onRefresh = {
+            viewModel.loadNextPosts()
+        }
     )
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when(event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.uiText.asString(context)
+                    )
+                }
+                else -> {
+                    null
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -80,9 +102,10 @@ fun MainFeedScreen(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search for user",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        painter = painterResource(id = R.drawable.search_icon),
+                        contentDescription = stringResource(id = R.string.search_for_users),
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(IconSizeSmall)
                     )
                 }
             }

@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -113,7 +114,7 @@ fun LoginScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = Icons.Default.Person,
+                leadingIcon = painterResource(id = R.drawable.email_icon),
                 hint = stringResource(id = R.string.login_hint)
             )
             Spacer(modifier = Modifier.height(SpaceMedium))
@@ -130,7 +131,7 @@ fun LoginScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = Icons.Default.Key,
+                leadingIcon = painterResource(id = R.drawable.password_icon),
                 showPasswordToggle = passwordState.isPasswordVisible,
                 onPasswordToggleClick = {
                     viewModel.onEvent(LoginEvent.TogglePasswordVisibility)

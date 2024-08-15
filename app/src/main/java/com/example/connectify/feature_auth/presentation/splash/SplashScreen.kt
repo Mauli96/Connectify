@@ -20,6 +20,7 @@ import com.example.connectify.R
 import com.example.connectify.core.presentation.util.UiEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 
@@ -53,6 +54,7 @@ fun SplashScreen(
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.Navigate -> {
+                    delay(500)
                     onPopBackStack()
                     onNavigate(event.route)
                 }

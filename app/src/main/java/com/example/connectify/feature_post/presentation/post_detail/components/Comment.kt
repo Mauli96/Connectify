@@ -48,7 +48,7 @@ fun Comment(
         modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
-        ),
+        )
     ) {
         Column(
             modifier = Modifier

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
@@ -140,6 +142,12 @@ fun BannerSection(
                                 onEditClick()
                                 showDropDownMenu = !showDropDownMenu
                             }
+                        )
+                        Divider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .height(0.5.dp)
                         )
                         DropdownMenuItem(
                             text = {

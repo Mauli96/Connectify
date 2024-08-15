@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -48,6 +49,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -59,6 +61,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -230,57 +233,76 @@ fun ProfileScreen(
                 if(i == pagingState.items.size - 1) {
                     Spacer(modifier = Modifier.height(50.dp))
                 }
-                if(state.isBottomSheetVisible) {
-                    ModalBottomSheet(
-                        onDismissRequest = {
-                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                        },
-                        sheetState = bottomSheetState,
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = CenterHorizontally
+                if(post.isOwnPost) {
+                    if(state.isBottomSheetVisible) {
+                        ModalBottomSheet(
+                            onDismissRequest = {
+                                viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                            },
+                            sheetState = bottomSheetState,
+                            containerColor = MaterialTheme.colorScheme.background
                         ) {
-                            Text(
-                                text = stringResource(id = R.string.delete_post),
-                                style = MaterialTheme.typography.titleMedium,
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.height(SpaceMedium))
-                            Row(
+                            Column(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Button(
-                                    onClick = {
-                                        viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                                    },
-                                    colors = ButtonColors(
-                                        containerColor = Color.White,
-                                        contentColor = MaterialTheme.colorScheme.onBackground,
-                                        disabledContentColor = MaterialTheme.colorScheme.onBackground,
-                                        disabledContainerColor = MaterialTheme.colorScheme.onBackground
-                                    ),
-                                    shape = RoundedCornerShape(0.dp),
-                                    modifier = Modifier.weight(0.5f)
+                                Text(
+                                    text = stringResource(id = R.string.delete_post),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(SpaceMedium))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .size(
+                                            height = 40.dp,
+                                            width = 100.dp
+                                        )
+                                        .clickable {
+                                            viewModel.onEvent(ProfileEvent.DeletePost(state.deletePostId))
+                                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = stringResource(id = R.string.cancel))
+                                    Spacer(modifier = Modifier.width(SpaceMedium))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.delete_icon),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(IconSizeSmall),
+                                        tint = Color.Red
+                                    )
+                                    Spacer(modifier = Modifier.width(SpaceSmall))
+                                    Text(
+                                        text = stringResource(id = R.string.delete),
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
                                 }
-                                Button(
-                                    onClick = {
-                                        viewModel.onEvent(ProfileEvent.DeletePost(state.deletePostId))
-                                        viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                                    },
-                                    colors = ButtonColors(
-                                        containerColor = Color.Red,
-                                        contentColor = MaterialTheme.colorScheme.onBackground,
-                                        disabledContentColor = MaterialTheme.colorScheme.onBackground,
-                                        disabledContainerColor = MaterialTheme.colorScheme.onBackground
-                                    ),
-                                    shape = RoundedCornerShape(0.dp),
-                                    modifier = Modifier.weight(0.5f)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .size(
+                                            height = 40.dp,
+                                            width = 100.dp
+                                        )
+                                        .clickable {
+                                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(text = stringResource(id = R.string.delete))
+                                    Spacer(modifier = Modifier.width(SpaceMedium))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.cancel_icon),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(SpaceSmall))
+                                    Text(
+                                        text = stringResource(id = R.string.cancel),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
                                 }
+                                Spacer(modifier = Modifier.height(SpaceLarge))
                             }
                         }
                     }

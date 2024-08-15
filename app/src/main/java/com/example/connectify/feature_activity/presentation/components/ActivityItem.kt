@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.feature_activity.presentation.util.ActivityType
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.TextWhite
@@ -42,7 +45,8 @@ fun ActivityItem(
             .padding(
                 start = SpaceSmall,
                 end = SpaceSmall
-            ),
+            )
+            .height(60.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
         ),

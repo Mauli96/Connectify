@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -111,7 +112,7 @@ fun RegisterScreen(
                     viewModel.onEvent(RegisterEvent.EnteredEmail(it))
                 },
                 keyboardType = KeyboardType.Email,
-                leadingIcon = Icons.Default.Email,
+                leadingIcon = painterResource(id = R.drawable.email_icon),
                 error = when(emailState.error) {
                     is AuthError.FieldEmpty -> {
                         stringResource(id = R.string.this_field_cant_be_empty)
@@ -138,7 +139,7 @@ fun RegisterScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = Icons.Default.Person,
+                leadingIcon = painterResource(id = R.drawable.person_icon),
                 hint = stringResource(id = R.string.username)
             )
             Spacer(modifier = Modifier.height(SpaceMedium))
@@ -161,7 +162,7 @@ fun RegisterScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = Icons.Default.Key,
+                leadingIcon = painterResource(id = R.drawable.password_icon),
                 showPasswordToggle = passwordState.isPasswordVisible,
                 onPasswordToggleClick = {
                     viewModel.onEvent(RegisterEvent.TogglePasswordVisibility)
