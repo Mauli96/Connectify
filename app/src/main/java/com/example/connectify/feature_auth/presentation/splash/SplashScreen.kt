@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.connectify.R
 import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.Constants
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -54,7 +55,7 @@ fun SplashScreen(
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.Navigate -> {
-                    delay(500)
+                    delay(Constants.SPLASH_SCREEN_DURATION)
                     onPopBackStack()
                     onNavigate(event.route)
                 }

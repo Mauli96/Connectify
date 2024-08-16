@@ -49,19 +49,6 @@ fun ProfileHeaderSection(
                 ),
                 textAlign = TextAlign.Center,
             )
-            if(!isOwnProfile) {
-                Spacer(modifier = Modifier.width(SpaceSmall))
-                IconButton(
-                    onClick = onMessageClick,
-                    modifier = Modifier.size(30.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.message_icon_profile),
-                        contentDescription = stringResource(id = R.string.message),
-                        modifier = modifier.size(22.dp)
-                    )
-                }
-            }
         }
         Spacer(modifier = Modifier.height(SpaceMedium))
         if(user.description.isNotBlank()) {
@@ -76,7 +63,8 @@ fun ProfileHeaderSection(
             user = user,
             isOwnProfile = isOwnProfile,
             isFollowing = isFollowing,
-            onFollowClick = onFollowClick
+            onFollowClick = onFollowClick,
+            onMessageClick = onMessageClick
         )
     }
 }

@@ -87,11 +87,12 @@
     <string name="share_intent_text">Hey, I found a great post, check it out :)\n%s</string>
     <string name="error_not_logged_in">Oops! Please login before doing that.</string>
     <string name="enter_a_message">Enter a message...</string>
-    <string name="message">Send message</string>
+    <string name="send_message">Send message</string>
     <string name="delete_post">Delete post</string>
     <string name="successfully_deleted_post">Successfully deleted post</string>
     <string name="message_screen">Messages</string>
     <string name="success_login">Successfully logged in</string>
     <string name="delete">Delete</string>
     <string name="connectify">Connectify</string>
+    <string name="message">Message</string>
 </resources>

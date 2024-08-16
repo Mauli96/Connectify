@@ -25,7 +25,7 @@ fun ProfileNumber(
         Text(
             text = number.toString(),
             style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 24.sp
+                fontSize = 20.sp
             ),
             textAlign = TextAlign.Center
         )

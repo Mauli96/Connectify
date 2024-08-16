@@ -75,11 +75,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
-    implementation("androidx.compose.material:material-icons-extended:1.6.7")
-    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.compose.material:material:1.6.8")
     implementation("androidx.paging:paging-compose:3.3.0")
     implementation("androidx.paging:paging-runtime-ktx:3.3.0")
     implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.compose.animation:animation:1.6.8")
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.7.0")

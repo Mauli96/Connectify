@@ -15,17 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,26 +33,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.connectify.R
-import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.CropActivityResultContract
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
-import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_post.presentation.util.PostConstants
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
 import kotlinx.coroutines.GlobalScope
@@ -144,9 +140,10 @@ fun CreatePostScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    painter = painterResource(id = R.drawable.add_icon),
                     contentDescription = stringResource(id = R.string.choose_image),
-                    tint = MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(IconSizeMedium)
                 )
                 imageUri?.let { uri ->
                     Image(
@@ -187,23 +184,30 @@ fun CreatePostScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = GreenAccent
                 ),
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .height(40.dp)
+                    .width(100.dp)
             ) {
-                Text(
-                    text = stringResource(id = R.string.post),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Spacer(modifier = Modifier.width(SpaceSmall))
                 if(viewModel.isLoading.value) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 16.dp,
+                    LinearProgressIndicator(
                         modifier = Modifier
-                            .size(20.dp)
-                            .align(CenterVertically)
+                            .fillMaxWidth()
+                            .align(CenterVertically),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        trackColor = MaterialTheme.colorScheme.primary
                     )
                 } else {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = null)
+                    Text(
+                        text = stringResource(id = R.string.post),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(SpaceSmall))
+                    Icon(
+                        painter = painterResource(id = R.drawable.post_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(IconSizeSmall)
+                    )
                 }
             }
         }

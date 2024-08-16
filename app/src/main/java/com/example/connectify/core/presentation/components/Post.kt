@@ -1,14 +1,15 @@
 package com.example.connectify.core.presentation.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,10 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +37,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -53,6 +58,8 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.IconSizeLarge
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -60,6 +67,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.TextWhite
 import com.example.connectify.core.util.Constants
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -243,27 +251,10 @@ fun EngagementButtons(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = {
-                onLikeClick()
-            },
-            modifier = Modifier.size(iconSize)
-        ) {
-            Icon(
-                painter =  painterResource(id = R.drawable.like_icon),
-                tint = if(isLiked) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    TextWhite
-                },
-                contentDescription = if(isLiked) {
-                    stringResource(id = R.string.unlike)
-                } else {
-                    stringResource(id = R.string.like)
-                },
-                modifier = Modifier.size(IconSizeSmall)
-            )
-        }
+        LikeButton(
+            isLiked = isLiked,
+            onLikeClick = onLikeClick
+        )
         Spacer(modifier = Modifier.width(SpaceMedium))
         IconButton(
             onClick = {
@@ -289,5 +280,73 @@ fun EngagementButtons(
                 modifier = Modifier.size(IconSizeSmall)
             )
         }
+    }
+}
+
+@Composable
+fun LikeButton(
+    isLiked: Boolean = false,
+    onLikeClick: () -> Unit = {}
+) {
+    var startAnimation by remember {
+        mutableStateOf(false)
+    }
+
+    val heartScale by animateFloatAsState(
+        targetValue = if(startAnimation) 1.3f else 1f,
+        animationSpec = spring(
+            dampingRatio = 0.4f,
+            stiffness = 300f
+        )
+    )
+
+    val heartColor by animateColorAsState(
+        targetValue = if(isLiked) MaterialTheme.colorScheme.primary else Color.White
+    )
+    val burstScale by animateFloatAsState(
+        targetValue = if(startAnimation) 1.5f else 0f,
+        animationSpec = tween(durationMillis = 400)
+    )
+
+    LaunchedEffect(isLiked) {
+        if(isLiked) {
+            startAnimation = true
+            delay(300)  // short delay for heart scaling
+            startAnimation = false
+        }
+    }
+
+    IconButton(
+        onClick = {
+            onLikeClick()
+        },
+        modifier = Modifier
+            .size(IconSizeLarge)
+            .clickable {
+                onLikeClick()
+            }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(IconSizeMedium)
+                .scale(burstScale)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), CircleShape)
+        )
+        Icon(
+            painter = if(isLiked) {
+                painterResource(id = R.drawable.like_icon)
+            } else {
+                painterResource(id = R.drawable.unlike_icon)
+            },
+            contentDescription = if(isLiked) {
+                stringResource(id = R.string.unlike)
+            } else {
+                stringResource(id = R.string.like)
+            },
+            tint = heartColor,
+            modifier = Modifier
+                .size(IconSizeSmall)
+                .scale(heartScale)
+        )
     }
 }

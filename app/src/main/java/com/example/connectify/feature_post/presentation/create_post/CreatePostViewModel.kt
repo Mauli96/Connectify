@@ -61,14 +61,17 @@ class CreatePostViewModel @Inject constructor(
                                 uiText = UiText.StringResource(R.string.post_created)
                             ))
                             _eventFlow.emit(UiEvent.Navigate(Screen.MainFeedScreen.route))
+                            _descriptionState.value = StandardTextFieldState()
+                            _chosenImageUri.value = null
+                            _isLoading.value = false
                         }
                         is Resource.Error -> {
                             _eventFlow.emit(UiEvent.ShowSnackbar(
                                 uiText = result.uiText ?: UiText.unknownError()
                             ))
+                            _isLoading.value = false
                         }
                     }
-                    _isLoading.value = false
                 }
 
             }

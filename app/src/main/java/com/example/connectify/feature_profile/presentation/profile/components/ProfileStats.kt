@@ -1,25 +1,27 @@
 package com.example.connectify.feature_profile.presentation.profile.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 
 @Composable
 fun ProfileStats(
@@ -28,43 +30,71 @@ fun ProfileStats(
     isOwnProfile: Boolean = true,
     isFollowing: Boolean = true,
     onFollowClick: () -> Unit = {},
+    onMessageClick: () -> Unit = {}
 ) {
-    Row(
+    Column(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        ProfileNumber(
-            number = user.followerCount,
-            text = stringResource(id = R.string.followers)
-        )
-        Spacer(modifier = Modifier.width(SpaceLarge))
-        ProfileNumber(
-            number = user.followingCount,
-            text = stringResource(id = R.string.following)
-        )
-        Spacer(modifier = Modifier.width(SpaceLarge))
-        ProfileNumber(
-            number = user.postCount,
-            text = stringResource(id = R.string.posts)
-        )
-        if(!isOwnProfile) {
+        Row {
+            ProfileNumber(
+                number = user.followerCount,
+                text = stringResource(id = R.string.followers)
+            )
             Spacer(modifier = Modifier.width(SpaceLarge))
-            Button(
-                onClick = onFollowClick,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = if(isFollowing) {
-                        Color.White
-                    } else MaterialTheme.colorScheme.primary
-                ),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(
-                    text = if(isFollowing) {
-                        stringResource(id = R.string.unfollow)
-                    } else stringResource(id = R.string.follow),
-                    style = MaterialTheme.typography.labelLarge
-                )
+            ProfileNumber(
+                number = user.followingCount,
+                text = stringResource(id = R.string.following)
+            )
+            Spacer(modifier = Modifier.width(SpaceLarge))
+            ProfileNumber(
+                number = user.postCount,
+                text = stringResource(id = R.string.posts)
+            )
+        }
+        Spacer(modifier = Modifier.height(SpaceMedium))
+        Row {
+            if(!isOwnProfile) {
+                Button(
+                    onClick = onFollowClick,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if(isFollowing) {
+                            Color.White
+                        } else MaterialTheme.colorScheme.primary
+                    ),
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(150.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(
+                        text = if(isFollowing) {
+                            stringResource(id = R.string.unfollow)
+                        } else stringResource(id = R.string.follow),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.width(SpaceSmall))
+                Button(
+                    onClick = onMessageClick,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(150.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.message),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = 12.sp
+                        )
+                    )
+                }
             }
         }
     }

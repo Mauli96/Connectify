@@ -10,11 +10,6 @@ import com.example.connectify.feature_chat.domain.use_case.InitializeRepository
 import com.example.connectify.feature_chat.domain.use_case.ObserveChatEvents
 import com.example.connectify.feature_chat.domain.use_case.ObserveMessages
 import com.example.connectify.feature_chat.domain.use_case.SendMessage
-import com.google.gson.Gson
-import com.tinder.scarlet.Scarlet
-import com.tinder.scarlet.retry.LinearBackoffStrategy
-import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
-import com.tinder.streamadapter.coroutines.CoroutinesStreamAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +34,7 @@ object ChatModule {
             observeMessages = ObserveMessages(repository),
             getChatsForUser = GetChatsForUser(repository),
             getMessagesForChat = GetMessagesForChat(repository),
-            initializeRepository = InitializeRepository(repository)
+            initializeRepository = InitializeRepository(repository),
         )
     }
 
