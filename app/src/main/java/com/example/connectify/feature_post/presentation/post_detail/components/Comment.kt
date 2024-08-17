@@ -32,6 +32,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
+import com.example.connectify.core.presentation.components.LikeButton
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -106,33 +107,20 @@ fun Comment(
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .clickable {
                                 onLikedByClick()
                             }
                     )
                 }
                 Spacer(modifier = Modifier.width(SpaceMedium))
-                IconButton(
-                    onClick = {
+                LikeButton(
+                    isLiked = comment.isLiked,
+                    onLikeClick = {
                         onLikeClick(comment.isLiked)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        tint = if(comment.isLiked) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onBackground
-                        },
-                        contentDescription = if(comment.isLiked) {
-                            stringResource(id = R.string.unlike)
-                        } else {
-                            stringResource(id = R.string.like)
-                        }
-                    )
-                }
+                    }
+                )
             }
         }
     }

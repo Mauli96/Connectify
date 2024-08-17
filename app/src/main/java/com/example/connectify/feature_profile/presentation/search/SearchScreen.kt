@@ -14,22 +14,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.PersonRemove
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -38,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
@@ -45,7 +44,6 @@ import com.example.connectify.R
 import com.example.connectify.core.presentation.components.UserProfileItem
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
-import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.showKeyboard
@@ -85,10 +83,13 @@ fun SearchScreen(
                     .padding(
                         top = SpaceMedium,
                         end = SpaceSmall
-                    )
+                    ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { onNavigateUp() }
+                    onClick = {
+                        onNavigateUp()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -101,14 +102,15 @@ fun SearchScreen(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(48.dp)
                         .focusRequester(focusRequester = focusRequester),
                     value = viewModel.searchFieldState.value.text,
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.White,
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
                         cursorColor = MaterialTheme.colorScheme.onPrimary,
-                        textColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledLabelColor = MaterialTheme.colorScheme.onPrimary,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
@@ -117,6 +119,9 @@ fun SearchScreen(
                             viewModel.onEvent(SearchEvent.Query(it))
                         }
                     },
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onPrimary
+                    ),
                     shape = RoundedCornerShape(10.dp),
                     singleLine = true,
                     placeholder = {
@@ -153,7 +158,7 @@ fun SearchScreen(
             }
             Column(
                 modifier = Modifier
-                    .padding(top = SpaceSmall)
+                    .padding(top = SpaceMedium)
                     .fillMaxSize()
             ) {
                 LazyColumn(

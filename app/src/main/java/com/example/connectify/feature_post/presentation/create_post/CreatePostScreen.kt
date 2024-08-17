@@ -96,9 +96,6 @@ fun CreatePostScreen(
                 is UiEvent.Navigate -> {
                     onNavigate(event.route)
                 }
-                is UiEvent.NavigateUp -> {
-                    onNavigateUp()
-                }
                 else -> {
                     null
                 }
