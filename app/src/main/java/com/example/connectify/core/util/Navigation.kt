@@ -78,6 +78,7 @@ fun Navigation(
             ChatScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
+                scaffoldState = scaffoldState,
                 imageLoader = imageLoader
             )
         }

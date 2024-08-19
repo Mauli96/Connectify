@@ -8,5 +8,6 @@ data class PostUseCases(
     val createComment: CreateCommentUseCase,
     val toggleLikeForParent: ToggleLikeForParentUseCase,
     val getLikesForParent: GetLikesForParentUseCase,
-    val deletePost: DeletePostUseCase
+    val deletePost: DeletePostUseCase,
+    val deleteComment: DeleteCommentUseCase
 )

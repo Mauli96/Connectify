@@ -2,6 +2,7 @@ package com.example.connectify.feature_chat.data.repository
 
 import com.example.connectify.R
 import com.example.connectify.core.util.Resource
+import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_chat.data.remote.ChatApi
 import com.example.connectify.feature_chat.data.remote.ChatService
@@ -92,5 +93,20 @@ class ChatRepositoryImpl(
                 chatId = chatId
             )
         )
+    }
+
+    override suspend fun deleteChat(chatId: String): SimpleResource {
+        return try {
+            chatApi.deleteChat(chatId)
+            Resource.Success(Unit)
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
     }
 }

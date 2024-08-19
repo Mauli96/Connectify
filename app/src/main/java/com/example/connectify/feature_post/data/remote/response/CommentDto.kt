@@ -11,7 +11,8 @@ data class CommentDto(
     val timestamp: Long,
     val comment: String,
     val isLiked: Boolean,
-    val likeCount: Int
+    val likeCount: Int,
+    val isOwnComment: Boolean
 ) {
     fun toComment(): Comment {
         return Comment(
@@ -23,7 +24,8 @@ data class CommentDto(
             },
             comment = comment,
             isLiked = isLiked,
-            likeCount = likeCount
+            likeCount = likeCount,
+            isOwnComment = isOwnComment
         )
     }
 }

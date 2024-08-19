@@ -7,5 +7,7 @@ data class PostDetailState(
     val post: Post? = null,
     val comments: List<Comment> = emptyList(),
     val isLoadingPost: Boolean = false,
-    val isLoadingComments: Boolean = false
+    val isLoadingComments: Boolean = false,
+    val isBottomSheetVisible: Boolean = false,
+    val deleteCommentId: String = ""
 )

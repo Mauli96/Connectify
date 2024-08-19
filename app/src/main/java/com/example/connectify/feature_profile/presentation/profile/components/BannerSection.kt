@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
-import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
@@ -230,7 +229,7 @@ fun BannerSection(
                     modifier = Modifier.size(iconSize)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_instagram_glyph_1),
+                        painter = painterResource(id = R.drawable.ic_instagram_logo),
                         contentDescription = "Instagram",
                         modifier = Modifier.size(iconSize)
                     )

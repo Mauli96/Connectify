@@ -108,7 +108,7 @@ fun SendTextField(
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.send_icon),
-                                contentDescription = stringResource(id = R.string.send_comment),
+                                contentDescription = stringResource(id = R.string.send),
                                 modifier = Modifier
                                     .size(25.dp)
                             )

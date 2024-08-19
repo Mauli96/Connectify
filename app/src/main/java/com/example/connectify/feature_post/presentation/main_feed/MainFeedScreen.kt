@@ -113,6 +113,7 @@ fun MainFeedScreen(
                     }
                     Post(
                         post = post,
+                        context = context,
                         imageLoader = imageLoader,
                         onPostClick = {
                             onNavigate(Screen.PostDetailScreen.route + "/${post.id}")

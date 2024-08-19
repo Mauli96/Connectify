@@ -95,4 +95,9 @@
     <string name="delete">Delete</string>
     <string name="connectify">Connectify</string>
     <string name="message">Message</string>
+    <string name="send">Send</string>
+    <string name="delete_comment">Delete comment</string>
+    <string name="successfully_deleted_comment">Successfully deleted comment</string>
+    <string name="successfully_deleted_chat">Successfully deleted chat</string>
+    <string name="delete_chat">Delete chat</string>
 </resources>

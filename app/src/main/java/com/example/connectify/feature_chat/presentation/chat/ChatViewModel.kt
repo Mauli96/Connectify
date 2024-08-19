@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.R
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
@@ -25,6 +26,29 @@ class ChatViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    fun onEvent(event: ChatEvent) {
+        when(event) {
+            is ChatEvent.DeleteChatId -> {
+                _state.value = state.value.copy(
+                    deleteChatId = event.chatId
+                )
+            }
+            is ChatEvent.DeleteChat -> {
+                deleteChat(event.chatId)
+            }
+            is ChatEvent.ShowBottomSheet -> {
+                _state.value = state.value.copy(
+                    isBottomSheetVisible = true
+                )
+            }
+            is ChatEvent.DismissBottomSheet -> {
+                _state.value = state.value.copy(
+                    isBottomSheetVisible = false
+                )
+            }
+        }
+    }
+
     init {
         loadChats()
     }
@@ -45,6 +69,33 @@ class ChatViewModel @Inject constructor(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                     _state.value = state.value.copy(isLoading = false)
+                }
+            }
+        }
+    }
+
+    private fun deleteChat(chatId: String) {
+        viewModelScope.launch {
+            val result = chatUseCases.deleteChat(chatId)
+            when(result) {
+                is Resource.Success -> {
+                    _state.value = state.value.copy(
+                        chats = state.value.chats.filter {
+                            it.chatId != chatId
+                        }
+                    )
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_chat
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
                 }
             }
         }

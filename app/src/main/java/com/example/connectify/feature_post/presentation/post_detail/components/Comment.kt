@@ -1,7 +1,9 @@
 package com.example.connectify.feature_post.presentation.post_detail.components
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,21 +15,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -36,14 +35,20 @@ import com.example.connectify.core.presentation.components.LikeButton
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.util.vibrate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Comment(
     modifier: Modifier = Modifier,
     comment: Comment,
+    context: Context,
     imageLoader: ImageLoader,
+    scope: CoroutineScope = rememberCoroutineScope(),
     onLikeClick: (Boolean) -> Unit = {},
-    onLikedByClick: () -> Unit = {}
+    onLikedByClick: () -> Unit = {},
+    onLongPress: (String) -> Unit = {}
 ) {
     Card(
         modifier = modifier,
@@ -54,7 +59,19 @@ fun Comment(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(SpaceMedium),
+                .padding(SpaceMedium)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            scope.launch {
+                                if(comment.isOwnComment) {
+                                    onLongPress(comment.id)
+                                    vibrate(context)
+                                }
+                            }
+                        }
+                    )
+                },
         ) {
             Row(
                 modifier = Modifier
@@ -108,7 +125,6 @@ fun Comment(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier
-                            .fillMaxWidth()
                             .clickable {
                                 onLikedByClick()
                             }

@@ -1,5 +1,6 @@
 package com.example.connectify.core.presentation.components
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,12 +50,14 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.Constants
+import com.example.connectify.core.util.vibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun Post(
     post: Post,
+    context: Context,
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     scope: CoroutineScope = rememberCoroutineScope(),
@@ -81,7 +84,10 @@ fun Post(
                         },
                         onLongPress = {
                             scope.launch {
-                                onLongPress(post.id)
+                                if(post.isOwnPost) {
+                                    onLongPress(post.id)
+                                    vibrate(context)
+                                }
                             }
                         }
                     )

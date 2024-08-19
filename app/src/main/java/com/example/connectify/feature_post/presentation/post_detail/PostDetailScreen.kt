@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -36,6 +39,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ActionRow
 import com.example.connectify.core.presentation.components.SendTextField
+import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
@@ -49,6 +53,7 @@ import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.feature_post.presentation.post_detail.components.Comment
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailScreen(
     scaffoldState: ScaffoldState,
@@ -60,6 +65,7 @@ fun PostDetailScreen(
 ) {
 
     val state = viewModel.state.value
+    val bottomSheetState = rememberModalBottomSheetState()
 
     val focusRequester = remember {
         FocusRequester()
@@ -189,33 +195,52 @@ fun PostDetailScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(SpaceMedium))
+                Spacer(modifier = Modifier.height(SpaceSmall))
+            }
+            if(state.comments.isNotEmpty()) {
+                item {
+                    Divider(
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .height(0.5.dp)
+                    )
+                    Spacer(modifier = Modifier.height(SpaceSmall))
+                }
             }
             items(state.comments) { comment ->
-                Box(
+                Comment(
                     modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Comment(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        imageLoader = imageLoader,
-                        comment = comment,
-                        onLikeClick = {
-                            viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
+                        .fillMaxWidth(),
+                    comment = comment,
+                    context = context,
+                    imageLoader = imageLoader,
+                    onLikeClick = {
+                        viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
+                    },
+                    onLikedByClick = {
+                        onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
+                    },
+                    onLongPress = { id ->
+                        viewModel.onEvent(PostDetailEvent.GetDeleteCommentId(id))
+                        viewModel.onEvent(PostDetailEvent.ShowBottomSheet)
+                    }
+                )
+                if(state.isBottomSheetVisible) {
+                    StandardBottomSheet(
+                        onDismissRequest = {
+                            viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                         },
-                        onLikedByClick = {
-                            onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
+                        bottomSheetState = bottomSheetState,
+                        title = stringResource(id = R.string.delete_comment),
+                        onDeleteClick = {
+                            viewModel.onEvent(PostDetailEvent.DeleteComment(state.deleteCommentId))
+                            viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                        },
+                        onCancelClick = {
+                            viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                         }
                     )
-                    if(state.isLoadingComments) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Center),
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 2.dp,
-                            trackColor = Color.White
-                        )
-                    }
                 }
             }
         }

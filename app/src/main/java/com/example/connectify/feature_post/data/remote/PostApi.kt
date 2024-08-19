@@ -73,6 +73,11 @@ interface PostApi {
         @Query("postId") postId: String,
     )
 
+    @DELETE("api/comment/delete")
+    suspend fun deleteComment(
+        @Query("commentId") commentId: String
+    )
+
 
     companion object {
         const val BASE_URL = "http://192.168.0.209:8001/"

@@ -80,6 +80,51 @@ class PostDetailViewModel @Inject constructor(
                     error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
                 )
             }
+            is PostDetailEvent.GetDeleteCommentId -> {
+                _state.value = state.value.copy(
+                    deleteCommentId = event.commentId
+                )
+            }
+            is PostDetailEvent.DeleteComment -> {
+                deleteComment(event.commentId)
+            }
+            is PostDetailEvent.ShowBottomSheet -> {
+                _state.value = state.value.copy(
+                    isBottomSheetVisible = true
+                )
+            }
+            is PostDetailEvent.DismissBottomSheet -> {
+                _state.value = state.value.copy(
+                    isBottomSheetVisible = false
+                )
+            }
+        }
+    }
+
+    private fun deleteComment(commentId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deleteComment(commentId)
+            when(result) {
+                is Resource.Success -> {
+                    _state.value = state.value.copy(
+                        comments = state.value.comments.filter {
+                            it.id != commentId
+                        }
+                    )
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_comment
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -162,7 +207,10 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun createComment(postId: String, comment: String) {
+    private fun createComment(
+        postId: String,
+        comment: String
+    ) {
         viewModelScope.launch {
             isUserLoggedIn = authenticate() is Resource.Success
             if(!isUserLoggedIn) {

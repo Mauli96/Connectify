@@ -61,6 +61,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
+import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
@@ -211,6 +212,7 @@ fun ProfileScreen(
                 }
                 Post(
                     post = post,
+                    context = context,
                     imageLoader = imageLoader,
                     onPostClick = {
                         onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
@@ -233,79 +235,21 @@ fun ProfileScreen(
                 if(i == pagingState.items.size - 1) {
                     Spacer(modifier = Modifier.height(50.dp))
                 }
-                if(post.isOwnPost) {
-                    if(state.isBottomSheetVisible) {
-                        ModalBottomSheet(
-                            onDismissRequest = {
-                                viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                            },
-                            sheetState = bottomSheetState,
-                            containerColor = MaterialTheme.colorScheme.background
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.delete_post),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(SpaceMedium))
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .size(
-                                            height = 40.dp,
-                                            width = 100.dp
-                                        )
-                                        .clickable {
-                                            viewModel.onEvent(ProfileEvent.DeletePost(state.deletePostId))
-                                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                                        },
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Spacer(modifier = Modifier.width(SpaceMedium))
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.delete_icon),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(IconSizeSmall),
-                                        tint = Color.Red
-                                    )
-                                    Spacer(modifier = Modifier.width(SpaceSmall))
-                                    Text(
-                                        text = stringResource(id = R.string.delete),
-                                        style = MaterialTheme.typography.titleSmall
-                                    )
-                                }
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .size(
-                                            height = 40.dp,
-                                            width = 100.dp
-                                        )
-                                        .clickable {
-                                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                                        },
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Spacer(modifier = Modifier.width(SpaceMedium))
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.cancel_icon),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(15.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(SpaceSmall))
-                                    Text(
-                                        text = stringResource(id = R.string.cancel),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(SpaceLarge))
-                            }
+                if(state.isBottomSheetVisible) {
+                    StandardBottomSheet(
+                        onDismissRequest = {
+                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                        },
+                        bottomSheetState = bottomSheetState,
+                        title = stringResource(id = R.string.delete_post),
+                        onDeleteClick = {
+                            viewModel.onEvent(ProfileEvent.DeletePost(state.deletePostId))
+                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                        },
+                        onCancelClick = {
+                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
                         }
-                    }
+                    )
                 }
             }
         }
