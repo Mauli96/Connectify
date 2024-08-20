@@ -12,6 +12,7 @@ import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import com.example.connectify.feature_profile.domain.use_case.SearchUserUseCase
 import com.example.connectify.feature_profile.domain.use_case.SetSkillSelectedUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
+import com.example.connectify.feature_profile.domain.use_case.GetFollowsByUserUseCase
 import com.example.connectify.feature_profile.domain.use_case.LogoutUseCase
 import com.example.connectify.feature_profile.domain.use_case.UpdateProfileUseCase
 import com.google.gson.Gson
@@ -56,6 +57,7 @@ object ProfileModule {
             getPostsForProfile = GetPostsForProfileUseCase(repository),
             searchUser = SearchUserUseCase(repository),
             toggleFollowStateForUser = ToggleFollowStateForUserUseCase(repository),
+            getFollowsByUser = GetFollowsByUserUseCase(repository),
             logout = LogoutUseCase(repository)
         )
     }

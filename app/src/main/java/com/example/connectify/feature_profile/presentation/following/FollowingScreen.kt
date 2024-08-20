@@ -1,4 +1,4 @@
-package com.example.connectify.feature_post.presentation.person_list
+package com.example.connectify.feature_profile.presentation.following
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,12 +31,12 @@ import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterialApi
 @Composable
-fun PersonListScreen(
+fun FollowingScreen(
     scaffoldState: ScaffoldState,
     imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    viewModel: PersonListViewModel = hiltViewModel()
+    viewModel: FollowingViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
     val context = LocalContext.current
@@ -55,6 +55,7 @@ fun PersonListScreen(
             }
         }
     }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -63,7 +64,7 @@ fun PersonListScreen(
             showBackArrow = true,
             title = {
                 Text(
-                    text = stringResource(id = R.string.liked_by),
+                    text = stringResource(id = R.string.following),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -85,7 +86,7 @@ fun PersonListScreen(
                             onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
                         },
                         onActionItemClick = {
-                            viewModel.onEvent(PersonListEvent.ToggleFollowStateForUser(user.userId))
+                            viewModel.onEvent(FollowingEvent.ToggleFollowStateForUser(user.userId))
                         },
                         ownUserId = viewModel.ownUserId.value
                     )

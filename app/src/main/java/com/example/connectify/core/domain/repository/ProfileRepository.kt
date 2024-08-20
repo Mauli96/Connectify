@@ -36,5 +36,7 @@ interface ProfileRepository {
 
     suspend fun unfollowUser(userId: String): SimpleResource
 
+    suspend fun getFollowsByUser(userId: String): Resource<List<UserItem>>
+
     fun logout()
 }

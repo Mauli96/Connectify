@@ -1,6 +1,11 @@
 package com.example.connectify.feature_chat.presentation.chat
 
 import android.util.Base64
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -95,7 +100,6 @@ fun ChatScreen(
                             onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}")
                         },
                         onLongPress = { id ->
-                            println("Given chatId : $id")
                             viewModel.onEvent(ChatEvent.DeleteChatId(id))
                             viewModel.onEvent(ChatEvent.ShowBottomSheet)
                         }

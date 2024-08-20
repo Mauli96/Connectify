@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -116,7 +117,7 @@ fun MessageScreen(
                         )
                         Spacer(modifier = Modifier.height(SpaceSmall))
                     }
-                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    Spacer(modifier = Modifier.height(SpaceSmall))
                 }
             }
             SendTextField(

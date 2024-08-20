@@ -25,6 +25,7 @@ import com.example.connectify.feature_auth.presentation.register.RegisterScreen
 import com.example.connectify.feature_profile.presentation.search.SearchScreen
 import com.example.connectify.feature_auth.presentation.splash.SplashScreen
 import com.example.connectify.feature_chat.presentation.message.MessageScreen
+import com.example.connectify.feature_profile.presentation.following.FollowingScreen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -216,6 +217,21 @@ fun Navigation(
                 onNavigateUp = navController::navigateUp,
                 scaffoldState = scaffoldState,
                 shouldShowKeyboard = shouldShowKeyboard,
+                imageLoader = imageLoader
+            )
+        }
+        composable(
+            route = Screen.FollowingScreen.route + "/{userId}",
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            FollowingScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+                scaffoldState = scaffoldState,
                 imageLoader = imageLoader
             )
         }

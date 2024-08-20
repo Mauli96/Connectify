@@ -257,9 +257,10 @@ fun EngagementButtons(
             )
         }
         Spacer(modifier = Modifier.width(SpaceMedium))
-        IconButton(onClick = {
-            onShareClick()
-        },
+        IconButton(
+            onClick = {
+                onShareClick()
+            },
             modifier = Modifier.size(iconSize)
         ) {
             Icon(

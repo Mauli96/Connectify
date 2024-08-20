@@ -1,5 +1,10 @@
 package com.example.connectify.feature_profile.presentation.profile.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -7,22 +12,24 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
@@ -103,75 +111,102 @@ fun BannerSection(
             },
             actions = {
                 if(isOwnProfile) {
-                    IconButton(
-                        onClick = {
-                           showDropDownMenu = !showDropDownMenu
+                    if(showDropDownMenu) {
+                        AnimatedVisibility(
+                            visible = showDropDownMenu,
+                            enter = expandVertically() + fadeIn(),
+                            exit = shrinkVertically() + fadeOut(),
+
+                        ) {
+                            DropdownMenu(
+                                expanded = showDropDownMenu,
+                                onDismissRequest = {
+                                    showDropDownMenu = !showDropDownMenu
+                                },
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.background)
+                            ) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp)
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.edit_icon),
+                                                contentDescription = stringResource(id = R.string.edit_profile),
+                                                modifier = Modifier.size(IconSizeSmall)
+                                            )
+                                            Spacer(modifier = Modifier.width(SpaceSmall))
+                                            Text(
+                                                text = stringResource(id = R.string.edit_profile),
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        onEditClick()
+                                        showDropDownMenu = !showDropDownMenu
+                                    }
+                                )
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .height(0.2.dp),
+                                    thickness = 0.2.dp,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp)
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.logout_icon),
+                                                contentDescription = stringResource(id = R.string.log_out),
+                                                modifier = Modifier.size(IconSizeSmall),
+                                                tint = Color.Red
+                                            )
+                                            Spacer(modifier = Modifier.width(SpaceSmall))
+                                            Text(
+                                                text = stringResource(id = R.string.log_out),
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    color = Color.Red
+                                                )
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        onLogoutClick()
+                                        showDropDownMenu = !showDropDownMenu
+                                    }
+                                )
+                            }
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.MoreVert,
-                            contentDescription = "More Items",
-                            tint = Color.White
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showDropDownMenu,
-                        onDismissRequest = {
-                            showDropDownMenu = !showDropDownMenu
-                        },
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp),
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Row {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.edit_icon),
-                                        contentDescription = "Edit Profile",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(SpaceSmall))
-                                    Text(
-                                        text = "Edit Profile",
-                                        style = MaterialTheme.typography.displaySmall
-                                    )
-                                }
-                            },
+                    } else {
+                        IconButton(
                             onClick = {
-                                onEditClick()
                                 showDropDownMenu = !showDropDownMenu
                             }
-                        )
-                        Divider(
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier
-                                .height(0.5.dp)
-                        )
-                        DropdownMenuItem(
-                            text = {
-                                Row {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.logout_icon),
-                                        contentDescription = "Edit Profile",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(SpaceSmall))
-                                    Text(
-                                        text = "Logout",
-                                        style = MaterialTheme.typography.displaySmall
-                                    )
-                                }
-                            },
-                            onClick = {
-                                onLogoutClick()
-                                showDropDownMenu = !showDropDownMenu
-                            }
-                        )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = "More Items",
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
             },
-            backgroundColor = Color.Transparent
+            colors = TopAppBarColors(
+                containerColor = Color.Transparent,
+                scrolledContainerColor = Color.Transparent,
+                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                titleContentColor = Color.Transparent,
+                actionIconContentColor = MaterialTheme.colorScheme.onBackground
+            )
         )
         Box(
             modifier = Modifier

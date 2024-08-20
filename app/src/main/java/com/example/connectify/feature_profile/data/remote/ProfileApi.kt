@@ -48,6 +48,11 @@ interface ProfileApi {
         @Query("userId") userId: String
     ): BasicApiResponse<Unit>
 
+    @GET("/api/get/following")
+    suspend fun getFollowsByUser(
+        @Query("userId") userId: String
+    ): List<UserItemDto>
+
     companion object {
         const val BASE_URL = "http://192.168.0.209:8001/"
     }
