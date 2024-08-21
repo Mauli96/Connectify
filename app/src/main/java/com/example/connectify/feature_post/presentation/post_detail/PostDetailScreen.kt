@@ -3,6 +3,7 @@ package com.example.connectify.feature_post.presentation.post_detail
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -177,8 +179,12 @@ fun PostDetailScreen(
                                             post.likeCount
                                         ),
                                         modifier = Modifier
-                                            .clickable {
-                                                onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                                            .pointerInput(Unit) {
+                                                detectTapGestures(
+                                                    onTap = {
+                                                        onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                                                    }
+                                                )
                                             },
                                         style = MaterialTheme.typography.labelSmall
                                     )

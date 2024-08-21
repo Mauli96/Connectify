@@ -125,8 +125,12 @@ fun Comment(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier
-                            .clickable {
-                                onLikedByClick()
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onTap = {
+                                        onLikedByClick()
+                                    }
+                                )
                             }
                     )
                 }

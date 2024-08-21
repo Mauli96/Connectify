@@ -45,9 +45,12 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
+import com.example.connectify.core.presentation.ui.theme.IconSizeMediumSmall
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.vibrate
@@ -210,8 +213,12 @@ fun ActionRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .clickable {
-                            onUsernameClick()
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    onUsernameClick()
+                                }
+                            )
                         }
                 )
             }
@@ -229,7 +236,6 @@ fun ActionRow(
 fun EngagementButtons(
     modifier: Modifier = Modifier,
     isLiked: Boolean = false,
-    iconSize: Dp = 30.dp,
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
@@ -243,31 +249,33 @@ fun EngagementButtons(
             isLiked = isLiked,
             onLikeClick = onLikeClick
         )
-        Spacer(modifier = Modifier.width(SpaceMedium))
-        IconButton(
-            onClick = {
-                onCommentClick()
-            },
-            modifier = Modifier.size(iconSize)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.comment_icon),
-                contentDescription = stringResource(id = R.string.comment),
-                modifier = Modifier.size(IconSizeSmall)
-            )
-        }
-        Spacer(modifier = Modifier.width(SpaceMedium))
-        IconButton(
-            onClick = {
-                onShareClick()
-            },
-            modifier = Modifier.size(iconSize)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.share_icon),
-                contentDescription = stringResource(id = R.string.share),
-                modifier = Modifier.size(IconSizeSmall)
-            )
-        }
+        Spacer(modifier = Modifier.width(SpaceMediumLarge))
+        Icon(
+            painter = painterResource(id = R.drawable.comment_icon),
+            contentDescription = stringResource(id = R.string.comment),
+            modifier = Modifier
+                .size(IconSizeSmall)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            onCommentClick()
+                        }
+                    )
+                }
+        )
+        Spacer(modifier = Modifier.width(SpaceMediumLarge))
+        Icon(
+            painter = painterResource(id = R.drawable.share_icon),
+            contentDescription = stringResource(id = R.string.share),
+            modifier = Modifier
+                .size(IconSizeSmall)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            onShareClick()
+                        }
+                    )
+                }
+        )
     }
 }
