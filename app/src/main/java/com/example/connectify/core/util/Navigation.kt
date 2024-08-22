@@ -25,6 +25,7 @@ import com.example.connectify.feature_auth.presentation.register.RegisterScreen
 import com.example.connectify.feature_profile.presentation.search.SearchScreen
 import com.example.connectify.feature_auth.presentation.splash.SplashScreen
 import com.example.connectify.feature_chat.presentation.message.MessageScreen
+import com.example.connectify.feature_profile.presentation.follower.FollowerScreen
 import com.example.connectify.feature_profile.presentation.following.FollowingScreen
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -229,6 +230,21 @@ fun Navigation(
             )
         ) {
             FollowingScreen(
+                onNavigate = navController::navigate,
+                onNavigateUp = navController::navigateUp,
+                scaffoldState = scaffoldState,
+                imageLoader = imageLoader
+            )
+        }
+        composable(
+            route = Screen.FollowerScreen.route + "/{userId}",
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            FollowerScreen(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
                 scaffoldState = scaffoldState,

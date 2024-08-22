@@ -30,6 +30,7 @@ fun ProfileStats(
     isOwnProfile: Boolean = true,
     isFollowing: Boolean = true,
     onFollowingClick: () -> Unit = {},
+    onFollowerClick: () -> Unit = {},
     onFollowClick: () -> Unit = {},
     onMessageClick: () -> Unit = {}
 ) {
@@ -41,7 +42,10 @@ fun ProfileStats(
         Row {
             ProfileNumber(
                 number = user.followerCount,
-                text = stringResource(id = R.string.followers)
+                text = stringResource(id = R.string.followers),
+                onClick = {
+                    onFollowerClick()
+                }
             )
             Spacer(modifier = Modifier.width(SpaceLarge))
             ProfileNumber(

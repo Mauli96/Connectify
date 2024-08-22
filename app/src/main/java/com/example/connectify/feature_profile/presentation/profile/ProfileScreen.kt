@@ -193,6 +193,9 @@ fun ProfileScreen(
                         onFollowingClick = {
                             onNavigate(Screen.FollowingScreen.route + "/${profile.userId}")
                         },
+                        onFollowerClick = {
+                            onNavigate(Screen.FollowerScreen.route + "/${profile.userId}")
+                        },
                         onFollowClick = {
                             viewModel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
                         },

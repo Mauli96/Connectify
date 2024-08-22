@@ -23,6 +23,7 @@ fun ProfileHeaderSection(
     isOwnProfile: Boolean = true,
     isFollowing: Boolean = true,
     onFollowingClick: () -> Unit = {},
+    onFollowerClick: () -> Unit = {},
     onFollowClick: () -> Unit = {},
     onMessageClick: () -> Unit = {}
 ) {
@@ -56,6 +57,7 @@ fun ProfileHeaderSection(
             isOwnProfile = isOwnProfile,
             isFollowing = isFollowing,
             onFollowingClick = onFollowingClick,
+            onFollowerClick = onFollowerClick,
             onFollowClick = onFollowClick,
             onMessageClick = onMessageClick
         )

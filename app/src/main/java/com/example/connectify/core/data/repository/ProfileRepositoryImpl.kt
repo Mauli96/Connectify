@@ -219,6 +219,23 @@ class ProfileRepositoryImpl(
         }
     }
 
+    override suspend fun getFollowedToUser(userId: String): Resource<List<UserItem>> {
+        return try {
+            val response = profileApi.getFollowedToUser(userId)
+            Resource.Success(
+                data = response.map { it.toUserItem() }
+            )
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
     override fun logout() {
         sharedPreferences.edit()
             .putString(Constants.KEY_JWT_TOKEN, "")
