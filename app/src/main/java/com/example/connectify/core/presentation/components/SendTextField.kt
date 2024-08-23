@@ -1,12 +1,12 @@
 package com.example.connectify.core.presentation.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
-import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 
 @Composable
 fun SendTextField(
@@ -45,21 +43,17 @@ fun SendTextField(
     isLoading: Boolean = false,
     focusRequester: FocusRequester = FocusRequester()
 ) {
-    Row(
+
+    Box(
         modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxWidth()
-            .padding(
-                start = SpaceMedium,
-                end = SpaceMedium,
-                bottom = SpaceSmall
-            ),
-        verticalAlignment = Alignment.CenterVertically
+            .navigationBarsPadding()
+            .fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter
     ) {
         OutlinedTextField(
             modifier = Modifier
+                .imePadding()
                 .fillMaxWidth()
-                .weight(1f)
                 .height(48.dp)
                 .shadow(16.dp)
                 .focusRequester(focusRequester = focusRequester),
@@ -81,7 +75,7 @@ fun SendTextField(
                     onValueChange(it)
                 }
             },
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(0.dp),
             maxLines = maxLines,
             singleLine = false,
             placeholder = {

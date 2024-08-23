@@ -80,6 +80,6 @@ interface PostApi {
 
 
     companion object {
-        const val BASE_URL = "http://192.168.0.209:8001/"
+        const val BASE_URL = "http://192.168.0.210:8001/"
     }
 }

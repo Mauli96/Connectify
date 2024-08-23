@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.StandardSearchField
 import com.example.connectify.core.presentation.components.UserProfileItem
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
@@ -98,37 +99,13 @@ fun SearchScreen(
                     )
                 }
                 Spacer(modifier = Modifier.width(SpaceSmall))
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .focusRequester(focusRequester = focusRequester),
-                    value = viewModel.searchFieldState.value.text,
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    onValueChange = {
-                        if(it.length <= ProfileConstants.MAX_LENGTH) {
-                            viewModel.onEvent(SearchEvent.Query(it))
-                        }
+                StandardSearchField(
+                    query = viewModel.searchFieldState.value.text,
+                    onQueryChanged = {
+                        viewModel.onEvent(SearchEvent.Query(it))
                     },
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    shape = RoundedCornerShape(10.dp),
-                    singleLine = true,
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.search),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    },
+                    focusRequester = focusRequester,
+                    placeholderText = stringResource(id = R.string.search_for_user),
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.search_icon),
@@ -152,7 +129,8 @@ fun SearchScreen(
                                 )
                             }
                         }
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
             Column(
