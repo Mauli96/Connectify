@@ -135,6 +135,16 @@ class MessageViewModel @Inject constructor(
             is MessageEvent.SendMessage -> {
                 sendMessage()
             }
+            is MessageEvent.ShowDialog -> {
+                _state.value = state.value.copy(
+                    isDialogVisible = true
+                )
+            }
+            is MessageEvent.DismissDialog -> {
+                _state.value = state.value.copy(
+                    isDialogVisible = false
+                )
+            }
         }
     }
 

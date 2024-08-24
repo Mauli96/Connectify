@@ -116,6 +116,7 @@ fun Navigation(
         }
         composable(Screen.ActivityScreen.route) {
             ActivityScreen(
+                imageLoader = imageLoader,
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
             )

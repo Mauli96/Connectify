@@ -8,6 +8,7 @@ import java.util.*
 data class ActivityDto(
     val timestamp: Long,
     val userId: String,
+    val profilePictureUrl: String,
     val parentId: String,
     val type: Int,
     val username: String,
@@ -19,6 +20,7 @@ data class ActivityDto(
             userId = userId,
             parentId = parentId,
             username = username,
+            profilePictureUrl = profilePictureUrl,
             activityType = when(type) {
                 ActivityType.FollowedUser.type -> ActivityType.FollowedUser
                 ActivityType.LikedPost.type -> ActivityType.LikedPost

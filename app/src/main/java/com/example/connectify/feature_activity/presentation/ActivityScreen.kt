@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,17 +21,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.HintGray
-import com.example.connectify.core.presentation.ui.theme.SpaceLarge
-import com.example.connectify.core.presentation.ui.theme.SpaceMedium
-import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.feature_activity.presentation.components.ActivityItem
 
 @Composable
 fun ActivityScreen(
+    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
     viewModel: ActivityViewModel = hiltViewModel()
@@ -76,17 +75,19 @@ fun ActivityScreen(
                                 activityType = activity.activityType,
                                 formattedTime = activity.formattedTime,
                                 parentId = activity.parentId,
-                                username = activity.username
+                                username = activity.username,
+                                profilePictureUrl = activity.profilePictureUrl
                             ),
                             onNavigate = onNavigate,
+                            imageLoader = imageLoader,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    Divider(
-                        thickness = 1.dp,
-                        color = HintGray,
+                    HorizontalDivider(
                         modifier = Modifier
-                            .height(0.5.dp)
+                            .height(0.5.dp),
+                        thickness = 1.dp,
+                        color = HintGray
                     )
                 }
                 item {
