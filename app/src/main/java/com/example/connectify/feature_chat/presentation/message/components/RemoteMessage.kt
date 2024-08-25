@@ -18,10 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.feature_chat.domain.model.Message
 
 @Composable
 fun RemoteMessage(
-    message: String,
+    message: Message,
     formattedTime: String,
     color: Color = HintGray,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
@@ -61,7 +62,7 @@ fun RemoteMessage(
     ) {
         Column {
             Text(
-                text = message,
+                text = message.text,
                 color = textColor
             )
             Box(

@@ -7,5 +7,6 @@ data class ChatUseCases(
     val getChatsForUser: GetChatsForUser,
     val getMessagesForChat: GetMessagesForChat,
     val initializeRepository: InitializeRepository,
-    val deleteChat: DeleteChat
+    val deleteChat: DeleteChat,
+    val deleteMessage: DeleteMessage
 )

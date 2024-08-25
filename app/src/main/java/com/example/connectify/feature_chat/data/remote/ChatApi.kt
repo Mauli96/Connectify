@@ -23,6 +23,11 @@ interface ChatApi {
         @Query("chatId") chatId: String
     )
 
+    @DELETE("/api/chat/message/delete")
+    suspend fun deleteMessage(
+        @Query("messageId") messageId: String
+    )
+
     companion object {
         const val BASE_URL = "http://192.168.0.210:8001/"
     }

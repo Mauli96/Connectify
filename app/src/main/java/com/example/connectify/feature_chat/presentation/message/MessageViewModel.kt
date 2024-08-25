@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
@@ -144,6 +145,36 @@ class MessageViewModel @Inject constructor(
                 _state.value = state.value.copy(
                     isDialogVisible = false
                 )
+            }
+            is MessageEvent.DeleteMessageId -> {
+                _state.value = state.value.copy(
+                    deleteMessageId = event.messageId
+                )
+            }
+            is MessageEvent.DeleteMessage -> {
+                deleteMessage(event.messageId)
+            }
+        }
+    }
+
+    private fun deleteMessage(messageId: String) {
+        viewModelScope.launch {
+            val result = chatUseCases.deleteMessage(messageId)
+            when(result) {
+                is Resource.Success -> {
+                    _pagingState.value = pagingState.value.copy(
+                        items = pagingState.value.items.filter {
+                            it.id != messageId
+                        }
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
             }
         }
     }

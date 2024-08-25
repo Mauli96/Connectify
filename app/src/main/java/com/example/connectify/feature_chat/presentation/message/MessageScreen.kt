@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,8 +36,11 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediu
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.feature_chat.presentation.message.components.OwnMessage
 import com.example.connectify.feature_chat.presentation.message.components.RemoteMessage
+import kotlinx.coroutines.flow.collectLatest
 import okio.ByteString.Companion.decodeBase64
 import java.nio.charset.Charset
 
@@ -43,6 +48,7 @@ import java.nio.charset.Charset
 fun MessageScreen(
     remoteUserId: String,
     remoteUsername: String,
+    scaffoldState: ScaffoldState,
     encodedRemoteUserProfilePictureUrl: String,
     imageLoader: ImageLoader,
     onNavigateUp: () -> Unit = {},
@@ -56,6 +62,22 @@ fun MessageScreen(
     val pagingState = viewModel.pagingState.value
     val state = viewModel.state.value
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when(event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.uiText.asString(context)
+                    )
+                }
+                else -> {
+                    null
+                }
+            }
+        }
+    }
 
     LaunchedEffect(key1 = pagingState) {
         viewModel.messageReceived.collect { event ->
@@ -111,15 +133,16 @@ fun MessageScreen(
                     }
                     if(message.fromId == remoteUserId) {
                         RemoteMessage(
-                            message = message.text,
+                            message = message,
                             formattedTime = message.formattedTime
                         )
                         Spacer(modifier = Modifier.height(SpaceSmall))
                     } else {
                         OwnMessage(
-                            message = message.text,
+                            message = message,
                             formattedTime = message.formattedTime,
-                            onLongPress = {
+                            onLongPress = { id ->
+                                viewModel.onEvent(MessageEvent.DeleteMessageId(id))
                                 viewModel.onEvent(MessageEvent.ShowDialog)
                             }
                         )
@@ -136,12 +159,12 @@ fun MessageScreen(
                 ) {
                     Column {
                         Text(
-                            text = "Delete Message?",
+                            text = stringResource(id = R.string.delete_message),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(modifier = Modifier.height(SpaceSmall))
                         Text(
-                            text = "This action cannot be undone.",
+                            text = stringResource(id = R.string.this_action_cannot_be_undone),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(SpaceMedium))
@@ -149,16 +172,17 @@ fun MessageScreen(
                             Button(onClick = {
                                 viewModel.onEvent(MessageEvent.DismissDialog)
                             }) {
-                                Text(text = "Cancel")
+                                Text(text = stringResource(id = R.string.cancel))
                             }
                             Spacer(modifier = Modifier.width(SpaceLarge))
                             Button(
                                 onClick = {
-
+                                    viewModel.onEvent(MessageEvent.DeleteMessage(state.deleteMessageId))
+                                    viewModel.onEvent(MessageEvent.DismissDialog)
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                             ) {
-                                Text(text = "Delete")
+                                Text(text = stringResource(id = R.string.delete))
                             }
                         }
                         Spacer(modifier = Modifier.height(SpaceSmall))

@@ -5,6 +5,7 @@ import com.example.connectify.feature_chat.data.repository.ChatRepositoryImpl
 import com.example.connectify.feature_chat.domain.respository.ChatRepository
 import com.example.connectify.feature_chat.domain.use_case.ChatUseCases
 import com.example.connectify.feature_chat.domain.use_case.DeleteChat
+import com.example.connectify.feature_chat.domain.use_case.DeleteMessage
 import com.example.connectify.feature_chat.domain.use_case.GetChatsForUser
 import com.example.connectify.feature_chat.domain.use_case.GetMessagesForChat
 import com.example.connectify.feature_chat.domain.use_case.InitializeRepository
@@ -36,7 +37,8 @@ object ChatModule {
             getChatsForUser = GetChatsForUser(repository),
             getMessagesForChat = GetMessagesForChat(repository),
             initializeRepository = InitializeRepository(repository),
-            deleteChat = DeleteChat(repository)
+            deleteChat = DeleteChat(repository),
+            deleteMessage = DeleteMessage(repository)
         )
     }
 

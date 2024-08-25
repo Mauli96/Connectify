@@ -102,4 +102,6 @@
     <string name="delete_chat">Delete chat</string>
     <string name="edit_profile">Edit profile</string>
     <string name="search_for_user">Search for user</string>
+    <string name="delete_message">Delete Message?</string>
+    <string name="this_action_cannot_be_undone">This action cannot be undone.</string>
 </resources>

@@ -109,4 +109,19 @@ class ChatRepositoryImpl(
             )
         }
     }
+
+    override suspend fun deleteMessage(messageId: String): SimpleResource {
+        return try {
+            chatApi.deleteMessage(messageId)
+            Resource.Success(Unit)
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
 }

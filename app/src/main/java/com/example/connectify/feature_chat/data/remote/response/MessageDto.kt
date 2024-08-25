@@ -20,6 +20,7 @@ data class MessageDto(
             formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
                 .format(timestamp),
             chatId = chatId,
+            id = id
         )
     }
 }

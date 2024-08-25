@@ -108,6 +108,7 @@ fun Navigation(
             MessageScreen(
                 remoteUserId = remoteUserId,
                 remoteUsername = remoteUsername,
+                scaffoldState = scaffoldState,
                 encodedRemoteUserProfilePictureUrl = remoteUserProfilePictureUrl,
                 onNavigateUp = navController::navigateUp,
                 onNavigate = navController::navigate,

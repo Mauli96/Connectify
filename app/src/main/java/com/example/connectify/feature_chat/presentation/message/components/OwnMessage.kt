@@ -24,19 +24,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.DarkerGreen
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.feature_chat.domain.model.Message
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun OwnMessage(
-    message: String,
+    message: Message,
     formattedTime: String,
     color: Color = DarkerGreen,
     scope: CoroutineScope = rememberCoroutineScope(),
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
     triangleHeight: Dp = 30.dp,
-    onLongPress: () -> Unit = {}
+    onLongPress: (String) -> Unit = {}
 ) {
     val cornerRadius = MaterialTheme.shapes.medium.bottomEnd
     Row(
@@ -53,7 +54,7 @@ fun OwnMessage(
                     detectTapGestures(
                         onLongPress = {
                             scope.launch {
-                                onLongPress()
+                                onLongPress(message.id)
                             }
                         }
                     )
@@ -84,7 +85,7 @@ fun OwnMessage(
         ) {
             Column {
                 Text(
-                    text = message,
+                    text = message.text,
                     color = textColor
                 )
                 Box(

@@ -30,4 +30,6 @@ interface ChatRepository {
     )
 
     suspend fun deleteChat(chatId: String): SimpleResource
+
+    suspend fun deleteMessage(messageId: String): SimpleResource
 }
