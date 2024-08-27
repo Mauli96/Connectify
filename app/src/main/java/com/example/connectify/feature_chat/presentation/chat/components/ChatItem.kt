@@ -34,6 +34,7 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.vibrate
+import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.domain.model.Chat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -107,8 +108,7 @@ fun ChatItem(
                     )
                     Spacer(modifier = Modifier.width(SpaceSmall))
                     Text(
-                        text = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
-                            .format(item.timestamp)
+                        text = DateFormatUtil.timestampToFormattedString(item.timestamp, "MMM dd, hh:mm a")
                     )
                 }
                 Spacer(modifier = Modifier.height(SpaceSmall))

@@ -97,7 +97,7 @@ fun ChatScreen(
                         context = context,
                         modifier = Modifier.fillMaxWidth(),
                         onItemClick = {
-                            onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}")
+                            onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}?isOnline=${chat.online}?lastSeen=${chat.lastSeen}")
                         },
                         onLongPress = { id ->
                             viewModel.onEvent(ChatEvent.DeleteChatId(id))

@@ -2,6 +2,7 @@ package com.example.connectify.feature_activity.data.remote.response
 
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.feature_activity.presentation.util.ActivityType
+import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,9 +29,7 @@ data class ActivityDto(
                 ActivityType.CommentedOnPost.type -> ActivityType.CommentedOnPost
                 else -> ActivityType.FollowedUser
             },
-            formattedTime = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault()).run {
-                format(timestamp)
-            }
+            formattedTime = DateFormatUtil.timestampToFormattedString(timestamp, "MMM dd, hh:mm a")
         )
     }
 }

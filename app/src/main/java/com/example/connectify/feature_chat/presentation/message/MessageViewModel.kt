@@ -60,7 +60,7 @@ class MessageViewModel @Inject constructor(
         onSuccess = { messages ->
             _pagingState.value = pagingState.value.copy(
                 items = pagingState.value.items + messages,
-                endReached = messages.isEmpty(),
+                endReached = messages.isEmpty()
             )
             viewModelScope.launch {
                 _messageUpdatedEvent.emit(MessageUpdateEvent.MessagePageLoaded)

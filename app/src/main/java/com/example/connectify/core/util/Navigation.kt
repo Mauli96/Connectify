@@ -85,11 +85,19 @@ fun Navigation(
             )
         }
         composable(
-            route = Screen.MessageScreen.route + "/{remoteUserId}/{remoteUsername}/{remoteUserProfilePictureUrl}?chatId={chatId}",
+            route = Screen.MessageScreen.route + "/{remoteUserId}/{remoteUsername}/{remoteUserProfilePictureUrl}?chatId={chatId}?isOnline={isOnline}?lastSeen={lastSeen}",
             arguments = listOf(
                 navArgument("chatId") {
                     type = NavType.StringType
                     nullable = true
+                },
+                navArgument("isOnline") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+                navArgument("lastSeen") {
+                    type = NavType.LongType
+                    defaultValue = 0L
                 },
                 navArgument("remoteUserId") {
                     type = NavType.StringType
@@ -105,9 +113,13 @@ fun Navigation(
             val remoteUserId = it.arguments?.getString("remoteUserId")!!
             val remoteUsername = it.arguments?.getString("remoteUsername")!!
             val remoteUserProfilePictureUrl = it.arguments?.getString("remoteUserProfilePictureUrl")!!
+            val isOnline = it.arguments?.getBoolean("isOnline") ?: false
+            val lastSeen = it.arguments?.getLong("lastSeen") ?: 0L
             MessageScreen(
                 remoteUserId = remoteUserId,
                 remoteUsername = remoteUsername,
+                isOnline = isOnline,
+                lastSeen = lastSeen,
                 scaffoldState = scaffoldState,
                 encodedRemoteUserProfilePictureUrl = remoteUserProfilePictureUrl,
                 onNavigateUp = navController::navigateUp,

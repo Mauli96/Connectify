@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.DarkerGreen
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_chat.domain.model.Message
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -37,9 +40,10 @@ fun OwnMessage(
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
     triangleHeight: Dp = 30.dp,
+    tailOffset: Dp = 8.dp,
     onLongPress: (String) -> Unit = {}
 ) {
-    val cornerRadius = MaterialTheme.shapes.medium.bottomEnd
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
@@ -48,7 +52,7 @@ fun OwnMessage(
             modifier = Modifier
                 .background(
                     color = color,
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.large
                 )
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -59,21 +63,23 @@ fun OwnMessage(
                         }
                     )
                 }
-                .padding(SpaceMedium)
                 .drawBehind {
-                    val cornerRadiusPx = cornerRadius.toPx(
-                        shapeSize = size,
-                        density = Density(density)
-                    )
                     val path = Path().apply {
+                        val triangleHeightPx = triangleHeight.toPx()
+                        val triangleWidthPx = triangleWidth.toPx()
+                        val tailOffsetPx = tailOffset.toPx()
+
                         moveTo(
-                            size.width,
-                            size.height - cornerRadiusPx
+                            size.width - triangleWidthPx + tailOffsetPx,
+                            0f
                         )
-                        lineTo(size.width, size.height + triangleHeight.toPx())
                         lineTo(
-                            size.width - triangleWidth.toPx(),
-                            size.height - cornerRadiusPx
+                            size.width + tailOffsetPx,
+                            0f
+                        )
+                        lineTo(
+                            size.width - triangleWidthPx + tailOffsetPx,
+                            triangleHeightPx
                         )
                         close()
                     }
@@ -82,6 +88,7 @@ fun OwnMessage(
                         color = color
                     )
                 }
+                .padding(SpaceSmall)
         ) {
             Column {
                 Text(

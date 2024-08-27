@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.feature_chat.domain.model.Message
 
 @Composable
@@ -27,30 +28,32 @@ fun RemoteMessage(
     color: Color = HintGray,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
-    triangleHeight: Dp = 30.dp
+    triangleHeight: Dp = 30.dp,
+    tailOffset: Dp = 8.dp,
 ) {
-    val cornerRadius = MaterialTheme.shapes.medium.bottomStart
     Box(
         modifier = Modifier
             .background(
                 color = color,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.large
             )
-            .padding(SpaceMedium)
             .drawBehind {
-                val cornerRadiusPx = cornerRadius.toPx(
-                    shapeSize = size,
-                    density = Density(density)
-                )
+                val triangleHeightPx = triangleHeight.toPx()
+                val triangleWidthPx = triangleWidth.toPx()
+                val tailOffsetPx = tailOffset.toPx()
+
                 val path = Path().apply {
                     moveTo(
-                        0f,
-                        size.height - cornerRadiusPx
+                        0f + triangleWidthPx - tailOffsetPx,
+                        0f
                     )
-                    lineTo(0f, size.height + triangleHeight.toPx())
                     lineTo(
-                        triangleWidth.toPx(),
-                        size.height - cornerRadiusPx
+                        0f - tailOffsetPx,
+                        0f
+                    )
+                    lineTo(
+                        0f + triangleWidthPx - tailOffsetPx,
+                        triangleHeightPx
                     )
                     close()
                 }
@@ -59,6 +62,7 @@ fun RemoteMessage(
                     color = color
                 )
             }
+            .padding(SpaceSmall)
     ) {
         Column {
             Text(

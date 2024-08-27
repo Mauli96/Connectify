@@ -7,6 +7,8 @@ data class ChatDto(
     val remoteUserId: String?,
     val remoteUsername: String?,
     val remoteUserProfilePictureUrl: String?,
+    val online: Boolean?,
+    val lastSeen: Long?,
     val lastMessage: String?,
     val timestamp: Long?
 ) {
@@ -16,6 +18,8 @@ data class ChatDto(
             remoteUserId = remoteUserId ?: return null,
             remoteUsername = remoteUsername ?: return null,
             remoteUserProfilePictureUrl = remoteUserProfilePictureUrl ?: return null,
+            online = online,
+            lastSeen = lastSeen,
             lastMessage = lastMessage ?: return null,
             timestamp = timestamp ?: return null
         )

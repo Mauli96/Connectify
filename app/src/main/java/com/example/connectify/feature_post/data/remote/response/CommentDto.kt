@@ -1,6 +1,7 @@
 package com.example.connectify.feature_post.data.remote.response
 
 import com.example.connectify.core.domain.models.Comment
+import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -19,9 +20,7 @@ data class CommentDto(
             id = id,
             username = username,
             profilePictureUrl = profilePictureUrl,
-            formattedTime = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault()).run {
-                format(timestamp)
-            },
+            formattedTime = DateFormatUtil.timestampToFormattedString(timestamp,"MMM dd, hh:mm a"),
             comment = comment,
             isLiked = isLiked,
             likeCount = likeCount,
