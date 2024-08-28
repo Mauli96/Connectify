@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -59,7 +60,12 @@ fun Comment(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(SpaceMedium)
+                .padding(
+                    top = SpaceMedium,
+                    bottom = SpaceMedium,
+                    start = 10.dp,
+                    end = 10.dp,
+                )
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onLongPress = {

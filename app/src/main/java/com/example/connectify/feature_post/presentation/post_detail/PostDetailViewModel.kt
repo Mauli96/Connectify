@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.ParentType
 import com.example.connectify.core.util.Resource
@@ -24,11 +25,15 @@ import javax.inject.Inject
 class PostDetailViewModel @Inject constructor(
     private val authenticate: AuthenticateUseCase,
     private val postUseCases: PostUseCases,
+    private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _state = mutableStateOf(PostDetailState())
     val state: State<PostDetailState> = _state
+
+    private val _profilePictureState = mutableStateOf("")
+    val profilePictureState: State<String> = _profilePictureState
 
     private val _commentTextFieldState = mutableStateOf(StandardTextFieldState(error = CommentError.FieldEmpty))
     val commentTextFieldState: State<StandardTextFieldState> = _commentTextFieldState
@@ -45,6 +50,7 @@ class PostDetailViewModel @Inject constructor(
         savedStateHandle.get<String>("postId")?.let { postId ->
             loadPostDetails(postId)
             loadCommentsForPost(postId)
+            getOwnProfilePicture()
         }
     }
 
@@ -97,6 +103,24 @@ class PostDetailViewModel @Inject constructor(
                 _state.value = state.value.copy(
                     isBottomSheetVisible = false
                 )
+            }
+        }
+    }
+
+    private fun getOwnProfilePicture() {
+        viewModelScope.launch {
+            val result = getOwnProfilePictureUseCase()
+            when(result) {
+                is Resource.Success -> {
+                   _profilePictureState.value = result.data.toString()
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
             }
         }
     }

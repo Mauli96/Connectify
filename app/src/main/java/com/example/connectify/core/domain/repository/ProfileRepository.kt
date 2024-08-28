@@ -40,5 +40,7 @@ interface ProfileRepository {
 
     suspend fun getFollowedToUser(userId: String): Resource<List<UserItem>>
 
+    suspend fun getOwnProfilePicture(): Resource<String>
+
     fun logout()
 }

@@ -2,7 +2,6 @@ package com.example.connectify.feature_post.presentation.post_detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -145,7 +144,12 @@ fun PostDetailScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(SpaceLarge)
+                                        .padding(
+                                            top = SpaceLarge,
+                                            bottom = SpaceLarge,
+                                            start = 10.dp,
+                                            end = 10.dp
+                                        )
                                 ) {
                                     ActionRow(
                                         username = state.post.username,
@@ -205,11 +209,11 @@ fun PostDetailScreen(
             }
             if(state.comments.isNotEmpty()) {
                 item {
-                    Divider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground,
+                    HorizontalDivider(
                         modifier = Modifier
-                            .height(0.5.dp)
+                            .height(0.5.dp),
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
                 }
@@ -258,6 +262,7 @@ fun PostDetailScreen(
             onSend = {
                 viewModel.onEvent(PostDetailEvent.Comment)
             },
+            ownProfilePicture = viewModel.profilePictureState.value,
             hint = stringResource(id = R.string.enter_a_comment),
             isLoading = viewModel.commentState.value.isLoading,
             focusRequester = focusRequester

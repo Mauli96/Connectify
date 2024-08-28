@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.presentation.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
@@ -23,11 +24,15 @@ import javax.inject.Inject
 @HiltViewModel
 class MessageViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
+    private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _messageTextFieldState = mutableStateOf(StandardTextFieldState())
     val messageTextFieldState: State<StandardTextFieldState> = _messageTextFieldState
+
+    private val _profilePictureState = mutableStateOf("")
+    val profilePictureState: State<String> = _profilePictureState
 
     private val _pagingState = mutableStateOf<PagingState<Message>>(PagingState())
     val pagingState: State<PagingState<Message>> = _pagingState
@@ -73,6 +78,7 @@ class MessageViewModel @Inject constructor(
         loadNextMessages()
         observeChatEvents()
         observeChatMessages()
+        getOwnProfilePicture()
     }
 
     private fun observeChatMessages() {
@@ -153,6 +159,24 @@ class MessageViewModel @Inject constructor(
             }
             is MessageEvent.DeleteMessage -> {
                 deleteMessage(event.messageId)
+            }
+        }
+    }
+
+    private fun getOwnProfilePicture() {
+        viewModelScope.launch {
+            val result = getOwnProfilePictureUseCase()
+            when(result) {
+                is Resource.Success -> {
+                    _profilePictureState.value = result.data.toString()
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
             }
         }
     }

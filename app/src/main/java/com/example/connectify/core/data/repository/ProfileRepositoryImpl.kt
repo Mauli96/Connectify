@@ -236,6 +236,27 @@ class ProfileRepositoryImpl(
         }
     }
 
+    override suspend fun getOwnProfilePicture(): Resource<String> {
+        return try {
+            val response = profileApi.getOwnProfilePicture()
+            if(response.successful) {
+                Resource.Success(data = response.data)
+            } else {
+                response.message?.let { msg ->
+                    Resource.Error(UiText.DynamicString(msg))
+                } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
+            }
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
     override fun logout() {
         sharedPreferences.edit()
             .putString(Constants.KEY_JWT_TOKEN, "")

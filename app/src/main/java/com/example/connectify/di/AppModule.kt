@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import coil.ComponentRegistry
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import com.example.connectify.core.domain.repository.ProfileRepository
+import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.DefaultPostLiker
@@ -78,5 +80,11 @@ object AppModule {
     @Singleton
     fun provideGetOwnUserIdUseCase(sharedPreferences: SharedPreferences): GetOwnUserIdUseCase {
         return GetOwnUserIdUseCase(sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetOwnProfilePictureUseCase(profileRepository: ProfileRepository): GetOwnProfilePictureUseCase {
+        return GetOwnProfilePictureUseCase(profileRepository)
     }
 }

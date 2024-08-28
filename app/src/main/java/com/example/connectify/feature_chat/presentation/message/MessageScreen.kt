@@ -1,10 +1,5 @@
 package com.example.connectify.feature_chat.presentation.message
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,8 +52,6 @@ import com.example.connectify.feature_chat.presentation.message.components.Remot
 import kotlinx.coroutines.flow.collectLatest
 import okio.ByteString.Companion.decodeBase64
 import java.nio.charset.Charset
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun MessageScreen(
@@ -166,7 +159,10 @@ fun MessageScreen(
                     state = lazyListState,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(SpaceMedium)
+                        .padding(
+                            start = SpaceMedium,
+                            end = SpaceMedium
+                        )
                 ) {
                     items(pagingState.items.size) { i ->
                         val message = pagingState.items[i]
@@ -238,6 +234,7 @@ fun MessageScreen(
                     onSend = {
                         viewModel.onEvent(MessageEvent.SendMessage)
                     },
+                    ownProfilePicture = viewModel.profilePictureState.value,
                     hint = stringResource(id = R.string.enter_a_message)
                 )
             }

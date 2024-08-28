@@ -58,6 +58,9 @@ interface ProfileApi {
         @Query("userId") userId: String
     ): List<UserItemDto>
 
+    @GET("/api/user/profile/picture")
+    suspend fun getOwnProfilePicture(): BasicApiResponse<String>
+
     companion object {
         const val BASE_URL = "http://192.168.0.209:8001/"
     }
