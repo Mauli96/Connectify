@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.3.0")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.compose.animation:animation:1.6.8")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.7.0")

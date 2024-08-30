@@ -8,6 +8,8 @@ import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,15 +22,21 @@ class SplashViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val _isUserAuthenticated = MutableStateFlow<Boolean?>(null)
+    val isUserAuthenticated: StateFlow<Boolean?> = _isUserAuthenticated
+
     init {
         viewModelScope.launch {
-            when(authenticateUseCase()) {
+            val result = authenticateUseCase()
+            when(result) {
                 is Resource.Success -> {
+                    _isUserAuthenticated.value = true
                     _eventFlow.emit(
                         UiEvent.Navigate(Screen.MainFeedScreen.route)
                     )
                 }
                 is Resource.Error -> {
+                    _isUserAuthenticated.value = false
                     _eventFlow.emit(
                         UiEvent.Navigate(Screen.LoginScreen.route)
                     )

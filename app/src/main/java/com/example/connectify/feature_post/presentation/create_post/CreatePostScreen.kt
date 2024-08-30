@@ -16,11 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -69,7 +65,7 @@ fun CreatePostScreen(
     val imageUri = viewModel.chosenImageUri.value
 
     val cropActivityLauncher = rememberLauncherForActivityResult(
-        contract = CropActivityResultContract(16f, 9f)
+        contract = CropActivityResultContract(4f, 5f)
     ) {
         viewModel.onEvent(CreatePostEvent.CropImage(it))
     }
@@ -123,7 +119,7 @@ fun CreatePostScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .aspectRatio(16f / 9f)
+                    .aspectRatio(4f / 5f)
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
                     .border(

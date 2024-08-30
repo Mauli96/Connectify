@@ -139,7 +139,7 @@ fun PostDetailScreen(
                                     contentDescription = "Post image",
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .aspectRatio(16f / 9f)
+                                        .aspectRatio(4f / 5f)
                                 )
                                 Column(
                                     modifier = Modifier

@@ -6,45 +6,42 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import coil.ImageLoader
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.example.connectify.core.domain.models.Post
+import coil.ImageLoader
 import com.example.connectify.feature_activity.presentation.ActivityScreen
-import com.example.connectify.feature_chat.presentation.chat.ChatScreen
-import com.example.connectify.feature_post.presentation.create_post.CreatePostScreen
-import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.example.connectify.feature_auth.presentation.login.LoginScreen
+import com.example.connectify.feature_auth.presentation.register.RegisterScreen
+import com.example.connectify.feature_chat.presentation.chat.ChatScreen
+import com.example.connectify.feature_chat.presentation.message.MessageScreen
+import com.example.connectify.feature_post.presentation.create_post.CreatePostScreen
 import com.example.connectify.feature_post.presentation.main_feed.MainFeedScreen
 import com.example.connectify.feature_post.presentation.person_list.PersonListScreen
 import com.example.connectify.feature_post.presentation.post_detail.PostDetailScreen
-import com.example.connectify.feature_profile.presentation.profile.ProfileScreen
-import com.example.connectify.feature_auth.presentation.register.RegisterScreen
-import com.example.connectify.feature_profile.presentation.search.SearchScreen
-import com.example.connectify.feature_auth.presentation.splash.SplashScreen
-import com.example.connectify.feature_chat.presentation.message.MessageScreen
+import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.example.connectify.feature_profile.presentation.follower.FollowerScreen
 import com.example.connectify.feature_profile.presentation.following.FollowingScreen
+import com.example.connectify.feature_profile.presentation.profile.ProfileScreen
+import com.example.connectify.feature_profile.presentation.search.SearchScreen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Navigation(
     navController: NavHostController,
     scaffoldState: ScaffoldState,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
+    isUserAuthenticated: Boolean?
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.SplashScreen.route
-    ) {
-        composable(Screen.SplashScreen.route) {
-            SplashScreen(
-                onPopBackStack = navController::popBackStack,
-                onNavigate = navController::navigate
-            )
+        startDestination = if(isUserAuthenticated == true) {
+            Screen.MainFeedScreen.route
+        } else {
+            Screen.LoginScreen.route
         }
+    ) {
         composable(Screen.LoginScreen.route) {
             LoginScreen(
                 onNavigate = navController::navigate,

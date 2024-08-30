@@ -3,28 +3,45 @@ package com.example.connectify.core.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import com.example.connectify.core.presentation.components.StandardScaffold
 import com.example.connectify.core.presentation.ui.theme.ConnectifyTheme
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Navigation
 import com.example.connectify.core.util.Screen
+import com.example.connectify.feature_auth.presentation.splash.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModels<SplashViewModel>()
     @Inject
     lateinit var imageLoader: ImageLoader
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var keepSplashScreenOn = true
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                keepSplashScreenOn
+            }
+        }
         setContent {
             ConnectifyTheme {
                 Surface(
@@ -34,6 +51,22 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val scaffoldState = rememberScaffoldState()
+                    val isUserAuthenticated by viewModel.isUserAuthenticated.collectAsStateWithLifecycle()
+
+                    LaunchedEffect(Unit) {
+                        viewModel.eventFlow.collectLatest { event ->
+                            when(event) {
+                                is UiEvent.Navigate -> {
+                                    delay(Constants.SPLASH_SCREEN_DURATION)
+                                    keepSplashScreenOn = false
+                                    navController.navigate(event.route) {
+                                        popUpTo(0)
+                                    }
+                                }
+                                else -> Unit
+                            }
+                        }
+                    }
 
                     StandardScaffold(
                         navController = navController,
@@ -44,12 +77,13 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(Screen.CreatePostScreen.route)
                         }
                     ) {
-                        Navigation(navController, scaffoldState, imageLoader)
+                        Navigation(navController, scaffoldState, imageLoader, isUserAuthenticated)
                     }
                 }
             }
         }
     }
+
     private fun shouldShowBottomBar(backStackEntry: NavBackStackEntry?): Boolean {
         val doesRouteMatch = backStackEntry?.destination?.route in listOf(
             Screen.MainFeedScreen.route,
