@@ -1,5 +1,6 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,13 +20,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.Post
@@ -48,6 +53,7 @@ fun MainFeedScreen(
     viewModel: MainFeedViewModel = hiltViewModel()
 ) {
     val pagingState = viewModel.pagingState.value
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
     val pullRefreshState = rememberPullRefreshState(
@@ -104,6 +110,14 @@ fun MainFeedScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .pullRefresh(pullRefreshState)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if(dragAmount < 1.dp.toPx() && !state.hasNavigated) {
+                            viewModel.onEvent(MainFeedEvent.Navigated)
+                            onNavigate(Screen.SearchScreen.route)
+                        }
+                    }
+                }
         ) {
             LazyColumn {
                 items(pagingState.items.size) { i ->

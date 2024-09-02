@@ -13,6 +13,8 @@ import com.example.connectify.core.util.PostLiker
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +27,9 @@ class MainFeedViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    private val _state = MutableStateFlow(MainFeedState())
+    val state: StateFlow<MainFeedState> = _state
 
     private val _pagingState = mutableStateOf<PagingState<Post>>(PagingState())
     val pagingState: State<PagingState<Post>> = _pagingState
@@ -57,6 +62,11 @@ class MainFeedViewModel @Inject constructor(
         when(event) {
             is MainFeedEvent.LikedPost -> {
                 toggleLikeForParent(event.postId)
+            }
+            is MainFeedEvent.Navigated -> {
+                _state.value = _state.value.copy(
+                    hasNavigated = true
+                )
             }
         }
     }
