@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,21 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -49,9 +42,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -62,7 +53,6 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
-import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -211,7 +201,13 @@ fun ProfileScreen(
             item {
                 Spacer(modifier = Modifier.height(SpaceMedium))
             }
-            items(pagingState.items.size) { i ->
+            items(
+                count = pagingState.items.size,
+                key = { i ->
+                    val post = pagingState.items[i]
+                    post.id
+                }
+            ) { i ->
                 val post = pagingState.items[i]
                 if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
                     viewModel.loadNextPosts()
@@ -233,29 +229,13 @@ fun ProfileScreen(
                         context.sendSharePostIntent(post.id)
                     },
                     onLongPress = { id ->
+                        viewModel.onEvent(ProfileEvent.SelectPost(id))
                         viewModel.onEvent(ProfileEvent.ShowBottomSheet)
-                        viewModel.onEvent(ProfileEvent.DeletePostId(id))
                     }
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 if(i == pagingState.items.size - 1) {
                     Spacer(modifier = Modifier.height(50.dp))
-                }
-                if(state.isBottomSheetVisible) {
-                    StandardBottomSheet(
-                        onDismissRequest = {
-                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                        },
-                        bottomSheetState = bottomSheetState,
-                        title = stringResource(id = R.string.delete_post),
-                        onDeleteClick = {
-                            viewModel.onEvent(ProfileEvent.DeletePost(state.deletePostId))
-                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                        },
-                        onCancelClick = {
-                            viewModel.onEvent(ProfileEvent.DismissBottomSheet)
-                        }
-                    )
                 }
             }
         }
@@ -340,6 +320,22 @@ fun ProfileScreen(
                         )
                 )
             }
+        }
+        if(state.isBottomSheetVisible) {
+            StandardBottomSheet(
+                onDismissRequest = {
+                    viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                },
+                bottomSheetState = bottomSheetState,
+                title = stringResource(id = R.string.delete_post),
+                onDeleteClick = {
+                    viewModel.onEvent(ProfileEvent.DeletePost)
+                    viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                },
+                onCancelClick = {
+                    viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                }
+            )
         }
         if(state.isLogoutDialogVisible) {
             Dialog(

@@ -1,11 +1,6 @@
 package com.example.connectify.feature_chat.presentation.chat
 
 import android.util.Base64
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -90,7 +85,12 @@ fun ChatScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                items(state.chats) { chat ->
+                items(
+                    items = state.chats,
+                    key = { chat ->
+                        chat.chatId
+                    }
+                ) { chat ->
                     ChatItem(
                         item = chat,
                         imageLoader = imageLoader,
@@ -100,29 +100,29 @@ fun ChatScreen(
                             onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}?isOnline=${chat.online}?lastSeen=${chat.lastSeen}")
                         },
                         onLongPress = { id ->
-                            viewModel.onEvent(ChatEvent.DeleteChatId(id))
+                            viewModel.onEvent(ChatEvent.SelectChat(id))
                             viewModel.onEvent(ChatEvent.ShowBottomSheet)
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
-                    if(state.isBottomSheetVisible) {
-                        StandardBottomSheet(
-                            onDismissRequest = {
-                                viewModel.onEvent(ChatEvent.DismissBottomSheet)
-                            },
-                            bottomSheetState = bottomSheetState,
-                            title = stringResource(id = R.string.delete_chat),
-                            onDeleteClick = {
-                                viewModel.onEvent(ChatEvent.DeleteChat(state.deleteChatId))
-                                viewModel.onEvent(ChatEvent.DismissBottomSheet)
-                            },
-                            onCancelClick = {
-                                viewModel.onEvent(ChatEvent.DismissBottomSheet)
-                            }
-                        )
-                    }
                 }
             }
+        }
+        if(state.isBottomSheetVisible) {
+            StandardBottomSheet(
+                onDismissRequest = {
+                    viewModel.onEvent(ChatEvent.DismissBottomSheet)
+                },
+                bottomSheetState = bottomSheetState,
+                title = stringResource(id = R.string.delete_chat),
+                onDeleteClick = {
+                    viewModel.onEvent(ChatEvent.DeleteChat)
+                    viewModel.onEvent(ChatEvent.DismissBottomSheet)
+                },
+                onCancelClick = {
+                    viewModel.onEvent(ChatEvent.DismissBottomSheet)
+                }
+            )
         }
         if(state.isLoading) {
             CircularProgressIndicator(

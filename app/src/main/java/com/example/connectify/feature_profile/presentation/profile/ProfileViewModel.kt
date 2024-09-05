@@ -91,8 +91,15 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
+            is ProfileEvent.SelectPost -> {
+                _state.value = state.value.copy(
+                    selectedPostId = event.postId
+                )
+            }
             is ProfileEvent.DeletePost -> {
-                deletePost(event.postId)
+                _state.value.selectedPostId?.let { postId ->
+                    deletePost(postId)
+                }
             }
             is ProfileEvent.ToggleFollowStateForUser -> {
                 toggleFollowStateForUser(event.userId)
@@ -105,11 +112,6 @@ class ProfileViewModel @Inject constructor(
             is ProfileEvent.DismissBottomSheet -> {
                 _state.value = state.value.copy(
                     isBottomSheetVisible = false
-                )
-            }
-            is ProfileEvent.DeletePostId -> {
-                _state.value = state.value.copy(
-                    deletePostId = event.postId
                 )
             }
             is ProfileEvent.ShowLogoutDialog -> {
@@ -137,6 +139,9 @@ class ProfileViewModel @Inject constructor(
                         items = pagingState.value.items.filter {
                             it.id != postId
                         }
+                    )
+                    _state.value = state.value.copy(
+                        selectedPostId = null
                     )
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(

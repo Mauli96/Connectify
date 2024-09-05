@@ -38,14 +38,14 @@ fun LikeButton(
             if(isLiked) {
                 heartScale.animateTo(
                     targetValue = 1.3f,
-                    animationSpec = spring(dampingRatio = 1f, stiffness = 800f)
+                    animationSpec = spring(dampingRatio = 1f, stiffness = 3000f)
                 )
                 heartScale.animateTo(1f)
             } else {
                 heartColor.animateTo(Color(0xFF08FF04))
                 heartScale.animateTo(
                     targetValue = 1.3f,
-                    animationSpec = spring(dampingRatio = 1f, stiffness = 800f)
+                    animationSpec = spring(dampingRatio = 1f, stiffness = 3000f)
                 )
                 heartScale.animateTo(1f)
             }

@@ -43,6 +43,7 @@ fun StandardBottomSheet(
             onDismissRequest()
         },
         sheetState = bottomSheetState,
+        shape = MaterialTheme.shapes.large,
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {

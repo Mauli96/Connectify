@@ -86,13 +86,15 @@ class PostDetailViewModel @Inject constructor(
                     error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
                 )
             }
-            is PostDetailEvent.GetDeleteCommentId -> {
+            is PostDetailEvent.SelectComment -> {
                 _state.value = state.value.copy(
-                    deleteCommentId = event.commentId
+                    selectedCommentId = event.commentId
                 )
             }
             is PostDetailEvent.DeleteComment -> {
-                deleteComment(event.commentId)
+                _state.value.selectedCommentId?.let { commentId ->
+                    deleteComment(commentId)
+                }
             }
             is PostDetailEvent.ShowBottomSheet -> {
                 _state.value = state.value.copy(
@@ -112,7 +114,7 @@ class PostDetailViewModel @Inject constructor(
             val result = getOwnProfilePictureUseCase()
             when(result) {
                 is Resource.Success -> {
-                   _profilePictureState.value = result.data.toString()
+                    _profilePictureState.value = result.data.toString()
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(
@@ -133,7 +135,8 @@ class PostDetailViewModel @Inject constructor(
                     _state.value = state.value.copy(
                         comments = state.value.comments.filter {
                             it.id != commentId
-                        }
+                        },
+                        selectedCommentId = null
                     )
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(

@@ -28,13 +28,15 @@ class ChatViewModel @Inject constructor(
 
     fun onEvent(event: ChatEvent) {
         when(event) {
-            is ChatEvent.DeleteChatId -> {
+            is ChatEvent.SelectChat -> {
                 _state.value = state.value.copy(
-                    deleteChatId = event.chatId
+                    selectedChat = event.chatId
                 )
             }
             is ChatEvent.DeleteChat -> {
-                deleteChat(event.chatId)
+                _state.value.selectedChat?.let { chatId ->
+                    deleteChat(chatId)
+                }
             }
             is ChatEvent.ShowBottomSheet -> {
                 _state.value = state.value.copy(
@@ -82,7 +84,8 @@ class ChatViewModel @Inject constructor(
                     _state.value = state.value.copy(
                         chats = state.value.chats.filter {
                             it.chatId != chatId
-                        }
+                        },
+                        selectedChat = null
                     )
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(

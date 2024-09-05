@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.presentation.PagingState
@@ -142,6 +141,16 @@ class MessageViewModel @Inject constructor(
             is MessageEvent.SendMessage -> {
                 sendMessage()
             }
+            is MessageEvent.SelectMessage -> {
+                _state.value = state.value.copy(
+                    selectedMessageId = event.messageId
+                )
+            }
+            is MessageEvent.DeleteMessage -> {
+                _state.value.selectedMessageId?.let { messageId ->
+                    deleteMessage(messageId)
+                }
+            }
             is MessageEvent.ShowDialog -> {
                 _state.value = state.value.copy(
                     isDialogVisible = true
@@ -151,14 +160,6 @@ class MessageViewModel @Inject constructor(
                 _state.value = state.value.copy(
                     isDialogVisible = false
                 )
-            }
-            is MessageEvent.DeleteMessageId -> {
-                _state.value = state.value.copy(
-                    deleteMessageId = event.messageId
-                )
-            }
-            is MessageEvent.DeleteMessage -> {
-                deleteMessage(event.messageId)
             }
         }
     }
@@ -190,6 +191,9 @@ class MessageViewModel @Inject constructor(
                         items = pagingState.value.items.filter {
                             it.id != messageId
                         }
+                    )
+                    _state.value = state.value.copy(
+                        selectedMessageId = null
                     )
                 }
                 is Resource.Error -> {

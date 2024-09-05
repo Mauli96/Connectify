@@ -6,8 +6,8 @@ import com.example.connectify.core.domain.models.Post
 data class PostDetailState(
     val post: Post? = null,
     val comments: List<Comment> = emptyList(),
+    val selectedCommentId: String? = null,
     val isLoadingPost: Boolean = false,
     val isLoadingComments: Boolean = false,
-    val isBottomSheetVisible: Boolean = false,
-    val deleteCommentId: String = ""
+    val isBottomSheetVisible: Boolean = false
 )

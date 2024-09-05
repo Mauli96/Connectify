@@ -164,7 +164,13 @@ fun MessageScreen(
                             end = SpaceMedium
                         )
                 ) {
-                    items(pagingState.items.size) { i ->
+                    items(
+                        count = pagingState.items.size,
+                        key = { i ->
+                            val message = pagingState.items[i]
+                            message.id
+                        }
+                    ) { i ->
                         val message = pagingState.items[i]
                         if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
                             viewModel.loadNextMessages()
@@ -179,7 +185,7 @@ fun MessageScreen(
                                 message = message,
                                 formattedTime = message.formattedTime,
                                 onLongPress = { id ->
-                                    viewModel.onEvent(MessageEvent.DeleteMessageId(id))
+                                    viewModel.onEvent(MessageEvent.SelectMessage(id))
                                     viewModel.onEvent(MessageEvent.ShowDialog)
                                 }
                             )
@@ -213,7 +219,7 @@ fun MessageScreen(
                                 Spacer(modifier = Modifier.width(SpaceLarge))
                                 Button(
                                     onClick = {
-                                        viewModel.onEvent(MessageEvent.DeleteMessage(state.deleteMessageId))
+                                        viewModel.onEvent(MessageEvent.DeleteMessage)
                                         viewModel.onEvent(MessageEvent.DismissDialog)
                                     },
                                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)

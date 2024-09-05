@@ -218,7 +218,12 @@ fun PostDetailScreen(
                     Spacer(modifier = Modifier.height(SpaceSmall))
                 }
             }
-            items(state.comments) { comment ->
+            items(
+                items = state.comments,
+                key = { comment ->
+                    comment.id
+                }
+            ) { comment ->
                 Comment(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -232,26 +237,10 @@ fun PostDetailScreen(
                         onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                     },
                     onLongPress = { id ->
-                        viewModel.onEvent(PostDetailEvent.GetDeleteCommentId(id))
+                        viewModel.onEvent(PostDetailEvent.SelectComment(id))
                         viewModel.onEvent(PostDetailEvent.ShowBottomSheet)
                     }
                 )
-                if(state.isBottomSheetVisible) {
-                    StandardBottomSheet(
-                        onDismissRequest = {
-                            viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                        },
-                        bottomSheetState = bottomSheetState,
-                        title = stringResource(id = R.string.delete_comment),
-                        onDeleteClick = {
-                            viewModel.onEvent(PostDetailEvent.DeleteComment(state.deleteCommentId))
-                            viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                        },
-                        onCancelClick = {
-                            viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                        }
-                    )
-                }
             }
         }
         SendTextField(
@@ -267,5 +256,21 @@ fun PostDetailScreen(
             isLoading = viewModel.commentState.value.isLoading,
             focusRequester = focusRequester
         )
+        if(state.isBottomSheetVisible) {
+            StandardBottomSheet(
+                onDismissRequest = {
+                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                },
+                bottomSheetState = bottomSheetState,
+                title = stringResource(id = R.string.delete_comment),
+                onDeleteClick = {
+                    viewModel.onEvent(PostDetailEvent.DeleteComment)
+                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                },
+                onCancelClick = {
+                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                }
+            )
+        }
     }
 }

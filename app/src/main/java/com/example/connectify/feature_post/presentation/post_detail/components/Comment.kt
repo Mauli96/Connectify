@@ -147,6 +147,7 @@ fun Comment(
                         onLikeClick(comment.isLiked)
                     }
                 )
+                Spacer(modifier = Modifier.width(SpaceSmall))
             }
         }
     }

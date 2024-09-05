@@ -59,17 +59,9 @@ fun SendTextField(
     isLoading: Boolean = false,
     focusRequester: FocusRequester = FocusRequester()
 ) {
-    val imeInsets = WindowInsets.ime
-    val density = LocalDensity.current
-
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = with(density) {
-                imeInsets
-                    .getBottom(this)
-                    .toDp()
-            }),
+            .fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter
     ) {
         BasicTextField(
