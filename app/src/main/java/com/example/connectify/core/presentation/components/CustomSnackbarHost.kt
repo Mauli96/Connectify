@@ -1,8 +1,13 @@
 package com.example.connectify.core.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
@@ -37,6 +42,8 @@ fun CustomSnackbarHost(
             isVisible = true
             delay(3000)
             isVisible = false
+            delay(3000)
+            snackbarHostState.currentSnackbarData?.dismiss()
         }
     }
 
