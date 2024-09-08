@@ -1,4 +1,4 @@
-package com.example.connectify.core.presentation
+package com.example.connectify.core.domain.states
 
 data class PagingState<T>(
     val items: List<T> = emptyList(),

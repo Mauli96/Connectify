@@ -110,11 +110,11 @@ fun ChatScreen(
         }
         if(state.isBottomSheetVisible) {
             StandardBottomSheet(
+                title = stringResource(id = R.string.delete_chat),
+                bottomSheetState = bottomSheetState,
                 onDismissRequest = {
                     viewModel.onEvent(ChatEvent.DismissBottomSheet)
                 },
-                bottomSheetState = bottomSheetState,
-                title = stringResource(id = R.string.delete_chat),
                 onDeleteClick = {
                     viewModel.onEvent(ChatEvent.DeleteChat)
                     viewModel.onEvent(ChatEvent.DismissBottomSheet)

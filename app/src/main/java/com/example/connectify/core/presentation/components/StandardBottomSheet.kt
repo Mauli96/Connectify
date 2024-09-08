@@ -32,9 +32,9 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StandardBottomSheet(
-    onDismissRequest: () -> Unit = {},
-    bottomSheetState: SheetState,
     title: String,
+    bottomSheetState: SheetState,
+    onDismissRequest: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onCancelClick: () -> Unit = {}
 ) {

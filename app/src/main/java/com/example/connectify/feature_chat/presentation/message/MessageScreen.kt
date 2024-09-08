@@ -107,7 +107,7 @@ fun MessageScreen(
     Box(
         modifier = Modifier
             .fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Center
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

@@ -135,6 +135,7 @@ fun ProfileScreen(
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
         viewModel.getProfile(userId)
+        viewModel.loadInitialPosts()
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
@@ -323,11 +324,11 @@ fun ProfileScreen(
         }
         if(state.isBottomSheetVisible) {
             StandardBottomSheet(
+                title = stringResource(id = R.string.delete_post),
+                bottomSheetState = bottomSheetState,
                 onDismissRequest = {
                     viewModel.onEvent(ProfileEvent.DismissBottomSheet)
                 },
-                bottomSheetState = bottomSheetState,
-                title = stringResource(id = R.string.delete_post),
                 onDeleteClick = {
                     viewModel.onEvent(ProfileEvent.DeletePost)
                     viewModel.onEvent(ProfileEvent.DismissBottomSheet)

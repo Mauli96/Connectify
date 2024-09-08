@@ -9,6 +9,8 @@ import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -31,6 +33,7 @@ fun StandardScaffold(
     navController: NavController,
     showBottomBar: Boolean = true,
     state: ScaffoldState,
+    snackbarHost:  @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     bottomNavItem: List<BottomNavItem> = listOf(
         BottomNavItem(
             route = Screen.MainFeedScreen.route,
@@ -88,6 +91,7 @@ fun StandardScaffold(
             }
         },
         scaffoldState = state,
+        snackbarHost = snackbarHost,
         floatingActionButton = {
             if(showBottomBar) {
                 FloatingActionButton(

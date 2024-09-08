@@ -59,11 +59,12 @@ fun MainFeedScreen(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = pagingState.isLoading,
         onRefresh = {
-            viewModel.loadNextPosts()
+            viewModel.loadInitialFeed()
         }
     )
 
     LaunchedEffect(key1 = true) {
+        viewModel.loadInitialFeed()
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
@@ -120,7 +121,13 @@ fun MainFeedScreen(
                 }
         ) {
             LazyColumn {
-                items(pagingState.items.size) { i ->
+                items(
+                    count = pagingState.items.size,
+                    key = { i ->
+                        val post = pagingState.items[i]
+                        post.id
+                    }
+                ) { i ->
                     val post = pagingState.items[i]
                     if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
                         viewModel.loadNextPosts()
@@ -143,7 +150,7 @@ fun MainFeedScreen(
                         },
                         onShareClick = {
                             context.sendSharePostIntent(post.id)
-                        },
+                        }
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
                     if(i == pagingState.items.size - 1) {

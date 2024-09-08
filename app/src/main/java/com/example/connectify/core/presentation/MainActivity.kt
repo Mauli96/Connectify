@@ -17,6 +17,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
+import com.example.connectify.core.presentation.components.CustomSnackbarHost
 import com.example.connectify.core.presentation.components.StandardScaffold
 import com.example.connectify.core.presentation.ui.theme.ConnectifyTheme
 import com.example.connectify.core.presentation.util.UiEvent
@@ -72,6 +73,9 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         showBottomBar = shouldShowBottomBar(navBackStackEntry),
                         state = scaffoldState,
+                        snackbarHost = {
+                            CustomSnackbarHost(snackbarHostState = scaffoldState.snackbarHostState)
+                        },
                         modifier = Modifier.fillMaxSize(),
                         onFabClick = {
                             navController.navigate(Screen.CreatePostScreen.route)

@@ -106,4 +106,6 @@
     <string name="this_action_cannot_be_undone">This action cannot be undone.</string>
     <string name="online">Online</string>
     <string name="comments">Comments</string>
+    <string name="more_items">More Items</string>
+    <string name="navigate_back">Navigate Back</string>
 </resources>

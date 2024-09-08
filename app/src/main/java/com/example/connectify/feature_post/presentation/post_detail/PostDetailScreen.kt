@@ -258,11 +258,11 @@ fun PostDetailScreen(
         )
         if(state.isBottomSheetVisible) {
             StandardBottomSheet(
+                title = stringResource(id = R.string.delete_comment),
+                bottomSheetState = bottomSheetState,
                 onDismissRequest = {
                     viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                 },
-                bottomSheetState = bottomSheetState,
-                title = stringResource(id = R.string.delete_comment),
                 onDeleteClick = {
                     viewModel.onEvent(PostDetailEvent.DeleteComment)
                     viewModel.onEvent(PostDetailEvent.DismissBottomSheet)

@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.core.domain.models.Post
-import com.example.connectify.core.presentation.PagingState
+import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
@@ -43,9 +43,9 @@ class MainFeedViewModel @Inject constructor(
         onRequest = { page ->
             postUseCases.getPostsForFollows(page = page)
         },
-        onSuccess = { posts ->
+        onSuccess = { posts, firstPage ->
             _pagingState.value = pagingState.value.copy(
-                items = pagingState.value.items + posts,
+                items = if(firstPage) posts else pagingState.value.items + posts,
                 endReached = posts.isEmpty(),
             )
         },
@@ -55,7 +55,7 @@ class MainFeedViewModel @Inject constructor(
     )
 
     init {
-        loadNextPosts()
+        loadInitialFeed()
     }
 
     fun onEvent(event: MainFeedEvent) {
@@ -74,6 +74,12 @@ class MainFeedViewModel @Inject constructor(
     fun loadNextPosts() {
         viewModelScope.launch {
             paginator.loadNextItems()
+        }
+    }
+
+    fun loadInitialFeed() {
+        viewModelScope.launch {
+            paginator.loadFirstItems()
         }
     }
 

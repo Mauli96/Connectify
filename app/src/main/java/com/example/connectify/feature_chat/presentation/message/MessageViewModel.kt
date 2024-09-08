@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
-import com.example.connectify.core.presentation.PagingState
+import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.Resource
@@ -61,9 +61,9 @@ class MessageViewModel @Inject constructor(
         onError = { errorUiText ->
             _eventFlow.emit(UiEvent.ShowSnackbar(errorUiText))
         },
-        onSuccess = { messages ->
+        onSuccess = { messages, firstPage ->
             _pagingState.value = pagingState.value.copy(
-                items = pagingState.value.items + messages,
+                items = if(firstPage) messages else pagingState.value.items + messages,
                 endReached = messages.isEmpty()
             )
             viewModelScope.launch {
@@ -74,7 +74,7 @@ class MessageViewModel @Inject constructor(
 
     init {
         chatUseCases.initializeRepository()
-        loadNextMessages()
+        loadInitialMessages()
         observeChatEvents()
         observeChatMessages()
         getOwnProfilePicture()
@@ -112,6 +112,12 @@ class MessageViewModel @Inject constructor(
     fun loadNextMessages() {
         viewModelScope.launch {
             paginator.loadNextItems()
+        }
+    }
+
+    fun loadInitialMessages() {
+        viewModelScope.launch {
+            paginator.loadFirstItems()
         }
     }
 

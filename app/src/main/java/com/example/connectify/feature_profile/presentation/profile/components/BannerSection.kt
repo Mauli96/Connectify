@@ -1,10 +1,10 @@
 package com.example.connectify.feature_profile.presentation.profile.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -48,6 +49,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
@@ -92,6 +94,86 @@ fun BannerSection(
             modifier = imageModifier
                 .fillMaxSize()
         )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(end = SpaceSmall),
+            contentAlignment = Alignment.TopEnd
+        ) {
+            AnimatedVisibility(
+                visible = showDropDownMenu,
+                enter = slideInVertically() + fadeIn(),
+                exit = slideOutVertically() + fadeOut()
+            ) {
+                DropdownMenu(
+                    expanded = showDropDownMenu,
+                    onDismissRequest = {
+                        showDropDownMenu = !showDropDownMenu
+                    },
+                    modifier = Modifier
+                        .shadow(8.dp)
+                        .background(MaterialTheme.colorScheme.background),
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Spacer(modifier = Modifier.width(SpaceSmall))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.edit_icon),
+                                    contentDescription = stringResource(id = R.string.edit_profile),
+                                    modifier = Modifier.size(IconSizeSmall)
+                                )
+                                Spacer(modifier = Modifier.width(SpaceSmall))
+                                Text(
+                                    text = stringResource(id = R.string.edit_profile),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.width(SpaceLarge))
+                            }
+                        },
+                        onClick = {
+                            onEditClick()
+                            showDropDownMenu = !showDropDownMenu
+                        }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .height(0.2.dp),
+                        thickness = 0.2.dp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Spacer(modifier = Modifier.width(SpaceSmall))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.logout_icon),
+                                    contentDescription = stringResource(id = R.string.log_out),
+                                    modifier = Modifier.size(IconSizeSmall),
+                                    tint = Color.Red
+                                )
+                                Spacer(modifier = Modifier.width(SpaceSmall))
+                                Text(
+                                    text = stringResource(id = R.string.log_out),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = Color.Red
+                                    )
+                                )
+                                Spacer(modifier = Modifier.width(SpaceLarge))
+                            }
+                        },
+                        onClick = {
+                            onLogoutClick()
+                            showDropDownMenu = !showDropDownMenu
+                        }
+                    )
+                }
+            }
+        }
         TopAppBar(
             title = { /*TODO*/ },
             navigationIcon = {
@@ -103,7 +185,7 @@ fun BannerSection(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navigate Back",
+                            contentDescription = stringResource(id = R.string.navigate_back),
                             tint = Color.White
                         )
                     }
@@ -111,92 +193,16 @@ fun BannerSection(
             },
             actions = {
                 if(isOwnProfile) {
-                    if(showDropDownMenu) {
-                        AnimatedVisibility(
-                            visible = showDropDownMenu,
-                            enter = expandVertically() + fadeIn(),
-                            exit = shrinkVertically() + fadeOut(),
-
-                        ) {
-                            DropdownMenu(
-                                expanded = showDropDownMenu,
-                                onDismissRequest = {
-                                    showDropDownMenu = !showDropDownMenu
-                                },
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.background)
-                            ) {
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 8.dp)
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.edit_icon),
-                                                contentDescription = stringResource(id = R.string.edit_profile),
-                                                modifier = Modifier.size(IconSizeSmall)
-                                            )
-                                            Spacer(modifier = Modifier.width(SpaceSmall))
-                                            Text(
-                                                text = stringResource(id = R.string.edit_profile),
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                        }
-                                    },
-                                    onClick = {
-                                        onEditClick()
-                                        showDropDownMenu = !showDropDownMenu
-                                    }
-                                )
-                                HorizontalDivider(
-                                    modifier = Modifier
-                                        .height(0.2.dp),
-                                    thickness = 0.2.dp,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 8.dp)
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.logout_icon),
-                                                contentDescription = stringResource(id = R.string.log_out),
-                                                modifier = Modifier.size(IconSizeSmall),
-                                                tint = Color.Red
-                                            )
-                                            Spacer(modifier = Modifier.width(SpaceSmall))
-                                            Text(
-                                                text = stringResource(id = R.string.log_out),
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    color = Color.Red
-                                                )
-                                            )
-                                        }
-                                    },
-                                    onClick = {
-                                        onLogoutClick()
-                                        showDropDownMenu = !showDropDownMenu
-                                    }
-                                )
-                            }
+                    IconButton(
+                        onClick = {
+                            showDropDownMenu = !showDropDownMenu
                         }
-                    } else {
-                        IconButton(
-                            onClick = {
-                                showDropDownMenu = !showDropDownMenu
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = "More Items",
-                                tint = Color.White
-                            )
-                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = stringResource(id = R.string.more_items),
+                            tint = Color.White
+                        )
                     }
                 }
             },
@@ -239,7 +245,6 @@ fun BannerSection(
                 )
             }
         }
-
         Row(
             modifier = rightIconModifier
                 .height(iconSize)
