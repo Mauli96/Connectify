@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -67,13 +69,16 @@ fun MessageScreen(
     viewModel: MessageViewModel = hiltViewModel()
 ) {
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val messageTextFieldState by viewModel.messageTextFieldState.collectAsStateWithLifecycle()
+    val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
+    val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
+
     val decodedRemoteUserProfilePictureUrl = remember {
         encodedRemoteUserProfilePictureUrl.decodeBase64()?.string(Charset.defaultCharset())
     }
-    val pagingState = viewModel.pagingState.value
-    val state = viewModel.state.value
-    val lazyListState = rememberLazyListState()
-    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -232,7 +237,7 @@ fun MessageScreen(
                     }
                 }
                 SendTextField(
-                    state = viewModel.messageTextFieldState.value,
+                    state = messageTextFieldState,
                     canSendMessage = state.canSendMessage,
                     onValueChange = {
                         viewModel.onEvent(MessageEvent.EnteredMessage(it))
@@ -240,7 +245,7 @@ fun MessageScreen(
                     onSend = {
                         viewModel.onEvent(MessageEvent.SendMessage)
                     },
-                    ownProfilePicture = viewModel.profilePictureState.value,
+                    ownProfilePicture = profilePictureState,
                     hint = stringResource(id = R.string.enter_a_message)
                 )
             }

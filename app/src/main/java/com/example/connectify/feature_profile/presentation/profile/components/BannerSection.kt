@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -97,8 +99,8 @@ fun BannerSection(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(end = SpaceSmall),
-            contentAlignment = Alignment.TopEnd
+                .wrapContentSize(Alignment.TopEnd)
+                .padding(end = SpaceSmall)
         ) {
             AnimatedVisibility(
                 visible = showDropDownMenu,
@@ -112,7 +114,7 @@ fun BannerSection(
                     },
                     modifier = Modifier
                         .shadow(8.dp)
-                        .background(MaterialTheme.colorScheme.background),
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     DropdownMenuItem(
                         text = {

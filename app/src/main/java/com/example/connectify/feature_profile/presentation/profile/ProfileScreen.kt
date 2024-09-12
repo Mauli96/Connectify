@@ -19,13 +19,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -79,9 +81,11 @@ fun ProfileScreen(
     profilePictureSize: Dp = ProfilePictureSizeLarge,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val pagingState = viewModel.pagingState.value
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
+    val toolbarState by viewModel.toolbarState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
-    val toolbarState = viewModel.toolbarState.value
 
     val bottomSheetState = rememberModalBottomSheetState()
 
@@ -104,8 +108,6 @@ fun ProfileScreen(
     val maxOffset = remember {
         toolbarHeightExpanded - toolbarHeightCollapsed
     }
-
-    val state = viewModel.state.value
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -386,6 +388,7 @@ fun ProfileScreen(
                 }
             }
         }
+
         if(state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Center),

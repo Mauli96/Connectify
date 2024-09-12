@@ -1,12 +1,12 @@
 package com.example.connectify.feature_activity.presentation
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.connectify.feature_activity.domain.use_case.GetActivitiesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,8 +16,8 @@ class ActivityViewModel @Inject constructor(
 
     val activities = getActivities().cachedIn(viewModelScope)
 
-    private val _state = mutableStateOf(ActivityState())
-    val state: State<ActivityState> = _state
+    private val _state = MutableStateFlow(ActivityState())
+    val state = _state.asStateFlow()
 
     fun onEvent(event: ActivityEvent) {
         when(event) {

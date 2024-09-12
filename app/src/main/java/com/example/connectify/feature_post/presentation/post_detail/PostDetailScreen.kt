@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -65,7 +67,10 @@ fun PostDetailScreen(
     shouldShowKeyboard: Boolean = false
 ) {
 
-    val state = viewModel.state.value
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
+    val commentState by viewModel.commentState.collectAsStateWithLifecycle()
+    val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
     val bottomSheetState = rememberModalBottomSheetState()
 
     val focusRequester = remember {
@@ -132,7 +137,7 @@ fun PostDetailScreen(
                             state.post?.let { post ->
                                 Image(
                                     painter = rememberAsyncImagePainter(
-                                        model = state.post.imageUrl,
+                                        model = post.imageUrl,
                                         imageLoader = imageLoader
                                     ),
                                     contentScale = ContentScale.Crop,
@@ -152,8 +157,8 @@ fun PostDetailScreen(
                                         )
                                 ) {
                                     ActionRow(
-                                        username = state.post.username,
-                                        profilePictureUrl = state.post.profilePictureUrl,
+                                        username = post.username,
+                                        profilePictureUrl = post.profilePictureUrl,
                                         imageLoader = imageLoader,
                                         modifier = Modifier.fillMaxWidth(),
                                         onUsernameClick = {
@@ -169,7 +174,7 @@ fun PostDetailScreen(
                                         onShareClick = {
                                             context.sendSharePostIntent(post.id)
                                         },
-                                        isLiked = state.post.isLiked
+                                        isLiked = post.isLiked
                                     )
                                     Spacer(modifier = Modifier.height(SpaceSmall))
                                     Text(
@@ -244,16 +249,16 @@ fun PostDetailScreen(
             }
         }
         SendTextField(
-            state = viewModel.commentTextFieldState.value,
+            state = commentTextFieldState,
             onValueChange = {
                 viewModel.onEvent(PostDetailEvent.EnteredComment(it))
             },
             onSend = {
                 viewModel.onEvent(PostDetailEvent.Comment)
             },
-            ownProfilePicture = viewModel.profilePictureState.value,
+            ownProfilePicture = profilePictureState,
             hint = stringResource(id = R.string.enter_a_comment),
-            isLoading = viewModel.commentState.value.isLoading,
+            isLoading = commentState.isLoading,
             focusRequester = focusRequester
         )
         if(state.isBottomSheetVisible) {

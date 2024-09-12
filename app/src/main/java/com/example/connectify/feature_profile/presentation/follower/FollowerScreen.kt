@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardToolbar
@@ -38,7 +40,8 @@ fun FollowerScreen(
     onNavigateUp: () -> Unit = {},
     viewModel: FollowerViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val ownUserId by viewModel.ownUserId.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
@@ -88,7 +91,7 @@ fun FollowerScreen(
                         onActionItemClick = {
                             viewModel.onEvent(FollowerEvent.ToggleFollowStateForUser(user.userId))
                         },
-                        ownUserId = viewModel.ownUserId.value
+                        ownUserId = ownUserId
                     )
                 }
             }

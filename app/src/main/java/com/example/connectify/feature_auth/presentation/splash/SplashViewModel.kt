@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,11 +20,11 @@ class SplashViewModel @Inject constructor(
     private val authenticateUseCase: AuthenticateUseCase
 ) : ViewModel() {
 
+    private val _isUserAuthenticated = MutableStateFlow<Boolean?>(null)
+    val isUserAuthenticated = _isUserAuthenticated.asStateFlow()
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
-
-    private val _isUserAuthenticated = MutableStateFlow<Boolean?>(null)
-    val isUserAuthenticated: StateFlow<Boolean?> = _isUserAuthenticated
 
     init {
         viewModelScope.launch {

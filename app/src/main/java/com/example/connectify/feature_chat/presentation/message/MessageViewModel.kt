@@ -1,13 +1,11 @@
 package com.example.connectify.feature_chat.presentation.message
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
-import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.Resource
@@ -16,7 +14,13 @@ import com.example.connectify.feature_chat.domain.model.Message
 import com.example.connectify.feature_chat.domain.use_case.ChatUseCases
 import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,29 +31,31 @@ class MessageViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _messageTextFieldState = mutableStateOf(StandardTextFieldState())
-    val messageTextFieldState: State<StandardTextFieldState> = _messageTextFieldState
+    private val _state = MutableStateFlow(MessageState())
+    val state = _state.asStateFlow()
 
-    private val _profilePictureState = mutableStateOf("")
-    val profilePictureState: State<String> = _profilePictureState
+    private val _messageTextFieldState = MutableStateFlow(StandardTextFieldState())
+    val messageTextFieldState = _messageTextFieldState.asStateFlow()
 
-    private val _pagingState = mutableStateOf<PagingState<Message>>(PagingState())
-    val pagingState: State<PagingState<Message>> = _pagingState
+    private val _profilePictureState = MutableStateFlow("")
+    val profilePictureState = _profilePictureState.asStateFlow()
 
-    private val _state = mutableStateOf(MessageState())
-    val state: State<MessageState> = _state
-
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _pagingState = MutableStateFlow<PagingState<Message>>(PagingState())
+    val pagingState = _pagingState.asStateFlow()
 
     private val _messageUpdatedEvent = MutableSharedFlow<MessageUpdateEvent>(replay = 1)
     val messageReceived = _messageUpdatedEvent.asSharedFlow()
 
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     private val paginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
-            _pagingState.value = pagingState.value.copy(
-                isLoading = isLoading
-            )
+            _pagingState.update {
+                it.copy(
+                    isLoading = isLoading
+                )
+            }
         },
         onRequest = { nextPage ->
             savedStateHandle.get<String>("chatId")?.let { chatId ->
@@ -62,10 +68,12 @@ class MessageViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackbar(errorUiText))
         },
         onSuccess = { messages, firstPage ->
-            _pagingState.value = pagingState.value.copy(
-                items = if(firstPage) messages else pagingState.value.items + messages,
-                endReached = messages.isEmpty()
-            )
+            _pagingState.update {
+                it.copy(
+                    items = if(firstPage) messages else pagingState.value.items + messages,
+                    endReached = messages.isEmpty()
+                )
+            }
             viewModelScope.launch {
                 _messageUpdatedEvent.emit(MessageUpdateEvent.MessagePageLoaded)
             }
@@ -84,9 +92,11 @@ class MessageViewModel @Inject constructor(
         viewModelScope.launch {
             chatUseCases.observeMessages()
                 .collect { message ->
-                    _pagingState.value = pagingState.value.copy(
-                        items = pagingState.value.items + message
-                    )
+                    _pagingState.update {
+                        it.copy(
+                            items = pagingState.value.items + message
+                        )
+                    }
                     _messageUpdatedEvent.emit(MessageUpdateEvent.SingleMessageUpdate)
                 }
         }
@@ -129,28 +139,34 @@ class MessageViewModel @Inject constructor(
         val chatId = savedStateHandle.get<String>("chatId")
         chatUseCases.sendMessage(toId, messageTextFieldState.value.text, chatId)
         _messageTextFieldState.value = StandardTextFieldState()
-        _state.value = state.value.copy(
-            canSendMessage = false
-        )
+        _state.update {
+            it.copy(
+                canSendMessage = false
+            )
+        }
     }
 
     fun onEvent(event: MessageEvent) {
         when(event) {
             is MessageEvent.EnteredMessage -> {
-                _messageTextFieldState.value = messageTextFieldState.value.copy(
-                    text = event.message
-                )
-                _state.value = state.value.copy(
-                    canSendMessage = event.message.isNotBlank()
-                )
+                _messageTextFieldState.update {
+                    it.copy(text = event.message)
+                }
+                _state.update {
+                    it.copy(
+                        canSendMessage = event.message.isNotBlank()
+                    )
+                }
             }
             is MessageEvent.SendMessage -> {
                 sendMessage()
             }
             is MessageEvent.SelectMessage -> {
-                _state.value = state.value.copy(
-                    selectedMessageId = event.messageId
-                )
+                _state.update {
+                    it.copy(
+                        selectedMessageId = event.messageId
+                    )
+                }
             }
             is MessageEvent.DeleteMessage -> {
                 _state.value.selectedMessageId?.let { messageId ->
@@ -158,14 +174,18 @@ class MessageViewModel @Inject constructor(
                 }
             }
             is MessageEvent.ShowDialog -> {
-                _state.value = state.value.copy(
-                    isDialogVisible = true
-                )
+                _state.update {
+                    it.copy(
+                        isDialogVisible = true
+                    )
+                }
             }
             is MessageEvent.DismissDialog -> {
-                _state.value = state.value.copy(
-                    isDialogVisible = false
-                )
+                _state.update {
+                    it.copy(
+                        isDialogVisible = false
+                    )
+                }
             }
         }
     }
@@ -193,14 +213,18 @@ class MessageViewModel @Inject constructor(
             val result = chatUseCases.deleteMessage(messageId)
             when(result) {
                 is Resource.Success -> {
-                    _pagingState.value = pagingState.value.copy(
-                        items = pagingState.value.items.filter {
-                            it.id != messageId
-                        }
-                    )
-                    _state.value = state.value.copy(
-                        selectedMessageId = null
-                    )
+                    _pagingState.update {
+                        it.copy(
+                            items = pagingState.value.items.filter {
+                                it.id != messageId
+                            }
+                        )
+                    }
+                    _state.update {
+                        it.copy(
+                            selectedMessageId = null
+                        )
+                    }
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(

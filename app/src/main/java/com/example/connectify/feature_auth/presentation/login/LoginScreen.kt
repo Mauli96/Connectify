@@ -1,6 +1,6 @@
 package com.example.connectify.feature_auth.presentation.login
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,19 +10,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -33,7 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
@@ -53,11 +51,12 @@ fun LoginScreen(
     onLogin: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val emailState = viewModel.emailState.value
-    val passwordState = viewModel.passwordState.value
-    val state = viewModel.loginState.value
-    val context = LocalContext.current
+
+    val state by viewModel.loginState.collectAsStateWithLifecycle()
+    val emailState by viewModel.emailState.collectAsStateWithLifecycle()
+    val passwordState by viewModel.passwordState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -66,8 +65,7 @@ fun LoginScreen(
                     keyboardController?.hide()
                     GlobalScope.launch {
                         scaffoldState.snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context),
-                            duration = SnackbarDuration.Short
+                            message = event.uiText.asString(context)
                         )
                     }
                 }
@@ -177,8 +175,12 @@ fun LoginScreen(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .clickable {
-                    onNavigate(Screen.RegisterScreen.route)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            onNavigate(Screen.RegisterScreen.route)
+                        }
+                    )
                 }
         )
     }

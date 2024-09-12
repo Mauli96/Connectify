@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -62,7 +64,8 @@ fun CreatePostScreen(
     viewModel: CreatePostViewModel = hiltViewModel()
 ) {
 
-    val imageUri = viewModel.chosenImageUri.value
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val descriptionState by viewModel.descriptionState.collectAsStateWithLifecycle()
 
     val cropActivityLauncher = rememberLauncherForActivityResult(
         contract = CropActivityResultContract(4f, 5f)
@@ -138,7 +141,7 @@ fun CreatePostScreen(
                     tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(IconSizeMedium)
                 )
-                imageUri?.let { uri ->
+                state.imageUri?.let { uri ->
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = uri,
@@ -153,9 +156,9 @@ fun CreatePostScreen(
             StandardTextField(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = viewModel.descriptionState.value.text,
+                text = descriptionState.text,
                 hint = stringResource(id = R.string.description),
-                error = when(viewModel.descriptionState.value.error) {
+                error = when(descriptionState.error) {
                     is PostDescriptionError.FieldEmpty -> {
                         stringResource(id = R.string.this_field_cant_be_empty)
                     }
@@ -182,7 +185,7 @@ fun CreatePostScreen(
                     .height(40.dp)
                     .width(100.dp)
             ) {
-                if(viewModel.isLoading.value) {
+                if(state.isLoading) {
                     LinearProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()

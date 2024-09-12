@@ -1,7 +1,5 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.core.domain.models.Post
@@ -12,10 +10,12 @@ import com.example.connectify.core.util.ParentType
 import com.example.connectify.core.util.PostLiker
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,29 +25,33 @@ class MainFeedViewModel @Inject constructor(
     private val postLiker: PostLiker
 ) : ViewModel() {
 
+    private val _state = MutableStateFlow(MainFeedState())
+    val state = _state.asStateFlow()
+
+    private val _pagingState = MutableStateFlow<PagingState<Post>>(PagingState())
+    val pagingState = _pagingState.asStateFlow()
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val _state = MutableStateFlow(MainFeedState())
-    val state: StateFlow<MainFeedState> = _state
-
-    private val _pagingState = mutableStateOf<PagingState<Post>>(PagingState())
-    val pagingState: State<PagingState<Post>> = _pagingState
-
     private val paginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
-            _pagingState.value = pagingState.value.copy(
-                isLoading = isLoading
-            )
+            _pagingState.update {
+                it.copy(
+                    isLoading = isLoading
+                )
+            }
         },
         onRequest = { page ->
             postUseCases.getPostsForFollows(page = page)
         },
         onSuccess = { posts, firstPage ->
-            _pagingState.value = pagingState.value.copy(
-                items = if(firstPage) posts else pagingState.value.items + posts,
-                endReached = posts.isEmpty(),
-            )
+            _pagingState.update {
+                it.copy(
+                    items = if(firstPage) posts else pagingState.value.items + posts,
+                    endReached = posts.isEmpty()
+                )
+            }
         },
         onError = { uiText ->
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
@@ -64,9 +68,12 @@ class MainFeedViewModel @Inject constructor(
                 toggleLikeForParent(event.postId)
             }
             is MainFeedEvent.Navigated -> {
-                _state.value = _state.value.copy(
-                    hasNavigated = true
-                )
+                _state.update {
+                    it.copy(
+                        hasNavigated = true
+                    )
+                }
+                resetHasNavigatedWithDelay()
             }
         }
     }
@@ -83,6 +90,17 @@ class MainFeedViewModel @Inject constructor(
         }
     }
 
+    private fun resetHasNavigatedWithDelay() {
+        viewModelScope.launch {
+            delay(500)
+            _state.update {
+                it.copy(
+                    hasNavigated = false
+                )
+            }
+        }
+    }
+
     private fun toggleLikeForParent(parentId: String) {
         viewModelScope.launch {
             postLiker.toggleLike(
@@ -96,9 +114,11 @@ class MainFeedViewModel @Inject constructor(
                     )
                 },
                 onStateUpdated = { posts ->
-                    _pagingState.value = pagingState.value.copy(
-                        items = posts
-                    )
+                    _pagingState.update {
+                        it.copy(
+                            items = posts
+                        )
+                    }
                 }
             )
         }

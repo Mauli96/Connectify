@@ -16,16 +16,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -67,7 +69,16 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
     profilePictureSize: Dp = ProfilePictureSizeLarge
 ) {
-    val profileState = viewModel.profileState.value
+
+    val profileState by viewModel.profileState.collectAsStateWithLifecycle()
+    val usernameState by viewModel.usernameState.collectAsStateWithLifecycle()
+    val githubTextFieldState by viewModel.githubTextFieldState.collectAsStateWithLifecycle()
+    val instagramTextFieldState by viewModel.instagramTextFieldState.collectAsStateWithLifecycle()
+    val linkedInTextFieldState by viewModel.linkedInTextFieldState.collectAsStateWithLifecycle()
+    val bioState by viewModel.bioState.collectAsStateWithLifecycle()
+    val skills by viewModel.skills.collectAsStateWithLifecycle()
+    val bannerUri by viewModel.bannerUri.collectAsStateWithLifecycle()
+    val profileUri by viewModel.profileUri.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val cropBannerImageLauncher = rememberLauncherForActivityResult(
@@ -113,6 +124,7 @@ fun EditProfileScreen(
             }
         }
     }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -147,11 +159,11 @@ fun EditProfileScreen(
             ) {
                 BannerEditSection(
                     bannerImage = rememberAsyncImagePainter(
-                        model = viewModel.bannerUri.value ?: profileState.profile?.bannerUrl,
+                        model = bannerUri ?: profileState.profile?.bannerUrl,
                         imageLoader = imageLoader
                     ),
                     profileImage = rememberAsyncImagePainter(
-                        model = viewModel.profileUri.value ?: profileState.profile?.profilePictureUrl,
+                        model = profileUri ?: profileState.profile?.profilePictureUrl,
                         imageLoader = imageLoader
                     ),
                     profilePictureSize = profilePictureSize,
@@ -175,8 +187,8 @@ fun EditProfileScreen(
                     StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = viewModel.usernameState.value.text,
-                        error = when(viewModel.usernameState.value.error) {
+                        text = usernameState.text,
+                        error = when(usernameState.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
@@ -196,8 +208,8 @@ fun EditProfileScreen(
                     StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = viewModel.githubTextFieldState.value.text,
-                        error = when(viewModel.githubTextFieldState.value.error) {
+                        text = githubTextFieldState.text,
+                        error = when(githubTextFieldState.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
@@ -217,8 +229,8 @@ fun EditProfileScreen(
                     StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = viewModel.instagramTextFieldState.value.text,
-                        error = when(viewModel.instagramTextFieldState.value.error) {
+                        text = instagramTextFieldState.text,
+                        error = when(instagramTextFieldState.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
@@ -238,8 +250,8 @@ fun EditProfileScreen(
                     StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = viewModel.linkedInTextFieldState.value.text,
-                        error = when(viewModel.linkedInTextFieldState.value.error) {
+                        text = linkedInTextFieldState.text,
+                        error = when(linkedInTextFieldState.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
@@ -259,8 +271,8 @@ fun EditProfileScreen(
                     StandardOutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        text = viewModel.bioState.value.text,
-                        error = when(viewModel.bioState.value.error) {
+                        text = bioState.text,
+                        error = when(bioState.error) {
                             is EditProfileError.FieldEmpty -> {
                                 stringResource(id = R.string.this_field_cant_be_empty)
                             }
@@ -291,7 +303,7 @@ fun EditProfileScreen(
                         mainAxisSpacing = SpaceMedium,
                         crossAxisSpacing = SpaceMedium
                     ) {
-                        viewModel.skills.value.skills.forEach { skill ->
+                        skills.skills.forEach { skill ->
                             Chip(
                                 text = skill.name,
                                 selected = skill in viewModel.skills.value.selectedSkills,

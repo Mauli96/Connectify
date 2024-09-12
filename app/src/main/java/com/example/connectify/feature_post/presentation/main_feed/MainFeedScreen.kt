@@ -52,8 +52,8 @@ fun MainFeedScreen(
     scaffoldState: ScaffoldState,
     viewModel: MainFeedViewModel = hiltViewModel()
 ) {
-    val pagingState = viewModel.pagingState.value
     val state by viewModel.state.collectAsState()
+    val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val pullRefreshState = rememberPullRefreshState(
@@ -113,7 +113,7 @@ fun MainFeedScreen(
                 .pullRefresh(pullRefreshState)
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { change, dragAmount ->
-                        if(dragAmount < 1.dp.toPx() && !state.hasNavigated) {
+                        if (dragAmount < 1.dp.toPx() && !state.hasNavigated) {
                             viewModel.onEvent(MainFeedEvent.Navigated)
                             onNavigate(Screen.SearchScreen.route)
                         }

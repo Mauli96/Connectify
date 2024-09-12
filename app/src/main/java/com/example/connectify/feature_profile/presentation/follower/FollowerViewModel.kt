@@ -13,7 +13,10 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,11 +28,11 @@ class FollowerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(FollowerState())
-    val state: State<FollowerState> = _state
+    private val _state = MutableStateFlow(FollowerState())
+    val state = _state.asStateFlow()
 
-    private val _ownUserId = mutableStateOf("")
-    val ownUserId: State<String> = _ownUserId
+    private val _ownUserId = MutableStateFlow("")
+    val ownUserId = _ownUserId.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -55,16 +58,17 @@ class FollowerViewModel @Inject constructor(
                 it.userId == userId
             }?.isFollowing == true
 
-            _state.value = state.value.copy(
-                users = state.value.users.map {
-                    if(it.userId == userId) {
-                        it.copy(
-                            isFollowing = !it.isFollowing
-                        )
-                    } else it
-                }
-            )
-
+            _state.update {
+                it.copy(
+                    users = state.value.users.map { userItem ->
+                        if(userItem.userId == userId) {
+                            userItem.copy(
+                                isFollowing = !userItem.isFollowing
+                            )
+                        } else userItem
+                    }
+                )
+            }
             val result = toggleFollowStateForUserUseCase(
                 userId = userId,
                 isFollowing = isFollowing
@@ -72,13 +76,17 @@ class FollowerViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> Unit
                 is Resource.Error -> {
-                    _state.value = state.value.copy(
-                        users = state.value.users.map {
-                            if(it.userId == userId) {
-                                it.copy(isFollowing = isFollowing)
-                            } else it
-                        }
-                    )
+                    _state.update {
+                        it.copy(
+                            users = state.value.users.map { userItem ->
+                                if(userItem.userId == userId) {
+                                    userItem.copy(
+                                        isFollowing = isFollowing
+                                    )
+                                } else userItem
+                            }
+                        )
+                    }
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
@@ -89,21 +97,27 @@ class FollowerViewModel @Inject constructor(
 
     private fun getFollowedToUser(userId: String) {
         viewModelScope.launch {
-            _state.value = state.value.copy(
-                isLoading = true
-            )
+            _state.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             val result = profileUseCases.getFollowedToUser(userId)
             when(result) {
                 is Resource.Success -> {
-                    _state.value = state.value.copy(
-                        users = result.data ?: emptyList(),
-                        isLoading = false
-                    )
+                    _state.update {
+                        it.copy(
+                            users = result.data ?: emptyList(),
+                            isLoading = false
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    _state.value = state.value.copy(
-                        isLoading = false
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(result.uiText ?: UiText.unknownError())
                     )

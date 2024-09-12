@@ -1,6 +1,7 @@
 package com.example.connectify.feature_auth.presentation.register
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +22,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardTextField
@@ -55,12 +59,12 @@ fun RegisterScreen(
     onPopBackStack: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val usernameState = viewModel.usernameState.value
-    val emailState = viewModel.emailState.value
-    val passwordState = viewModel.passwordState.value
-    val registerState = viewModel.registerState.value
-    val context = LocalContext.current
+    val usernameState by viewModel.usernameState.collectAsStateWithLifecycle()
+    val emailState by viewModel.emailState.collectAsStateWithLifecycle()
+    val passwordState by viewModel.passwordState.collectAsStateWithLifecycle()
+    val registerState by viewModel.registerState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.onRegister.collect {
@@ -75,8 +79,7 @@ fun RegisterScreen(
                     keyboardController?.hide()
                     GlobalScope.launch {
                         scaffoldState.snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context),
-                            duration = SnackbarDuration.Short
+                            message = event.uiText.asString(context)
                         )
                     }
                 }
@@ -208,9 +211,11 @@ fun RegisterScreen(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .clickable {
-                    onNavigate(
-                        Screen.LoginScreen.route
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            onNavigate(Screen.LoginScreen.route)
+                        }
                     )
                 }
         )

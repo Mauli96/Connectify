@@ -1,15 +1,13 @@
 package com.example.connectify.feature_profile.presentation.profile
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
-import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
@@ -20,7 +18,10 @@ import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,23 +35,25 @@ class ProfileViewModel @Inject constructor(
     private val postLiker: PostLiker
 ) : ViewModel() {
 
-    private val _toolbarState = mutableStateOf(ProfileToolbarState())
-    val toolbarState: State<ProfileToolbarState> = _toolbarState
+    private val _state = MutableStateFlow(ProfileState())
+    val state = _state.asStateFlow()
 
-    private val _state = mutableStateOf(ProfileState())
-    val state: State<ProfileState> = _state
+    private val _toolbarState = MutableStateFlow(ProfileToolbarState())
+    val toolbarState = _toolbarState.asStateFlow()
+
+    private val _pagingState = MutableStateFlow<PagingState<Post>>(PagingState())
+    val pagingState = _pagingState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val _pagingState = mutableStateOf<PagingState<Post>>(PagingState())
-    val pagingState: State<PagingState<Post>> = _pagingState
-
     private val paginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
-            _pagingState.value = pagingState.value.copy(
-                isLoading = isLoading
-            )
+            _pagingState.update {
+                it.copy(
+                    isLoading = isLoading
+                )
+            }
         },
         onRequest = { page ->
             val userId = savedStateHandle.get<String>("userId") ?: getOwnUserId()
@@ -60,10 +63,12 @@ class ProfileViewModel @Inject constructor(
             )
         },
         onSuccess = { posts, firstPage ->
-            _pagingState.value = pagingState.value.copy(
-                items = if(firstPage) posts else pagingState.value.items + posts,
-                endReached = posts.isEmpty(),
-            )
+            _pagingState.update {
+                it.copy(
+                    items = if(firstPage) posts else pagingState.value.items + posts,
+                    endReached = posts.isEmpty()
+                )
+            }
         },
         onError = { uiText ->
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
@@ -71,11 +76,19 @@ class ProfileViewModel @Inject constructor(
     )
 
     fun setExpandedRatio(ratio: Float) {
-        _toolbarState.value = _toolbarState.value.copy(expandedRatio = ratio)
+        _toolbarState.update {
+            it.copy(
+                expandedRatio = ratio
+            )
+        }
     }
 
     fun setToolbarOffsetY(value: Float) {
-        _toolbarState.value = _toolbarState.value.copy(toolbarOffsetY = value)
+        _toolbarState.update {
+            it.copy(
+                toolbarOffsetY = value
+            )
+        }
     }
 
     init {
@@ -92,9 +105,11 @@ class ProfileViewModel @Inject constructor(
                 }
             }
             is ProfileEvent.SelectPost -> {
-                _state.value = state.value.copy(
-                    selectedPostId = event.postId
-                )
+                _state.update {
+                    it.copy(
+                        selectedPostId = event.postId
+                    )
+                }
             }
             is ProfileEvent.DeletePost -> {
                 _state.value.selectedPostId?.let { postId ->
@@ -105,24 +120,32 @@ class ProfileViewModel @Inject constructor(
                 toggleFollowStateForUser(event.userId)
             }
             is ProfileEvent.ShowBottomSheet -> {
-                _state.value = state.value.copy(
-                    isBottomSheetVisible = true
-                )
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = true
+                    )
+                }
             }
             is ProfileEvent.DismissBottomSheet -> {
-                _state.value = state.value.copy(
-                    isBottomSheetVisible = false
-                )
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = false
+                    )
+                }
             }
             is ProfileEvent.ShowLogoutDialog -> {
-                _state.value = state.value.copy(
-                    isLogoutDialogVisible = true
-                )
+                _state.update {
+                    it.copy(
+                        isLogoutDialogVisible = true
+                    )
+                }
             }
             is ProfileEvent.DismissLogoutDialog -> {
-                _state.value = state.value.copy(
-                    isLogoutDialogVisible = false
-                )
+                _state.update {
+                    it.copy(
+                        isLogoutDialogVisible = false
+                    )
+                }
             }
             is ProfileEvent.Logout -> {
                 profileUseCases.logout()
@@ -135,14 +158,18 @@ class ProfileViewModel @Inject constructor(
             val result = postUseCases.deletePost(postId)
             when(result) {
                 is Resource.Success -> {
-                    _pagingState.value = pagingState.value.copy(
-                        items = pagingState.value.items.filter {
-                            it.id != postId
-                        }
-                    )
-                    _state.value = state.value.copy(
-                        selectedPostId = null
-                    )
+                    _pagingState.update {
+                        it.copy(
+                            items = pagingState.value.items.filter { post ->
+                                post.id != postId
+                            }
+                        )
+                    }
+                    _state.update {
+                        it.copy(
+                            selectedPostId = null
+                        )
+                    }
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_post
@@ -185,9 +212,11 @@ class ProfileViewModel @Inject constructor(
                     )
                 },
                 onStateUpdated = { posts ->
-                    _pagingState.value = pagingState.value.copy(
-                        items = posts,
-                    )
+                    _pagingState.update {
+                        it.copy(
+                            items = posts
+                        )
+                    }
                 }
             )
         }
@@ -198,16 +227,18 @@ class ProfileViewModel @Inject constructor(
             val isFollowing = state.value.profile?.isFollowing == true
             val currentFollowerCount = state.value.profile?.followerCount ?: 0
 
-            _state.value = _state.value.copy(
-                profile = state.value.profile?.copy(
-                    isFollowing = !isFollowing,
-                    followerCount = if(isFollowing) {
-                        currentFollowerCount - 1
-                    } else {
-                        currentFollowerCount + 1
-                    }
+            _state.update {
+                it.copy(
+                    profile = state.value.profile?.copy(
+                        isFollowing = !isFollowing,
+                        followerCount = if(isFollowing) {
+                            currentFollowerCount - 1
+                        } else {
+                            currentFollowerCount + 1
+                        }
+                    )
                 )
-            )
+            }
             val result = toggleFollowStateForUserUseCase(
                 userId = userId,
                 isFollowing = isFollowing
@@ -215,16 +246,18 @@ class ProfileViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> Unit
                 is Resource.Error -> {
-                    _state.value = _state.value.copy(
-                        profile = state.value.profile?.copy(
-                            isFollowing = isFollowing,
-                            followerCount = if(isFollowing) {
-                                currentFollowerCount + 1
-                            } else {
-                                currentFollowerCount - 1
-                            }
+                    _state.update {
+                        it.copy(
+                            profile = state.value.profile?.copy(
+                                isFollowing = !isFollowing,
+                                followerCount = if(isFollowing) {
+                                    currentFollowerCount + 1
+                                } else {
+                                    currentFollowerCount - 1
+                                }
+                            )
                         )
-                    )
+                    }
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
@@ -235,21 +268,27 @@ class ProfileViewModel @Inject constructor(
 
     fun getProfile(userId: String?) {
         viewModelScope.launch {
-            _state.value = state.value.copy(
-                isLoading = true
-            )
+            _state.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             val result = profileUseCases.getProfile(userId = userId ?: getOwnUserId())
             when(result) {
                 is Resource.Success -> {
-                    _state.value = state.value.copy(
-                        profile = result.data,
-                        isLoading = false
-                    )
+                    _state.update {
+                        it.copy(
+                            profile = result.data,
+                            isLoading = false
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    _state.value = state.value.copy(
-                        isLoading = false
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))

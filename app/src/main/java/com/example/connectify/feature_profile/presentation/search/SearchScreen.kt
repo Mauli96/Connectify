@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,24 +19,21 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardSearchField
@@ -49,7 +44,6 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.showKeyboard
 import com.example.connectify.core.util.Screen
-import com.example.connectify.feature_profile.domain.util.ProfileConstants
 
 @ExperimentalMaterialApi
 @Composable
@@ -59,7 +53,8 @@ fun SearchScreen(
     onNavigateUp: () -> Unit = {},
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
-    val state = viewModel.searchState.value
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val searchFieldState by viewModel.searchFieldState.collectAsStateWithLifecycle()
 
     val focusRequester = remember {
         FocusRequester()
@@ -100,7 +95,7 @@ fun SearchScreen(
                 }
                 Spacer(modifier = Modifier.width(SpaceSmall))
                 StandardSearchField(
-                    query = viewModel.searchFieldState.value.text,
+                    query = searchFieldState.text,
                     onQueryChanged = {
                         viewModel.onEvent(SearchEvent.Query(it))
                     },
@@ -115,7 +110,7 @@ fun SearchScreen(
                         )
                     },
                     trailingIcon = {
-                        if(viewModel.searchFieldState.value.text.isNotEmpty()) {
+                        if(searchFieldState.text.isNotEmpty()) {
                             IconButton(
                                 onClick = {
                                     viewModel.onEvent(SearchEvent.OnToggleSearch(""))

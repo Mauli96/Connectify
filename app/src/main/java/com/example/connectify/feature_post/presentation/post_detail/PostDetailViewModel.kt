@@ -1,7 +1,5 @@
 package com.example.connectify.feature_post.presentation.post_detail
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +15,10 @@ import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.presentation.util.CommentError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,17 +30,17 @@ class PostDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(PostDetailState())
-    val state: State<PostDetailState> = _state
+    private val _state = MutableStateFlow(PostDetailState())
+    val state = _state.asStateFlow()
 
-    private val _profilePictureState = mutableStateOf("")
-    val profilePictureState: State<String> = _profilePictureState
+    private val _profilePictureState = MutableStateFlow("")
+    val profilePictureState = _profilePictureState.asStateFlow()
 
-    private val _commentTextFieldState = mutableStateOf(StandardTextFieldState(error = CommentError.FieldEmpty))
-    val commentTextFieldState: State<StandardTextFieldState> = _commentTextFieldState
+    private val _commentTextFieldState = MutableStateFlow(StandardTextFieldState(error = CommentError.FieldEmpty))
+    val commentTextFieldState = _commentTextFieldState.asStateFlow()
 
-    private val _commentState = mutableStateOf(CommentState())
-    val commentState: State<CommentState> = _commentState
+    private val _commentState = MutableStateFlow(CommentState())
+    val commentState = _commentState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -81,15 +82,19 @@ class PostDetailViewModel @Inject constructor(
                 )
             }
             is PostDetailEvent.EnteredComment -> {
-                _commentTextFieldState.value = commentTextFieldState.value.copy(
-                    text = event.comment,
-                    error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
-                )
+                _commentTextFieldState.update {
+                    it.copy(
+                        text = event.comment,
+                        error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
+                    )
+                }
             }
             is PostDetailEvent.SelectComment -> {
-                _state.value = state.value.copy(
-                    selectedCommentId = event.commentId
-                )
+                _state.update {
+                    it.copy(
+                        selectedCommentId = event.commentId
+                    )
+                }
             }
             is PostDetailEvent.DeleteComment -> {
                 _state.value.selectedCommentId?.let { commentId ->
@@ -97,14 +102,18 @@ class PostDetailViewModel @Inject constructor(
                 }
             }
             is PostDetailEvent.ShowBottomSheet -> {
-                _state.value = state.value.copy(
-                    isBottomSheetVisible = true
-                )
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = true
+                    )
+                }
             }
             is PostDetailEvent.DismissBottomSheet -> {
-                _state.value = state.value.copy(
-                    isBottomSheetVisible = false
-                )
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = false
+                    )
+                }
             }
         }
     }
@@ -132,12 +141,14 @@ class PostDetailViewModel @Inject constructor(
             val result = postUseCases.deleteComment(commentId)
             when(result) {
                 is Resource.Success -> {
-                    _state.value = state.value.copy(
-                        comments = state.value.comments.filter {
-                            it.id != commentId
-                        },
-                        selectedCommentId = null
-                    )
+                    _state.update {
+                        it.copy(
+                            comments = state.value.comments.filter { comment ->
+                                comment.id != commentId
+                            },
+                            selectedCommentId = null
+                        )
+                    }
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_comment
@@ -173,28 +184,32 @@ class PostDetailViewModel @Inject constructor(
             when(parentType) {
                 ParentType.Post.type -> {
                     val post = state.value.post
-                    _state.value = state.value.copy(
-                        post = state.value.post?.copy(
-                            isLiked = !isLiked,
-                            likeCount = if(isLiked) {
-                                post?.likeCount?.minus(1) ?: 0
-                            } else post?.likeCount?.plus(1) ?: 0
+                    _state.update {
+                        it.copy(
+                            post = state.value.post?.copy(
+                                isLiked = !isLiked,
+                                likeCount = if(isLiked) {
+                                    post?.likeCount?.minus(1) ?: 0
+                                } else post?.likeCount?.plus(1) ?: 0
+                            )
                         )
-                    )
+                    }
                 }
                 ParentType.Comment.type -> {
-                    _state.value = state.value.copy(
-                        comments = state.value.comments.map { comment ->
-                            if(comment.id == parentId) {
-                                comment.copy(
-                                    isLiked = !isLiked,
-                                    likeCount = if(isLiked) {
-                                        comment.likeCount - 1
-                                    } else comment.likeCount + 1
-                                )
-                            } else comment
-                        }
-                    )
+                    _state.update {
+                        it.copy(
+                            comments = state.value.comments.map { comment ->
+                                if(comment.id == parentId) {
+                                    comment.copy(
+                                        isLiked = !isLiked,
+                                        likeCount = if(isLiked) {
+                                            comment.likeCount - 1
+                                        } else comment.likeCount + 1
+                                    )
+                                } else comment
+                            }
+                        )
+                    }
                 }
             }
             val result = postUseCases.toggleLikeForParent(
@@ -207,26 +222,30 @@ class PostDetailViewModel @Inject constructor(
                 is Resource.Error -> {
                     when(parentType) {
                         ParentType.Post.type -> {
-                            _state.value = state.value.copy(
-                                post = state.value.post?.copy(
-                                    isLiked = isLiked,
-                                    likeCount = currentLikeCount
+                            _state.update {
+                                it.copy(
+                                    post = state.value.post?.copy(
+                                        isLiked = isLiked,
+                                        likeCount = currentLikeCount
+                                    )
                                 )
-                            )
+                            }
                         }
                         ParentType.Comment.type -> {
-                            _state.value = state.value.copy(
-                                comments = state.value.comments.map { comment ->
-                                    if(comment.id == parentId) {
-                                        comment.copy(
-                                            isLiked = isLiked,
-                                            likeCount = if(comment.isLiked) {
-                                                comment.likeCount - 1
-                                            } else comment.likeCount + 1
-                                        )
-                                    } else comment
-                                }
-                            )
+                            _state.update {
+                                it.copy(
+                                    comments = state.value.comments.map { comment ->
+                                        if(comment.id == parentId) {
+                                            comment.copy(
+                                                isLiked = isLiked,
+                                                likeCount = if(comment.isLiked) {
+                                                    comment.likeCount - 1
+                                                } else comment.likeCount + 1
+                                            )
+                                        } else comment
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -247,9 +266,11 @@ class PostDetailViewModel @Inject constructor(
                 return@launch
             }
 
-            _commentState.value = commentState.value.copy(
-                isLoading = true
-            )
+            _commentState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             val result = postUseCases.createComment(
                 postId = postId,
                 comment = comment
@@ -259,22 +280,28 @@ class PostDetailViewModel @Inject constructor(
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = UiText.StringResource(R.string.comment_posted)
                     ))
-                    _commentState.value = commentState.value.copy(
-                        isLoading = false
-                    )
-                    _commentTextFieldState.value = commentTextFieldState.value.copy(
-                        text = "",
-                        error = CommentError.FieldEmpty
-                    )
+                    _commentState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    _commentTextFieldState.update {
+                        it.copy(
+                            text = "",
+                            error = CommentError.FieldEmpty
+                        )
+                    }
                     loadCommentsForPost(postId)
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
-                    _commentState.value = commentState.value.copy(
-                        isLoading = false
-                    )
+                    _commentState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                 }
             }
         }
@@ -282,21 +309,27 @@ class PostDetailViewModel @Inject constructor(
 
     private fun loadPostDetails(postId: String) {
         viewModelScope.launch {
-            _state.value = state.value.copy(
-                isLoadingPost = true
-            )
+            _state.update {
+                it.copy(
+                    isLoadingPost = true
+                )
+            }
             val result = postUseCases.getPostDetails(postId)
             when(result) {
                 is Resource.Success -> {
-                    _state.value = state.value.copy(
-                        post = result.data,
-                        isLoadingPost = false
-                    )
+                    _state.update {
+                        it.copy(
+                            post = result.data,
+                            isLoadingPost = false
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    _state.value = state.value.copy(
-                        isLoadingPost = false
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoadingPost = false
+                        )
+                    }
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
@@ -309,21 +342,27 @@ class PostDetailViewModel @Inject constructor(
 
     private fun loadCommentsForPost(postId: String) {
         viewModelScope.launch {
-            _state.value = state.value.copy(
-                isLoadingComments = true
-            )
+            _state.update {
+                it.copy(
+                    isLoadingComments = true
+                )
+            }
             val result = postUseCases.getCommentsForPost(postId)
             when(result) {
                 is Resource.Success -> {
-                    _state.value = state.value.copy(
-                        comments = result.data ?: emptyList(),
-                        isLoadingComments = false
-                    )
+                    _state.update {
+                        it.copy(
+                            comments = result.data ?: emptyList(),
+                            isLoadingComments = false
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    _state.value = state.value.copy(
-                        isLoadingComments = false
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoadingComments = false
+                        )
+                    }
                 }
             }
         }

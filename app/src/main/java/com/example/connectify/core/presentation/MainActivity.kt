@@ -53,12 +53,13 @@ class MainActivity : ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val scaffoldState = rememberScaffoldState()
                     val isUserAuthenticated by viewModel.isUserAuthenticated.collectAsStateWithLifecycle()
+                    val splashDuration = if(isUserAuthenticated == true) 100L else Constants.SPLASH_SCREEN_DURATION
 
                     LaunchedEffect(Unit) {
                         viewModel.eventFlow.collectLatest { event ->
                             when(event) {
                                 is UiEvent.Navigate -> {
-                                    delay(Constants.SPLASH_SCREEN_DURATION)
+                                    delay(splashDuration)
                                     keepSplashScreenOn = false
                                     navController.navigate(event.route) {
                                         popUpTo(0)

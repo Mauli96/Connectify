@@ -34,13 +34,16 @@ fun Navigation(
     imageLoader: ImageLoader,
     isUserAuthenticated: Boolean?
 ) {
-    NavHost(
+    val startDestination = when(isUserAuthenticated) {
+        true -> Screen.MainFeedScreen.route
+        false -> Screen.LoginScreen.route
+        null -> null
+    }
+
+    startDestination?.let {
+        NavHost(
         navController = navController,
-        startDestination = if(isUserAuthenticated == true) {
-            Screen.MainFeedScreen.route
-        } else {
-            Screen.LoginScreen.route
-        }
+        startDestination = it
     ) {
         composable(Screen.LoginScreen.route) {
             LoginScreen(
@@ -262,5 +265,6 @@ fun Navigation(
                 imageLoader = imageLoader
             )
         }
+    }
     }
 }
