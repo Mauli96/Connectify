@@ -44,7 +44,8 @@ interface PostApi {
 
     @GET("/api/comment/get")
     suspend fun getCommentsForPost(
-        @Query("postId") postId: String
+        @Query("postId") postId: String,
+        @Query("filterType") filterType: String
     ): List<CommentDto>
 
     @POST("/api/comment/create")
@@ -80,6 +81,6 @@ interface PostApi {
 
 
     companion object {
-        const val BASE_URL = "http://192.168.0.210:8001/"
+        const val BASE_URL = "http://192.168.0.209:8001/"
     }
 }

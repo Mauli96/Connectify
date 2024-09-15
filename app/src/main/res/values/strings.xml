@@ -108,4 +108,8 @@
     <string name="comments">Comments</string>
     <string name="more_items">More Items</string>
     <string name="navigate_back">Navigate Back</string>
+    <string name="most_recent_comments">Most recent comments</string>
+    <string name="most_old_commets">Most old comments</string>
+    <string name="most_popular_comments">Most popular comments</string>
+    <string name="filter_comments">Filter comments</string>
 </resources>

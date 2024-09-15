@@ -14,6 +14,7 @@ import com.example.connectify.feature_post.data.remote.request.CreateCommentRequ
 import com.example.connectify.feature_post.data.remote.request.CreatePostRequest
 import com.example.connectify.feature_post.data.remote.request.LikeUpdateRequest
 import com.example.connectify.feature_post.domain.repository.PostRepository
+import com.example.connectify.feature_post.presentation.util.CommentFilter
 import com.google.gson.Gson
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -105,9 +106,9 @@ class PostRepositoryImpl(
         }
     }
 
-    override suspend fun getCommentsForPost(postId: String): Resource<List<Comment>> {
+    override suspend fun getCommentsForPost(postId: String, filterType: CommentFilter): Resource<List<Comment>> {
         return try {
-            val comments = api.getCommentsForPost(postId = postId).map {
+            val comments = api.getCommentsForPost(postId = postId, filterType = filterType.value).map {
                 it.toComment()
             }
             Resource.Success(comments)

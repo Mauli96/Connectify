@@ -7,6 +7,7 @@ import com.example.connectify.core.domain.models.UserItem
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
+import com.example.connectify.feature_post.presentation.util.CommentFilter
 
 interface PostRepository {
 
@@ -22,7 +23,7 @@ interface PostRepository {
 
     suspend fun getPostDetails(postId: String): Resource<Post>
 
-    suspend fun getCommentsForPost(postId: String): Resource<List<Comment>>
+    suspend fun getCommentsForPost(postId: String, filterType: CommentFilter): Resource<List<Comment>>
 
     suspend fun createComment(
         postId: String,

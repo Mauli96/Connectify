@@ -9,5 +9,6 @@ data class PostDetailState(
     val selectedCommentId: String? = null,
     val isLoadingPost: Boolean = false,
     val isLoadingComments: Boolean = false,
+    val isDropdownExpanded: Boolean = false,
     val isBottomSheetVisible: Boolean = false
 )

@@ -13,6 +13,7 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.presentation.util.CommentError
+import com.example.connectify.feature_post.presentation.util.CommentFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +51,10 @@ class PostDetailViewModel @Inject constructor(
     init {
         savedStateHandle.get<String>("postId")?.let { postId ->
             loadPostDetails(postId)
-            loadCommentsForPost(postId)
+            loadCommentsForPost(
+                postId = postId,
+                filterType = CommentFilter.MOST_RECENT
+            )
             getOwnProfilePicture()
         }
     }
@@ -96,9 +100,34 @@ class PostDetailViewModel @Inject constructor(
                     )
                 }
             }
+            is PostDetailEvent.ChangeCommentFilter -> {
+                _commentState.update {
+                    it.copy(
+                        commentFilter = event.filterType
+                    )
+                }
+                loadCommentsForPost(
+                    postId = savedStateHandle.get<String>("postId") ?: "",
+                    filterType = commentState.value.commentFilter
+                )
+            }
             is PostDetailEvent.DeleteComment -> {
                 _state.value.selectedCommentId?.let { commentId ->
                     deleteComment(commentId)
+                }
+            }
+            is PostDetailEvent.ShowDropDownMenu -> {
+                _state.update {
+                    it.copy(
+                        isDropdownExpanded = true
+                    )
+                }
+            }
+            is PostDetailEvent.DismissDropDownMenu -> {
+                _state.update {
+                    it.copy(
+                        isDropdownExpanded = false
+                    )
                 }
             }
             is PostDetailEvent.ShowBottomSheet -> {
@@ -291,7 +320,10 @@ class PostDetailViewModel @Inject constructor(
                             error = CommentError.FieldEmpty
                         )
                     }
-                    loadCommentsForPost(postId)
+                    loadCommentsForPost(
+                        postId = postId,
+                        filterType = commentState.value.commentFilter
+                    )
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(UiEvent.ShowSnackbar(
@@ -340,14 +372,17 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadCommentsForPost(postId: String) {
+    private fun loadCommentsForPost(
+        postId: String,
+        filterType: CommentFilter
+    ) {
         viewModelScope.launch {
             _state.update {
                 it.copy(
                     isLoadingComments = true
                 )
             }
-            val result = postUseCases.getCommentsForPost(postId)
+            val result = postUseCases.getCommentsForPost(postId, filterType)
             when(result) {
                 is Resource.Success -> {
                     _state.update {
