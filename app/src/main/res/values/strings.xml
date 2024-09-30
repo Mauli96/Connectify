@@ -112,4 +112,5 @@
     <string name="most_old_commets">Most old comments</string>
     <string name="most_popular_comments">Most popular comments</string>
     <string name="filter_comments">Filter comments</string>
+    <string name="save_post">Save post</string>
 </resources>

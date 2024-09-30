@@ -1,13 +1,8 @@
 package com.example.connectify.core.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
@@ -19,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -31,9 +26,11 @@ fun CustomSnackbarHost(
     snackbarHostState: SnackbarHostState
 ) {
 
-    val currentSnackbarData by rememberUpdatedState(newValue = snackbarHostState.currentSnackbarData)
+    val currentSnackbarData by rememberUpdatedState(
+        newValue = snackbarHostState.currentSnackbarData
+    )
 
-    var isVisible by remember {
+    var isVisible by rememberSaveable {
         mutableStateOf(false)
     }
 

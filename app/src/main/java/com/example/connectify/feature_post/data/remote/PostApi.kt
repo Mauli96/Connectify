@@ -37,15 +37,12 @@ interface PostApi {
         @Part postImage: MultipartBody.Part
     ): BasicApiResponse<Unit>
 
-    @GET("/api/post/details")
-    suspend fun getPostDetails(
-        @Query("postId") postId: String
-    ): BasicApiResponse<Post>
-
     @GET("/api/comment/get")
     suspend fun getCommentsForPost(
         @Query("postId") postId: String,
-        @Query("filterType") filterType: String
+        @Query("filterType") filterType: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
     ): List<CommentDto>
 
     @POST("/api/comment/create")

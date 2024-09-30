@@ -3,13 +3,14 @@ package com.example.connectify.di
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
-import coil.ComponentRegistry
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.example.connectify.core.domain.repository.ProfileRepository
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
+import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.Constants
+import com.example.connectify.core.util.DefaultCommentLiker
 import com.example.connectify.core.util.DefaultPostLiker
 import com.example.connectify.core.util.PostLiker
 import com.google.gson.Gson
@@ -68,6 +69,12 @@ object AppModule {
     @Singleton
     fun providePostLiker(): PostLiker {
         return DefaultPostLiker()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCommentLiker(): CommentLiker {
+        return DefaultCommentLiker()
     }
 
     @Provides

@@ -32,12 +32,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
+import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
@@ -51,6 +54,8 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.feature_post.presentation.util.PostConstants
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
+import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileEvent
+import com.example.connectify.feature_profile.presentation.util.EditProfileError
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -153,23 +158,24 @@ fun CreatePostScreen(
                 }
             }
             Spacer(modifier = Modifier.height(SpaceMedium))
-            StandardTextField(
-                modifier = Modifier
-                    .fillMaxWidth(),
+            Text(
+                text = stringResource(id = R.string.description),
+                style = MaterialTheme.typography.labelSmall
+            )
+            StandardOutlinedTextField(
                 text = descriptionState.text,
-                hint = stringResource(id = R.string.description),
+                onValueChange = {
+                    viewModel.onEvent(CreatePostEvent.EnterDescription(it))
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = false,
+                maxLines = 5,
+                minLines = 3,
                 error = when(descriptionState.error) {
                     is PostDescriptionError.FieldEmpty -> {
                         stringResource(id = R.string.this_field_cant_be_empty)
                     }
                     else -> ""
-                },
-                singleLine = false,
-                maxLines = 5,
-                minLines = 3,
-                maxLength = PostConstants.MAX_POST_DESCRIPTION_LENGTH,
-                onValueChange = {
-                    viewModel.onEvent(CreatePostEvent.EnterDescription(it))
                 }
             )
             Spacer(modifier = Modifier.height(SpaceLarge))

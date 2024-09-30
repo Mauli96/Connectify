@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -17,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -44,19 +48,33 @@ fun StandardBottomSheet(
         },
         sheetState = bottomSheetState,
         shape = MaterialTheme.shapes.large,
+        dragHandle = {},
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Icon(
+                painter = painterResource(R.drawable.line_icon),
+                contentDescription = null,
+                modifier = Modifier.size(IconSizeMedium),
+                tint = Color.Gray
+            )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(SpaceMedium))
+            Spacer(modifier = Modifier.height(SpaceSmall))
+            HorizontalDivider(
+                modifier = Modifier
+                    .height(0.5.dp),
+                thickness = 0.5.dp,
+                color = HintGray
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,7 +128,7 @@ fun StandardBottomSheet(
                     )
                 )
             }
-            Spacer(modifier = Modifier.height(SpaceLarge))
+            Spacer(modifier = Modifier.height(30.dp))
         }
     }
 }

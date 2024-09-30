@@ -38,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -67,6 +66,9 @@ fun BannerSection(
     leftIconModifier: Modifier = Modifier,
     rightIconModifier: Modifier = Modifier,
     bannerUrl: String? = null,
+    expanded: Boolean = false,
+    onShowDropDownMenu: () -> Unit,
+    onDismissDropdownMenu: () -> Unit,
     topSkills: List<Skill> = emptyList(),
     shouldShowGitHub: Boolean = false,
     shouldShowInstagram: Boolean = false,
@@ -79,9 +81,6 @@ fun BannerSection(
     onInstagramClick: () -> Unit = {},
     onLinkedInClick: () -> Unit = {}
 ) {
-    var showDropDownMenu by remember {
-        mutableStateOf(false)
-    }
 
     BoxWithConstraints(
         modifier = modifier
@@ -103,17 +102,17 @@ fun BannerSection(
                 .padding(end = SpaceSmall)
         ) {
             AnimatedVisibility(
-                visible = showDropDownMenu,
+                visible = expanded,
                 enter = slideInVertically() + fadeIn(),
                 exit = slideOutVertically() + fadeOut()
             ) {
                 DropdownMenu(
-                    expanded = showDropDownMenu,
+                    expanded = expanded,
                     onDismissRequest = {
-                        showDropDownMenu = !showDropDownMenu
+                        onDismissDropdownMenu()
                     },
                     modifier = Modifier
-                        .shadow(8.dp)
+                        .shadow(20.dp)
                         .background(MaterialTheme.colorScheme.background)
                 ) {
                     DropdownMenuItem(
@@ -136,8 +135,8 @@ fun BannerSection(
                             }
                         },
                         onClick = {
+                            onDismissDropdownMenu()
                             onEditClick()
-                            showDropDownMenu = !showDropDownMenu
                         }
                     )
                     HorizontalDivider(
@@ -169,8 +168,8 @@ fun BannerSection(
                             }
                         },
                         onClick = {
+                            onDismissDropdownMenu()
                             onLogoutClick()
-                            showDropDownMenu = !showDropDownMenu
                         }
                     )
                 }
@@ -197,13 +196,13 @@ fun BannerSection(
                 if(isOwnProfile) {
                     IconButton(
                         onClick = {
-                            showDropDownMenu = !showDropDownMenu
+                            onShowDropDownMenu()
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.MoreVert,
+                            painter = painterResource(R.drawable.more_item_icon),
                             contentDescription = stringResource(id = R.string.more_items),
-                            tint = Color.White
+                            modifier = Modifier.size(IconSizeSmall)
                         )
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
+import android.content.Context
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,16 +15,21 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -33,6 +39,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.example.connectify.R
+import com.example.connectify.core.domain.models.Comment
+import com.example.connectify.core.domain.states.PagingState
+import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
@@ -41,9 +51,10 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
+import com.example.connectify.core.presentation.components.Comment
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainFeedScreen(
     imageLoader: ImageLoader,
@@ -53,18 +64,26 @@ fun MainFeedScreen(
     viewModel: MainFeedViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
+    val pagingPostState by viewModel.pagingPostState.collectAsStateWithLifecycle()
+    val pagingCommentState by viewModel.pagingCommentState.collectAsStateWithLifecycle()
+    val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     val context = LocalContext.current
 
+    val focusRequester = remember {
+        FocusRequester()
+    }
+
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = pagingState.isLoading,
+        refreshing = pagingPostState.isLoading,
         onRefresh = {
-            viewModel.loadInitialFeed()
+            viewModel.loadInitialPosts()
         }
     )
 
     LaunchedEffect(key1 = true) {
-        viewModel.loadInitialFeed()
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
@@ -122,23 +141,19 @@ fun MainFeedScreen(
         ) {
             LazyColumn {
                 items(
-                    count = pagingState.items.size,
+                    count = pagingPostState.items.size,
                     key = { i ->
-                        val post = pagingState.items[i]
+                        val post = pagingPostState.items[i]
                         post.id
                     }
                 ) { i ->
-                    val post = pagingState.items[i]
-                    if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
+                    val post = pagingPostState.items[i]
+                    if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
                         viewModel.loadNextPosts()
                     }
                     Post(
                         post = post,
-                        context = context,
                         imageLoader = imageLoader,
-                        onPostClick = {
-                            onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
-                        },
                         onUsernameClick = {
                             onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
                         },
@@ -146,24 +161,114 @@ fun MainFeedScreen(
                             viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
                         },
                         onCommentClick = {
-                            onNavigate(Screen.PostDetailScreen.route + "/${post.id}?shouldShowKeyboard=true")
+                            viewModel.onEvent(MainFeedEvent.SelectPost(post.id))
+                            viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
+                            viewModel.onEvent(MainFeedEvent.LoadComments)
                         },
                         onShareClick = {
                             context.sendSharePostIntent(post.id)
+                        },
+                        onLikedByClick = {
+                            onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
-                    if(i == pagingState.items.size - 1) {
+                    if(i == pagingPostState.items.size - 1) {
                         Spacer(modifier = Modifier.height(50.dp))
                     }
                 }
             }
+            CommentSheetContent(
+                pagingCommentState = pagingCommentState,
+                imageLoader = imageLoader,
+                onNavigate = onNavigate,
+                context = context,
+                viewModel = viewModel,
+                focusRequester = focusRequester,
+                bottomSheetState = bottomSheetState,
+                commentTextFieldState = commentTextFieldState,
+                state = state
+            )
             PullRefreshIndicator(
-                refreshing = pagingState.isLoading,
+                refreshing = pagingPostState.isLoading,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
                 backgroundColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommentSheetContent(
+    pagingCommentState: PagingState<Comment>,
+    imageLoader: ImageLoader,
+    onNavigate: (String) -> Unit,
+    context: Context,
+    viewModel: MainFeedViewModel,
+    focusRequester: FocusRequester,
+    bottomSheetState: SheetState,
+    commentTextFieldState: StandardTextFieldState,
+    state: MainFeedState
+) {
+    if(state.isBottomSheetVisible) {
+        PaginatedBottomSheet(
+            title = stringResource(R.string.comments),
+            bottomSheetState = bottomSheetState,
+            onDismissBottomSheet = {
+                viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+            },
+            items = pagingCommentState.items,
+            isListLoading = pagingCommentState.isLoading,
+            endReached = pagingCommentState.endReached,
+            loadNextPage = {
+                viewModel.loadNextComments()
+            },
+            selectedFilter = state.commentFilter,
+            onFilterSelected = { filterType ->
+                viewModel.onEvent(MainFeedEvent.ChangeCommentFilter(filterType))
+            },
+            isDropdownMenuExpanded = state.isDropdownMenuVisible,
+            onShowDropDownMenu = {
+                viewModel.onEvent(MainFeedEvent.ShowDropDownMenu)
+            },
+            onDismissDropdownMenu = {
+                viewModel.onEvent(MainFeedEvent.DismissDropDownMenu)
+            },
+            keyExtractor = { comment ->
+                comment.id
+            },
+            textFieldState = commentTextFieldState,
+            onValueChange = {
+                viewModel.onEvent(MainFeedEvent.EnteredComment(it))
+            },
+            onSend = {
+                viewModel.onEvent(MainFeedEvent.Comment)
+            },
+            ownProfilePicture = state.profilePicture ?: "",
+            hint = stringResource(R.string.enter_a_comment),
+            isUploading = state.isUploading,
+            focusRequester = focusRequester
+        ) { _, comment ->
+            Comment(
+                modifier = Modifier.fillMaxWidth(),
+                comment = comment,
+                context = context,
+                imageLoader = imageLoader,
+                onLikeClick = {
+                    viewModel.onEvent(MainFeedEvent.LikedComment(comment.id))
+                },
+                onLikedByClick = {
+                    onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
+                },
+                onLongPress = {
+                    viewModel.onEvent(MainFeedEvent.SelectComment(comment.id))
+                },
+                onDeleteClick = {
+                    viewModel.onEvent(MainFeedEvent.DeleteComment)
+                }
             )
         }
     }

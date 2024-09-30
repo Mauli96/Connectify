@@ -22,7 +22,7 @@ val Typography = Typography(
     headlineMedium = TextStyle( //h1
         fontFamily = quicksand,
         fontWeight = FontWeight.Bold,
-        fontSize = 30.sp,
+        fontSize = 26.sp,
         color = TextWhite
     ),
     headlineSmall = TextStyle(
@@ -40,7 +40,7 @@ val Typography = Typography(
     titleMedium = TextStyle(
         fontFamily = quicksand,
         fontWeight = FontWeight.Medium,
-        fontSize = 20.sp,
+        fontSize = 18.sp,
         color = TextWhite
     ),
     titleSmall = TextStyle(

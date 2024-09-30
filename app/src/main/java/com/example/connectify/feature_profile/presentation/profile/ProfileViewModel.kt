@@ -4,17 +4,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
+import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.domain.states.PagingState
+import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
 import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
 import com.example.connectify.core.util.PostLiker
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
+import com.example.connectify.feature_post.presentation.util.CommentError
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,28 +33,36 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
+    private val postLiker: PostLiker,
+    private val commentLiker: CommentLiker,
     private val postUseCases: PostUseCases,
     private val getOwnUserId: GetOwnUserIdUseCase,
-    private val toggleFollowStateForUserUseCase: ToggleFollowStateForUserUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val postLiker: PostLiker
+    private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
+    private val toggleFollowStateForUserUseCase: ToggleFollowStateForUserUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
     val state = _state.asStateFlow()
 
+    private val _pagingPostState = MutableStateFlow<PagingState<Post>>(PagingState())
+    val pagingPostState = _pagingPostState.asStateFlow()
+
+    private val _pagingCommentState = MutableStateFlow<PagingState<Comment>>(PagingState())
+    val pagingCommentState = _pagingCommentState.asStateFlow()
+
+    private val _commentTextFieldState = MutableStateFlow(StandardTextFieldState(error = CommentError.FieldEmpty))
+    val commentTextFieldState = _commentTextFieldState.asStateFlow()
+
     private val _toolbarState = MutableStateFlow(ProfileToolbarState())
     val toolbarState = _toolbarState.asStateFlow()
-
-    private val _pagingState = MutableStateFlow<PagingState<Post>>(PagingState())
-    val pagingState = _pagingState.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val paginator = DefaultPaginator(
+    private val postPaginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
-            _pagingState.update {
+            _pagingPostState.update {
                 it.copy(
                     isLoading = isLoading
                 )
@@ -63,9 +76,9 @@ class ProfileViewModel @Inject constructor(
             )
         },
         onSuccess = { posts, firstPage ->
-            _pagingState.update {
+            _pagingPostState.update {
                 it.copy(
-                    items = if(firstPage) posts else pagingState.value.items + posts,
+                    items = if(firstPage) posts else pagingPostState.value.items + posts,
                     endReached = posts.isEmpty()
                 )
             }
@@ -74,6 +87,41 @@ class ProfileViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
         }
     )
+
+    private val commentPaginator = DefaultPaginator(
+        onLoadUpdated = { isLoading ->
+            _pagingCommentState.update {
+                it.copy(
+                    isLoading = isLoading
+                )
+            }
+        },
+        onRequest = { page ->
+            val filterType = state.value.commentFilter
+            state.value.selectedPostId?.let { postId ->
+                postUseCases.getCommentsForPost(
+                    postId = postId,
+                    filterType = filterType,
+                    page = page
+                )
+            } ?: Resource.Error(UiText.unknownError())
+        },
+        onSuccess = { comments, firstPage ->
+            _pagingCommentState.update {
+                it.copy(
+                    items = if(firstPage) comments else pagingCommentState.value.items + comments,
+                    endReached = comments.isEmpty()
+                )
+            }
+        },
+        onError = { uiText ->
+            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+        }
+    )
+
+    init {
+        loadInitialPosts()
+    }
 
     fun setExpandedRatio(ratio: Float) {
         _toolbarState.update {
@@ -91,16 +139,40 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    init {
-        loadInitialPosts()
-    }
-
     fun onEvent(event: ProfileEvent) {
         when(event) {
-            is ProfileEvent.LikePost -> {
-                viewModelScope.launch {
-                    toggleLikeForParent(
-                        parentId = event.postId
+            is ProfileEvent.ToggleFollowStateForUser -> {
+                toggleFollowStateForUser(event.userId)
+            }
+            is ProfileEvent.LikedPost -> {
+                toggleLikeForParent(
+                    parentId = event.postId,
+                    parentType = ParentType.Post.type
+                )
+            }
+            is ProfileEvent.LikedComment -> {
+                toggleLikeForParent(
+                    parentId = event.commentId,
+                    parentType = ParentType.Comment.type
+                )
+            }
+            is ProfileEvent.LoadComments -> {
+                loadInitialComments()
+                getOwnProfilePicture()
+            }
+            is ProfileEvent.Comment -> {
+                state.value.selectedPostId?.let { postId ->
+                    createComment(
+                        postId = postId,
+                        comment = commentTextFieldState.value.text
+                    )
+                }
+            }
+            is ProfileEvent.EnteredComment -> {
+                _commentTextFieldState.update {
+                    it.copy(
+                        text = event.comment,
+                        error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
                     )
                 }
             }
@@ -116,8 +188,39 @@ class ProfileViewModel @Inject constructor(
                     deletePost(postId)
                 }
             }
-            is ProfileEvent.ToggleFollowStateForUser -> {
-                toggleFollowStateForUser(event.userId)
+            is ProfileEvent.SelectComment -> {
+                _state.update {
+                    it.copy(
+                        selectedCommentId = event.commentId
+                    )
+                }
+            }
+            is ProfileEvent.DeleteComment -> {
+                state.value.selectedCommentId?.let { commentId ->
+                    deleteComment(commentId)
+                }
+            }
+            is ProfileEvent.ChangeCommentFilter -> {
+                _state.update {
+                    it.copy(
+                        commentFilter = event.filterType
+                    )
+                }
+                loadInitialComments()
+            }
+            is ProfileEvent.ShowDeleteSheet -> {
+                _state.update {
+                    it.copy(
+                        isDeleteSheetVisible = true
+                    )
+                }
+            }
+            is ProfileEvent.DismissDeleteSheet -> {
+                _state.update {
+                    it.copy(
+                        isDeleteSheetVisible = false
+                    )
+                }
             }
             is ProfileEvent.ShowBottomSheet -> {
                 _state.update {
@@ -130,6 +233,34 @@ class ProfileViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = false
+                    )
+                }
+            }
+            is ProfileEvent.ShowFilterMenu -> {
+                _state.update {
+                    it.copy(
+                        isFilterMenuVisible = true
+                    )
+                }
+            }
+            is ProfileEvent.DismissFilterMenu -> {
+                _state.update {
+                    it.copy(
+                        isFilterMenuVisible = false
+                    )
+                }
+            }
+            is ProfileEvent.ShowDropDownMenu -> {
+                _state.update {
+                    it.copy(
+                        isDropdownMenuVisible = true
+                    )
+                }
+            }
+            is ProfileEvent.DisMissDropDownMenu -> {
+                _state.update {
+                    it.copy(
+                        isDropdownMenuVisible = false
                     )
                 }
             }
@@ -153,72 +284,27 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun deletePost(postId: String) {
+    private fun loadInitialPosts() {
         viewModelScope.launch {
-            val result = postUseCases.deletePost(postId)
-            when(result) {
-                is Resource.Success -> {
-                    _pagingState.update {
-                        it.copy(
-                            items = pagingState.value.items.filter { post ->
-                                post.id != postId
-                            }
-                        )
-                    }
-                    _state.update {
-                        it.copy(
-                            selectedPostId = null
-                        )
-                    }
-                    _eventFlow.emit(
-                        UiEvent.ShowSnackbar(UiText.StringResource(
-                            R.string.successfully_deleted_post
-                        ))
-                    )
-                }
-                is Resource.Error -> {
-                    _eventFlow.emit(
-                        UiEvent.ShowSnackbar(
-                            uiText = result.uiText ?: UiText.unknownError()
-                        )
-                    )
-                }
-            }
+            postPaginator.loadFirstItems()
         }
     }
 
     fun loadNextPosts() {
         viewModelScope.launch {
-            paginator.loadNextItems()
+            postPaginator.loadNextItems()
         }
     }
 
-    fun loadInitialPosts() {
+    private fun loadInitialComments() {
         viewModelScope.launch {
-            paginator.loadFirstItems()
+            commentPaginator.loadFirstItems()
         }
     }
 
-    private fun toggleLikeForParent(parentId: String) {
+    fun loadNextComments() {
         viewModelScope.launch {
-            postLiker.toggleLike(
-                posts = pagingState.value.items,
-                parentId = parentId,
-                onRequest = { isLiked ->
-                    postUseCases.toggleLikeForParent(
-                        parentId = parentId,
-                        parentType = ParentType.Post.type,
-                        isLiked = isLiked
-                    )
-                },
-                onStateUpdated = { posts ->
-                    _pagingState.update {
-                        it.copy(
-                            items = posts
-                        )
-                    }
-                }
-            )
+            commentPaginator.loadNextItems()
         }
     }
 
@@ -292,6 +378,189 @@ class ProfileViewModel @Inject constructor(
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
+                }
+            }
+        }
+    }
+
+    private fun deletePost(postId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deletePost(postId)
+            when(result) {
+                is Resource.Success -> {
+                    _pagingPostState.update {
+                        it.copy(
+                            items = pagingPostState.value.items.filter { post ->
+                                post.id != postId
+                            }
+                        )
+                    }
+                    _state.update {
+                        it.copy(
+                            selectedPostId = null
+                        )
+                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getOwnProfilePicture() {
+        viewModelScope.launch {
+            val result = getOwnProfilePictureUseCase()
+            when(result) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            profilePicture = result.data.toString()
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleLikeForParent(
+        parentId: String,
+        parentType: Int,
+    ) {
+        viewModelScope.launch {
+            when(parentType) {
+                ParentType.Post.type -> {
+                    postLiker.toggleLike(
+                        posts = pagingPostState.value.items,
+                        parentId = parentId,
+                        onRequest = { isLiked ->
+                            postUseCases.toggleLikeForParent(
+                                parentId = parentId,
+                                parentType = ParentType.Post.type,
+                                isLiked = isLiked
+                            )
+                        },
+                        onStateUpdated = { posts ->
+                            _pagingPostState.update {
+                                it.copy(
+                                    items = posts
+                                )
+                            }
+                        }
+                    )
+                }
+                ParentType.Comment.type -> {
+                    commentLiker.toggleLike(
+                        comments = pagingCommentState.value.items,
+                        parentId = parentId,
+                        onRequest = { isLiked ->
+                            postUseCases.toggleLikeForParent(
+                                parentId = parentId,
+                                parentType = ParentType.Comment.type,
+                                isLiked = isLiked
+                            )
+                        },
+                        onStateUpdated = { comments ->
+                            _pagingCommentState.update {
+                                it.copy(
+                                    items = comments
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun createComment(
+        postId: String,
+        comment: String
+    ) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isUploading = true
+                )
+            }
+            val result = postUseCases.createComment(
+                postId = postId,
+                comment = comment
+            )
+            when(result) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            isUploading = false
+                        )
+                    }
+                    _commentTextFieldState.update {
+                        it.copy(
+                            text = "",
+                            error = CommentError.FieldEmpty
+                        )
+                    }
+                    loadInitialComments()
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                        uiText = result.uiText ?: UiText.unknownError()
+                    ))
+                    _state.update {
+                        it.copy(
+                            isUploading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteComment(commentId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deleteComment(commentId)
+            when(result) {
+                is Resource.Success -> {
+                    _pagingCommentState.update {
+                        it.copy(
+                            items = _pagingCommentState.value.items.filter { comment ->
+                                comment.id != commentId
+                            }
+                        )
+                    }
+                    _state.update {
+                        it.copy(
+                            selectedCommentId = null
+                        )
+                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_comment
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
                 }
             }
         }

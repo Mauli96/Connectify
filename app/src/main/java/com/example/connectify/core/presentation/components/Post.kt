@@ -1,9 +1,7 @@
 package com.example.connectify.core.presentation.components
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,11 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +32,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
@@ -45,31 +40,24 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.HintGray
-import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
-import com.example.connectify.core.presentation.ui.theme.IconSizeMediumSmall
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.Constants
-import com.example.connectify.core.util.vibrate
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun Post(
     post: Post,
-    context: Context,
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
-    scope: CoroutineScope = rememberCoroutineScope(),
-    onPostClick: () -> Unit = {},
     onLikeClick: () -> Unit = {},
+    onLikedByClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onUsernameClick: () -> Unit = {},
-    onLongPress: (String) -> Unit = {}
+    onMoreItemClick: (String) -> Unit = {}
 ) {
 
     Box(
@@ -80,22 +68,71 @@ fun Post(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(DarkGray)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            onPostClick()
-                        },
-                        onLongPress = {
-                            scope.launch {
-                                if(post.isOwnPost) {
-                                    onLongPress(post.id)
-                                    vibrate(context)
-                                }
-                            }
-                        }
-                    )
-                }
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                    start = SpaceSmall,
+                    end = SpaceSmall,
+                    bottom = SpaceSmall
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = post.profilePictureUrl,
+                            imageLoader = imageLoader
+                        ),
+                        contentDescription = stringResource(id = R.string.profile_image),
+                        modifier = Modifier
+                            .size(ProfilePictureSizeExtraSmall)
+                            .clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(SpaceSmall))
+                    Box(
+                        modifier = Modifier
+                            .height(20.dp)
+                            .width(150.dp)
+                    ) {
+                        Text(
+                            text = post.username,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            onUsernameClick()
+                                        }
+                                    )
+                                }
+                        )
+                    }
+                }
+                Icon(
+                    painter = painterResource(R.drawable.more_item_icon),
+                    contentDescription = stringResource(R.string.more_items),
+                    modifier = Modifier
+                        .size(IconSizeSmall)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    if(post.isOwnPost) {
+                                        onMoreItemClick(post.id)
+                                    }
+                                }
+                            )
+                        }
+                )
+            }
             Image(
                 painter = rememberAsyncImagePainter(
                     model = post.imageUrl,
@@ -113,15 +150,16 @@ fun Post(
                     .padding(SpaceMedium)
             ) {
                 ActionRow(
-                    username = post.username,
-                    profilePictureUrl = post.profilePictureUrl,
-                    imageLoader = imageLoader,
                     modifier = Modifier.fillMaxWidth(),
                     isLiked = post.isLiked,
+                    likeCount = post.likeCount,
+                    commentCount = post.commentCount,
                     onLikeClick = onLikeClick,
-                    onCommentClick = onCommentClick,
+                    onCommentClick = {
+                        onCommentClick()
+                    },
                     onShareClick = onShareClick,
-                    onUsernameClick = onUsernameClick,
+                    onLikedByClick = onLikedByClick
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 Text(
@@ -141,29 +179,6 @@ fun Post(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = Constants.MAX_POST_DESCRIPTION_LINES
                 )
-                Spacer(modifier = Modifier.height(SpaceSmall))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(
-                            id = R.string.liked_by_x_people,
-                            post.likeCount
-                        ),
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
-                        text = stringResource(
-                            id = R.string.x_comments,
-                            post.commentCount
-                        ),
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
             }
         }
     }
@@ -172,62 +187,40 @@ fun Post(
 @Composable
 fun ActionRow(
     modifier: Modifier = Modifier,
-    profilePictureUrl: String,
-    imageLoader: ImageLoader,
     isLiked: Boolean = false,
+    likeCount: Int = 0,
+    commentCount: Int = 0,
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
-    username: String,
-    onUsernameClick: () -> Unit = {}
+    onLikedByClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = profilePictureUrl,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = stringResource(id = R.string.profile_image),
-                modifier = Modifier
-                    .size(ProfilePictureSizeExtraSmall)
-                    .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.width(SpaceSmall))
-            Box(
-                modifier = Modifier
-                    .height(20.dp)
-                    .width(120.dp)
-            ) {
-                Text(
-                    text = username,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = {
-                                    onUsernameClick()
-                                }
-                            )
-                        }
-                )
-            }
-        }
         EngagementButtons(
             isLiked = isLiked,
+            likeCount = likeCount,
+            commentCount = commentCount,
             onLikeClick = onLikeClick,
             onCommentClick = onCommentClick,
             onShareClick = onShareClick,
+            onLikedByClick = onLikedByClick
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.unsave_icon),
+            contentDescription = stringResource(id = R.string.save_post),
+            modifier = Modifier
+                .size(IconSizeSmall)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+
+                        }
+                    )
+                }
         )
     }
 }
@@ -236,9 +229,12 @@ fun ActionRow(
 fun EngagementButtons(
     modifier: Modifier = Modifier,
     isLiked: Boolean = false,
+    likeCount: Int = 0,
+    commentCount: Int = 0,
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
+    onLikedByClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier,
@@ -249,6 +245,22 @@ fun EngagementButtons(
             isLiked = isLiked,
             onLikeClick = onLikeClick
         )
+        if(likeCount != 0) {
+            Spacer(modifier = Modifier.width(SpaceSmall))
+            Text(
+                text = likeCount.toString(),
+                fontSize = 17.sp,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                onLikedByClick()
+                            }
+                        )
+                    }
+            )
+        }
         Spacer(modifier = Modifier.width(SpaceMediumLarge))
         Icon(
             painter = painterResource(id = R.drawable.comment_icon),
@@ -263,6 +275,14 @@ fun EngagementButtons(
                     )
                 }
         )
+        if(commentCount != 0) {
+            Spacer(modifier = Modifier.width(SpaceSmall))
+            Text(
+                text = commentCount.toString(),
+                fontSize = 17.sp,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
         Spacer(modifier = Modifier.width(SpaceMediumLarge))
         Icon(
             painter = painterResource(id = R.drawable.share_icon),

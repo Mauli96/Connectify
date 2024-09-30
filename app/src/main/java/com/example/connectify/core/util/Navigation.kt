@@ -1,6 +1,5 @@
 package com.example.connectify.core.util
 
-import android.content.Intent
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
@@ -9,7 +8,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import coil.ImageLoader
 import com.example.connectify.feature_activity.presentation.ActivityScreen
 import com.example.connectify.feature_auth.presentation.login.LoginScreen
@@ -19,7 +17,6 @@ import com.example.connectify.feature_chat.presentation.message.MessageScreen
 import com.example.connectify.feature_post.presentation.create_post.CreatePostScreen
 import com.example.connectify.feature_post.presentation.main_feed.MainFeedScreen
 import com.example.connectify.feature_post.presentation.person_list.PersonListScreen
-import com.example.connectify.feature_post.presentation.post_detail.PostDetailScreen
 import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.example.connectify.feature_profile.presentation.follower.FollowerScreen
 import com.example.connectify.feature_profile.presentation.following.FollowingScreen
@@ -129,6 +126,7 @@ fun Navigation(
         }
         composable(Screen.ActivityScreen.route) {
             ActivityScreen(
+                scaffoldState = scaffoldState,
                 imageLoader = imageLoader,
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
@@ -201,37 +199,6 @@ fun Navigation(
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
                 scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(
-            route = Screen.PostDetailScreen.route + "/{postId}?shouldShowKeyboard={shouldShowKeyboard}",
-            arguments = listOf(
-                navArgument(
-                    name = "postId"
-                ) {
-                    type = NavType.StringType
-                },
-                navArgument(
-                    name = "shouldShowKeyboard"
-                ) {
-                    type = NavType.BoolType
-                    defaultValue = false
-                }
-            ),
-            deepLinks = listOf(
-                navDeepLink {
-                    action = Intent.ACTION_VIEW
-                    uriPattern = "https://connectify.com/{postId}"
-                }
-            )
-        ) {
-            val shouldShowKeyboard = it.arguments?.getBoolean("shouldShowKeyboard") ?: false
-            PostDetailScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                shouldShowKeyboard = shouldShowKeyboard,
                 imageLoader = imageLoader
             )
         }

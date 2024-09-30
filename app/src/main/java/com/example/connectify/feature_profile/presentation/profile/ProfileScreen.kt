@@ -1,16 +1,18 @@
 package com.example.connectify.feature_profile.presentation.profile
 
+import android.content.Context
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,6 +24,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -41,6 +45,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -52,7 +57,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
+import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.User
+import com.example.connectify.core.domain.states.PagingState
+import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
@@ -65,6 +74,7 @@ import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.openUrlInBrowser
 import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
+import com.example.connectify.core.presentation.components.Comment
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
 import kotlinx.coroutines.flow.collectLatest
@@ -79,15 +89,24 @@ fun ProfileScreen(
     onNavigateUp: () -> Unit = {},
     onLogout: () -> Unit = {},
     profilePictureSize: Dp = ProfilePictureSizeLarge,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewmodel: ProfileViewModel = hiltViewModel(),
 ) {
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
-    val toolbarState by viewModel.toolbarState.collectAsStateWithLifecycle()
+    val state by viewmodel.state.collectAsStateWithLifecycle()
+    val toolbarState by viewmodel.toolbarState.collectAsStateWithLifecycle()
+    val pagingPostState by viewmodel.pagingPostState.collectAsStateWithLifecycle()
+    val pagingCommentState by viewmodel.pagingCommentState.collectAsStateWithLifecycle()
+    val commentTextFieldState by  viewmodel.commentTextFieldState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
 
-    val bottomSheetState = rememberModalBottomSheetState()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    val focusRequester = remember {
+        FocusRequester()
+    }
 
     val iconHorizontalCenterLength =
         (LocalConfiguration.current.screenWidthDp.dp.toPx() / 4f -
@@ -117,28 +136,26 @@ fun ProfileScreen(
             ): Offset {
                 val delta = available.y
                 val shouldNotScroll = delta > 0f && lazyListState.firstVisibleItemIndex != 0 ||
-                        viewModel.pagingState.value.items.isEmpty()
+                        viewmodel.pagingPostState.value.items.isEmpty()
                 if(shouldNotScroll) {
                     return Offset.Zero
                 }
-                val newOffset = viewModel.toolbarState.value.toolbarOffsetY + delta
-                viewModel.setToolbarOffsetY(
+                val newOffset = viewmodel.toolbarState.value.toolbarOffsetY + delta
+                viewmodel.setToolbarOffsetY(
                     newOffset.coerceIn(
                         minimumValue = -maxOffset.toPx(),
                         maximumValue = 0f
                     )
                 )
-                viewModel.setExpandedRatio((viewModel.toolbarState.value.toolbarOffsetY + maxOffset.toPx()) / maxOffset.toPx())
+                viewmodel.setExpandedRatio((viewmodel.toolbarState.value.toolbarOffsetY + maxOffset.toPx()) / maxOffset.toPx())
                 return Offset.Zero
             }
         }
     }
 
-    val context = LocalContext.current
     LaunchedEffect(key1 = true) {
-        viewModel.getProfile(userId)
-        viewModel.loadInitialPosts()
-        viewModel.eventFlow.collectLatest { event ->
+        viewmodel.getProfile(userId)
+        viewmodel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
@@ -190,7 +207,7 @@ fun ProfileScreen(
                             onNavigate(Screen.FollowerScreen.route + "/${profile.userId}")
                         },
                         onFollowClick = {
-                            viewModel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
+                            viewmodel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
                         },
                         onMessageClick = {
                             val encodedProfilePictureUrl = Base64.encodeToString(profile.profilePictureUrl.encodeToByteArray(), 0)
@@ -205,39 +222,43 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(SpaceMedium))
             }
             items(
-                count = pagingState.items.size,
+                count = pagingPostState.items.size,
                 key = { i ->
-                    val post = pagingState.items[i]
+                    val post = pagingPostState.items[i]
                     post.id
                 }
             ) { i ->
-                val post = pagingState.items[i]
-                if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
-                    viewModel.loadNextPosts()
+                val post = pagingPostState.items[i]
+                if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                    viewmodel.loadNextPosts()
                 }
                 Post(
                     post = post,
-                    context = context,
                     imageLoader = imageLoader,
-                    onPostClick = {
-                        onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+                    onUsernameClick = {
+                        onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
                     },
                     onLikeClick = {
-                        viewModel.onEvent(ProfileEvent.LikePost(post.id))
+                        viewmodel.onEvent(ProfileEvent.LikedPost(post.id))
                     },
                     onCommentClick = {
-                        onNavigate(Screen.PostDetailScreen.route + "/${post.id}?shouldShowKeyboard=true")
+                        viewmodel.onEvent(ProfileEvent.SelectPost(post.id))
+                        viewmodel.onEvent(ProfileEvent.ShowBottomSheet)
+                        viewmodel.onEvent(ProfileEvent.LoadComments)
                     },
                     onShareClick = {
                         context.sendSharePostIntent(post.id)
                     },
-                    onLongPress = { id ->
-                        viewModel.onEvent(ProfileEvent.SelectPost(id))
-                        viewModel.onEvent(ProfileEvent.ShowBottomSheet)
+                    onLikedByClick = {
+                        onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                    },
+                    onMoreItemClick = {
+                        viewmodel.onEvent(ProfileEvent.SelectPost(post.id))
+                        viewmodel.onEvent(ProfileEvent.ShowDeleteSheet)
                     }
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
-                if(i == pagingState.items.size - 1) {
+                if(i == pagingPostState.items.size - 1) {
                     Spacer(modifier = Modifier.height(50.dp))
                 }
             }
@@ -276,6 +297,13 @@ fun ProfileScreen(
                     shouldShowLinkedIn = !profile.linkedInUrl.isNullOrBlank(),
                     bannerUrl = profile.bannerUrl,
                     isOwnProfile = profile.isOwnProfile,
+                    expanded = state.isDropdownMenuVisible,
+                    onShowDropDownMenu = {
+                        viewmodel.onEvent(ProfileEvent.ShowDropDownMenu)
+                    },
+                    onDismissDropdownMenu = {
+                        viewmodel.onEvent(ProfileEvent.DisMissDropDownMenu)
+                    },
                     onGitHubClick = {
                         context.openUrlInBrowser(profile.gitHubUrl ?: return@BannerSection)
                     },
@@ -289,7 +317,7 @@ fun ProfileScreen(
                         onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
                     },
                     onLogoutClick = {
-                        viewModel.onEvent(ProfileEvent.ShowLogoutDialog)
+                        viewmodel.onEvent(ProfileEvent.ShowLogoutDialog)
                     },
                     onNavigateUp = {
                         onNavigateUp()
@@ -324,26 +352,37 @@ fun ProfileScreen(
                 )
             }
         }
-        if(state.isBottomSheetVisible) {
+        CommentSheetContent(
+            pagingCommentState = pagingCommentState,
+            imageLoader = imageLoader,
+            onNavigate = onNavigate,
+            context = context,
+            viewModel = viewmodel,
+            focusRequester = focusRequester,
+            bottomSheetState = bottomSheetState,
+            commentTextFieldState = commentTextFieldState,
+            state = state
+        )
+        if(state.isDeleteSheetVisible) {
             StandardBottomSheet(
                 title = stringResource(id = R.string.delete_post),
                 bottomSheetState = bottomSheetState,
                 onDismissRequest = {
-                    viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
                 },
                 onDeleteClick = {
-                    viewModel.onEvent(ProfileEvent.DeletePost)
-                    viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                    viewmodel.onEvent(ProfileEvent.DeletePost)
+                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
                 },
                 onCancelClick = {
-                    viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
                 }
             )
         }
         if(state.isLogoutDialogVisible) {
             Dialog(
                 onDismissRequest = {
-                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
+                viewmodel.onEvent(ProfileEvent.DismissLogoutDialog)
             }) {
                 Column(
                     modifier = Modifier
@@ -370,31 +409,114 @@ fun ProfileScreen(
                         Text(
                             text = stringResource(id = R.string.cancel),
                             style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.clickable {
-                                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
-                            }
+                            modifier = Modifier
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            viewmodel.onEvent(ProfileEvent.DismissLogoutDialog)
+                                        }
+                                    )
+                                }
                         )
                         Spacer(modifier = Modifier.width(SpaceMedium))
                         Text(
                             text = stringResource(id = R.string.log_out),
                             style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier.clickable {
-                                viewModel.onEvent(ProfileEvent.Logout)
-                                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
-                                onLogout()
-                            }
+                            modifier = Modifier
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            viewmodel.onEvent(ProfileEvent.DismissLogoutDialog)
+                                            viewmodel.onEvent(ProfileEvent.Logout)
+                                            onLogout()
+                                        }
+                                    )
+                                }
                         )
                     }
                 }
             }
         }
-
         if(state.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Center),
                 color = MaterialTheme.colorScheme.primary,
                 strokeWidth = 2.dp,
                 trackColor = Color.White
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommentSheetContent(
+    pagingCommentState: PagingState<Comment>,
+    imageLoader: ImageLoader,
+    onNavigate: (String) -> Unit,
+    context: Context,
+    viewModel: ProfileViewModel,
+    focusRequester: FocusRequester,
+    bottomSheetState: SheetState,
+    commentTextFieldState: StandardTextFieldState,
+    state: ProfileState
+) {
+    if(state.isBottomSheetVisible) {
+        PaginatedBottomSheet(
+            title = stringResource(R.string.comments),
+            bottomSheetState = bottomSheetState,
+            onDismissBottomSheet = {
+                viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+            },
+            items = pagingCommentState.items,
+            isListLoading = pagingCommentState.isLoading,
+            endReached = pagingCommentState.endReached,
+            loadNextPage = {
+                viewModel.loadNextComments()
+            },
+            selectedFilter = state.commentFilter,
+            onFilterSelected = { filterType ->
+                viewModel.onEvent(ProfileEvent.ChangeCommentFilter(filterType))
+            },
+            isDropdownMenuExpanded = state.isFilterMenuVisible,
+            onShowDropDownMenu = {
+                viewModel.onEvent(ProfileEvent.ShowFilterMenu)
+            },
+            onDismissDropdownMenu = {
+                viewModel.onEvent(ProfileEvent.DismissFilterMenu)
+            },
+            keyExtractor = { comment ->
+                comment.id
+            },
+            textFieldState = commentTextFieldState,
+            onValueChange = {
+                viewModel.onEvent(ProfileEvent.EnteredComment(it))
+            },
+            onSend = {
+                viewModel.onEvent(ProfileEvent.Comment)
+            },
+            ownProfilePicture = state.profilePicture ?: "",
+            hint = stringResource(R.string.enter_a_comment),
+            isUploading = state.isUploading,
+            focusRequester = focusRequester
+        ) { _, comment ->
+            Comment(
+                modifier = Modifier.fillMaxWidth(),
+                comment = comment,
+                context = context,
+                imageLoader = imageLoader,
+                onLikeClick = {
+                    viewModel.onEvent(ProfileEvent.LikedComment(comment.id))
+                },
+                onLikedByClick = {
+                    onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
+                },
+                onLongPress = {
+                    viewModel.onEvent(ProfileEvent.SelectComment(comment.id))
+                },
+                onDeleteClick = {
+                    viewModel.onEvent(ProfileEvent.DeleteComment)
+                }
             )
         }
     }

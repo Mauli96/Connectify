@@ -7,7 +7,6 @@ class DefaultPaginator<T>(
     private val onError: suspend (UiText) -> Unit
 ) : Paginator<T> {
 
-
     override suspend fun loadFirstItems() {
         onLoadUpdated(true)
         val result = onRequest(0)
@@ -18,7 +17,6 @@ class DefaultPaginator<T>(
                 onSuccess(items, true)
                 onLoadUpdated(false)
             }
-
             is Resource.Error -> {
                 onError(result.uiText ?: UiText.unknownError())
                 onLoadUpdated(false)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,13 +21,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -36,6 +40,7 @@ import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -56,6 +61,7 @@ fun LoginScreen(
     val emailState by viewModel.emailState.collectAsStateWithLifecycle()
     val passwordState by viewModel.passwordState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
@@ -106,6 +112,10 @@ fun LoginScreen(
                     viewModel.onEvent(LoginEvent.EnteredEmail(it))
                 },
                 keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next,
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                },
                 error = when(emailState.error) {
                     is AuthError.FieldEmpty -> {
                         stringResource(id = R.string.this_field_cant_be_empty)
@@ -123,6 +133,10 @@ fun LoginScreen(
                 },
                 hint = stringResource(id = R.string.password_hint),
                 keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done,
+                onNext = {
+                    focusManager.clearFocus()
+                },
                 error = when(emailState.error) {
                     is AuthError.FieldEmpty -> {
                         stringResource(id = R.string.this_field_cant_be_empty)
@@ -140,8 +154,8 @@ fun LoginScreen(
                 onClick = {
                      viewModel.onEvent(LoginEvent.Login)
                 },
-                modifier = Modifier
-                    .align(Alignment.End)
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if(state.isLoading) {
                     CircularProgressIndicator(

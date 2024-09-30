@@ -21,9 +21,12 @@ interface PostRepository {
         imageUri: Uri
     ): SimpleResource
 
-    suspend fun getPostDetails(postId: String): Resource<Post>
-
-    suspend fun getCommentsForPost(postId: String, filterType: CommentFilter): Resource<List<Comment>>
+    suspend fun getCommentsForPost(
+        postId: String,
+        filterType: CommentFilter,
+        page: Int,
+        pageSize: Int
+    ): Resource<List<Comment>>
 
     suspend fun createComment(
         postId: String,

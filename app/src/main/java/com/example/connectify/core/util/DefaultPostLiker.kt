@@ -18,8 +18,8 @@ class DefaultPostLiker : PostLiker {
                 post.copy(
                     isLiked = !post.isLiked,
                     likeCount = if(currentlyLiked) {
-                        post.likeCount - 1
-                    } else post.likeCount + 1
+                        post.likeCount.minus(1)
+                    } else post.likeCount.plus(1)
                 )
             } else post
         }

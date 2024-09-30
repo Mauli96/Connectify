@@ -119,15 +119,15 @@ class MessageViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun loadNextMessages() {
+    private fun loadInitialMessages() {
         viewModelScope.launch {
-            paginator.loadNextItems()
+            paginator.loadFirstItems()
         }
     }
 
-    fun loadInitialMessages() {
+    fun loadNextMessages() {
         viewModelScope.launch {
-            paginator.loadFirstItems()
+            paginator.loadNextItems()
         }
     }
 

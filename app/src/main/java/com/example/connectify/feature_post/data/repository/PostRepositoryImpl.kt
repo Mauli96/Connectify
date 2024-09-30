@@ -85,32 +85,19 @@ class PostRepositoryImpl(
         }
     }
 
-    override suspend fun getPostDetails(postId: String): Resource<Post> {
+    override suspend fun getCommentsForPost(
+        postId: String,
+        filterType: CommentFilter,
+        page: Int,
+        pageSize: Int
+    ): Resource<List<Comment>> {
         return try {
-            val response = api.getPostDetails(postId = postId)
-            if(response.successful) {
-                Resource.Success(response.data)
-            } else {
-                response.message?.let { msg ->
-                    Resource.Error(UiText.DynamicString(msg))
-                } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
-            }
-        } catch(e: IOException) {
-            Resource.Error(
-                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
-            )
-        } catch(e: HttpException) {
-            Resource.Error(
-                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
-            )
-        }
-    }
-
-    override suspend fun getCommentsForPost(postId: String, filterType: CommentFilter): Resource<List<Comment>> {
-        return try {
-            val comments = api.getCommentsForPost(postId = postId, filterType = filterType.value).map {
-                it.toComment()
-            }
+            val comments = api.getCommentsForPost(
+                postId = postId,
+                filterType = filterType.value,
+                page = page,
+                pageSize = pageSize
+            ).map { it.toComment() }
             Resource.Success(comments)
         } catch(e: IOException) {
             Resource.Error(
