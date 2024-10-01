@@ -1,5 +1,7 @@
 package com.example.connectify.core.presentation.components
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -57,7 +59,9 @@ fun Post(
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
     onUsernameClick: () -> Unit = {},
-    onMoreItemClick: (String) -> Unit = {}
+    onMoreItemClick: (String) -> Unit = {},
+    isDescriptionVisible: Boolean,
+    onDescriptionToggle: () -> Unit = {},
 ) {
 
     Box(
@@ -162,9 +166,19 @@ fun Post(
                     onLikedByClick = onLikedByClick
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
-                Text(
-                    text = buildAnnotatedString {
-                        append(post.description)
+                val descriptionText = buildAnnotatedString {
+                    append(post.description)
+                    if(isDescriptionVisible) {
+                        withStyle(SpanStyle(
+                            color = HintGray
+                        )) {
+                            append(
+                                " " + LocalContext.current.getString(
+                                    R.string.read_less
+                                )
+                            )
+                        }
+                    } else {
                         withStyle(SpanStyle(
                             color = HintGray
                         )) {
@@ -174,10 +188,26 @@ fun Post(
                                 )
                             )
                         }
-                    },
+                    }
+                }
+                Text(
+                    text = descriptionText,
                     style = MaterialTheme.typography.bodySmall,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = Constants.MAX_POST_DESCRIPTION_LINES
+                    maxLines = if(isDescriptionVisible) {
+                        Int.MAX_VALUE
+                    } else Constants.MAX_POST_DESCRIPTION_LINES,
+                    modifier = Modifier
+                        .animateContentSize(
+                            animationSpec = tween(300)
+                        )
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    onDescriptionToggle()
+                                }
+                            )
+                        }
                 )
             }
         }

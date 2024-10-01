@@ -278,6 +278,16 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
+            is ProfileEvent.OnDescriptionToggle -> {
+                _state.update { currentState ->
+                    val currentVisibility = currentState.isDescriptionVisible[event.postId] ?: false
+                    currentState.copy(
+                        isDescriptionVisible = currentState.isDescriptionVisible.toMutableMap().apply {
+                            this[event.postId] = !currentVisibility
+                        }
+                    )
+                }
+            }
             is ProfileEvent.Logout -> {
                 profileUseCases.logout()
             }

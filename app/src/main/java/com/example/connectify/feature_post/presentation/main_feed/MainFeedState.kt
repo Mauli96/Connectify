@@ -1,6 +1,5 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
-import androidx.compose.ui.unit.DpOffset
 import com.example.connectify.feature_post.presentation.util.CommentFilter
 
 data class MainFeedState(
@@ -11,6 +10,6 @@ data class MainFeedState(
     val isBottomSheetVisible: Boolean = false,
     val isDropdownMenuVisible: Boolean = false,
     val hasNavigated: Boolean = false,
-    val contextMenuOffset: DpOffset = DpOffset.Zero,
+    val isDescriptionVisible: Map<String, Boolean> = emptyMap(),
     val commentFilter: CommentFilter = CommentFilter.MOST_RECENT,
 )

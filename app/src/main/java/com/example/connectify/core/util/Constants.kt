@@ -2,7 +2,7 @@ package com.example.connectify.core.util
 
 object Constants {
     const val SPLASH_SCREEN_DURATION = 300L
-    const val MAX_POST_DESCRIPTION_LINES = 3
+    const val MAX_POST_DESCRIPTION_LINES = 2
     const val MIN_USERNAME_LENGTH = 3
     const val MIN_PASSWORD_LENGTH = 3
     const val DEFAULT_PAGE_SIZE = 15

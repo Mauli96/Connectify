@@ -170,6 +170,10 @@ fun MainFeedScreen(
                         },
                         onLikedByClick = {
                             onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                        },
+                        isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
+                        onDescriptionToggle = {
+                            viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))

@@ -255,6 +255,10 @@ fun ProfileScreen(
                     onMoreItemClick = {
                         viewmodel.onEvent(ProfileEvent.SelectPost(post.id))
                         viewmodel.onEvent(ProfileEvent.ShowDeleteSheet)
+                    },
+                    isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
+                    onDescriptionToggle = {
+                        viewmodel.onEvent(ProfileEvent.OnDescriptionToggle(post.id))
                     }
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))

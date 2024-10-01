@@ -211,6 +211,16 @@ class MainFeedViewModel @Inject constructor(
                     )
                 }
             }
+            is MainFeedEvent.OnDescriptionToggle -> {
+                _state.update { currentState ->
+                val currentVisibility = currentState.isDescriptionVisible[event.postId] ?: false
+                    currentState.copy(
+                        isDescriptionVisible = currentState.isDescriptionVisible.toMutableMap().apply {
+                            this[event.postId] = !currentVisibility
+                        }
+                    )
+                }
+            }
         }
     }
 
