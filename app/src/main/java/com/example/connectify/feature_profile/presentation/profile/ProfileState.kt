@@ -15,6 +15,7 @@ data class ProfileState(
     val isBottomSheetVisible: Boolean = false,
     val isDeleteSheetVisible: Boolean = false,
     val isFilterMenuVisible: Boolean = false,
+    val isNavigatedToPersonListScreen: Boolean = false,
     val isDescriptionVisible: Map<String, Boolean> = emptyMap(),
     val commentFilter: CommentFilter = CommentFilter.MOST_RECENT,
 )

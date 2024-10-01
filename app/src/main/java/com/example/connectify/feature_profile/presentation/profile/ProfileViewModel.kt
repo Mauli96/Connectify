@@ -22,6 +22,7 @@ import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.presentation.util.CommentError
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -288,6 +289,14 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
+            is ProfileEvent.NavigatedToPersonListScreen -> {
+                _state.update {
+                    it.copy(
+                        isNavigatedToPersonListScreen = true
+                    )
+                }
+                resetHasNavigatedWithDelay()
+            }
             is ProfileEvent.Logout -> {
                 profileUseCases.logout()
             }
@@ -315,6 +324,17 @@ class ProfileViewModel @Inject constructor(
     fun loadNextComments() {
         viewModelScope.launch {
             commentPaginator.loadNextItems()
+        }
+    }
+
+    private fun resetHasNavigatedWithDelay() {
+        viewModelScope.launch {
+            delay(500)
+            _state.update {
+                it.copy(
+                    isNavigatedToPersonListScreen = false
+                )
+            }
         }
     }
 

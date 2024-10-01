@@ -1,5 +1,9 @@
 package com.example.connectify.core.util
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
@@ -34,204 +38,241 @@ fun Navigation(
     val startDestination = when(isUserAuthenticated) {
         true -> Screen.MainFeedScreen.route
         false -> Screen.LoginScreen.route
-        null -> null
+        else -> null
     }
+    val animationDuration = 500
 
     startDestination?.let {
         NavHost(
-        navController = navController,
-        startDestination = it
-    ) {
-        composable(Screen.LoginScreen.route) {
-            LoginScreen(
-                onNavigate = navController::navigate,
-                onLogin = {
-                    navController.popBackStack(
-                        route = Screen.LoginScreen.route,
-                        inclusive = true
-                    ) ||  navController.popBackStack(
-                        route = Screen.RegisterScreen.route,
-                        inclusive = true
-                    )
-                    navController.navigate(Screen.MainFeedScreen.route)
-                },
-                scaffoldState = scaffoldState
-            )
-        }
-        composable(Screen.RegisterScreen.route) {
-            RegisterScreen(
-                onNavigate = navController::navigate,
-                scaffoldState = scaffoldState,
-                onPopBackStack = navController::popBackStack
-            )
-        }
-        composable(Screen.MainFeedScreen.route) {
-            MainFeedScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(Screen.ChatScreen.route) {
-            ChatScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(
-            route = Screen.MessageScreen.route + "/{remoteUserId}/{remoteUsername}/{remoteUserProfilePictureUrl}?chatId={chatId}?isOnline={isOnline}?lastSeen={lastSeen}",
-            arguments = listOf(
-                navArgument("chatId") {
-                    type = NavType.StringType
-                    nullable = true
-                },
-                navArgument("isOnline") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-                navArgument("lastSeen") {
-                    type = NavType.LongType
-                    defaultValue = 0L
-                },
-                navArgument("remoteUserId") {
-                    type = NavType.StringType
-                },
-                navArgument("remoteUsername") {
-                    type = NavType.StringType
-                },
-                navArgument("remoteUserProfilePictureUrl") {
-                    type = NavType.StringType
-                }
-            )
+            navController = navController,
+            startDestination = startDestination
         ) {
-            val remoteUserId = it.arguments?.getString("remoteUserId")!!
-            val remoteUsername = it.arguments?.getString("remoteUsername")!!
-            val remoteUserProfilePictureUrl = it.arguments?.getString("remoteUserProfilePictureUrl")!!
-            val isOnline = it.arguments?.getBoolean("isOnline") ?: false
-            val lastSeen = it.arguments?.getLong("lastSeen") ?: 0L
-            MessageScreen(
-                remoteUserId = remoteUserId,
-                remoteUsername = remoteUsername,
-                isOnline = isOnline,
-                lastSeen = lastSeen,
-                scaffoldState = scaffoldState,
-                encodedRemoteUserProfilePictureUrl = remoteUserProfilePictureUrl,
-                onNavigateUp = navController::navigateUp,
-                onNavigate = navController::navigate,
-                imageLoader = imageLoader
-            )
-        }
-        composable(Screen.ActivityScreen.route) {
-            ActivityScreen(
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader,
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-            )
-        }
-        composable(
-            route = Screen.ProfileScreen.route + "?userId={userId}",
-            arguments = listOf(
-                navArgument(name = "userId") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) {
-            ProfileScreen(
-                userId = it.arguments?.getString("userId"),
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                onLogout = {
-                    navController.popBackStack(
-                        route = Screen.MainFeedScreen.route,
-                        inclusive = true
-                    )
-                    navController.navigate(Screen.LoginScreen.route)
+            composable(Screen.LoginScreen.route) {
+                LoginScreen(
+                    onNavigate = navController::navigate,
+                    onLogin = {
+                        navController.popBackStack(
+                            route = Screen.LoginScreen.route,
+                            inclusive = true
+                        ) ||  navController.popBackStack(
+                            route = Screen.RegisterScreen.route,
+                            inclusive = true
+                        )
+                        navController.navigate(Screen.MainFeedScreen.route)
+                    },
+                    scaffoldState = scaffoldState
+                )
+            }
+            composable(Screen.RegisterScreen.route) {
+                RegisterScreen(
+                    onNavigate = navController::navigate,
+                    scaffoldState = scaffoldState,
+                    onPopBackStack = navController::popBackStack
+                )
+            }
+            composable(
+                route = Screen.MainFeedScreen.route,
+                exitTransition = {
+                    if(targetState.destination.route == Screen.SearchScreen.route) {
+                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                    } else {
+                        null
+                    }
                 },
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(Screen.CreatePostScreen.route) {
-            CreatePostScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(
-            route = Screen.EditProfileScreen.route + "/{userId}",
-            arguments = listOf(
-                navArgument(name = "userId") {
-                    type = NavType.StringType
+                popEnterTransition = {
+                    if(initialState.destination.route == Screen.SearchScreen.route) {
+                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
+                    } else {
+                        null
+                    }
                 }
-            )
-        ) {
-            EditProfileScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(Screen.SearchScreen.route) {
-            SearchScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                imageLoader = imageLoader,
-            )
-        }
-        composable(
-            route = Screen.PersonListScreen.route + "/{parentId}",
-            arguments = listOf(
-                navArgument("parentId") {
-                    type = NavType.StringType
+            ) {
+                MainFeedScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(Screen.ChatScreen.route) {
+                ChatScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(
+                route = Screen.MessageScreen.route + "/{remoteUserId}/{remoteUsername}/{remoteUserProfilePictureUrl}?chatId={chatId}?isOnline={isOnline}?lastSeen={lastSeen}",
+                arguments = listOf(
+                    navArgument("chatId") {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument("isOnline") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    },
+                    navArgument("lastSeen") {
+                        type = NavType.LongType
+                        defaultValue = 0L
+                    },
+                    navArgument("remoteUserId") {
+                        type = NavType.StringType
+                    },
+                    navArgument("remoteUsername") {
+                        type = NavType.StringType
+                    },
+                    navArgument("remoteUserProfilePictureUrl") {
+                        type = NavType.StringType
+                    }
+                ),
+                enterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                },
+                exitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
                 }
-            )
-        ) {
-            PersonListScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-        composable(
-            route = Screen.FollowingScreen.route + "/{userId}",
-            arguments = listOf(
-                navArgument("userId") {
-                    type = NavType.StringType
+            ) {
+                val remoteUserId = it.arguments?.getString("remoteUserId")!!
+                val remoteUsername = it.arguments?.getString("remoteUsername")!!
+                val remoteUserProfilePictureUrl = it.arguments?.getString("remoteUserProfilePictureUrl")!!
+                val isOnline = it.arguments?.getBoolean("isOnline") ?: false
+                val lastSeen = it.arguments?.getLong("lastSeen") ?: 0L
+                MessageScreen(
+                    remoteUserId = remoteUserId,
+                    remoteUsername = remoteUsername,
+                    isOnline = isOnline,
+                    lastSeen = lastSeen,
+                    scaffoldState = scaffoldState,
+                    encodedRemoteUserProfilePictureUrl = remoteUserProfilePictureUrl,
+                    onNavigateUp = navController::navigateUp,
+                    onNavigate = navController::navigate,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(Screen.ActivityScreen.route) {
+                ActivityScreen(
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader,
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                )
+            }
+            composable(
+                route = Screen.ProfileScreen.route + "?userId={userId}",
+                arguments = listOf(
+                    navArgument(name = "userId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) {
+                ProfileScreen(
+                    userId = it.arguments?.getString("userId"),
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    onLogout = {
+                        navController.popBackStack(
+                            route = Screen.MainFeedScreen.route,
+                            inclusive = true
+                        )
+                        navController.navigate(Screen.LoginScreen.route)
+                    },
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(Screen.CreatePostScreen.route) {
+                CreatePostScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(
+                route = Screen.EditProfileScreen.route + "/{userId}",
+                arguments = listOf(
+                    navArgument(name = "userId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                EditProfileScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(
+                route = Screen.SearchScreen.route,
+                enterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                },
+                exitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
                 }
-            )
-        ) {
-            FollowingScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
+            ) {
+                SearchScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    imageLoader = imageLoader,
+                )
+            }
+            composable(
+                route = Screen.PersonListScreen.route + "/{parentId}",
+                arguments = listOf(
+                    navArgument("parentId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                PersonListScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(
+                route = Screen.FollowingScreen.route + "/{userId}",
+                arguments = listOf(
+                    navArgument("userId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                FollowingScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
+            composable(
+                route = Screen.FollowerScreen.route + "/{userId}",
+                arguments = listOf(
+                    navArgument("userId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                FollowerScreen(
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
+                )
+            }
         }
-        composable(
-            route = Screen.FollowerScreen.route + "/{userId}",
-            arguments = listOf(
-                navArgument("userId") {
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            FollowerScreen(
-                onNavigate = navController::navigate,
-                onNavigateUp = navController::navigateUp,
-                scaffoldState = scaffoldState,
-                imageLoader = imageLoader
-            )
-        }
-    }
     }
 }

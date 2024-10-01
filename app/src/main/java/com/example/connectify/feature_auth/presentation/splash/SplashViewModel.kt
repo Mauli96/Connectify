@@ -20,6 +20,9 @@ class SplashViewModel @Inject constructor(
     private val authenticateUseCase: AuthenticateUseCase
 ) : ViewModel() {
 
+    private val _keepSplashScreenOn = MutableStateFlow(true)
+    val keepSplashScreenOn = _keepSplashScreenOn.asStateFlow()
+
     private val _isUserAuthenticated = MutableStateFlow<Boolean?>(null)
     val isUserAuthenticated = _isUserAuthenticated.asStateFlow()
 
@@ -28,21 +31,26 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val result = authenticateUseCase()
-            when(result) {
-                is Resource.Success -> {
-                    _isUserAuthenticated.value = true
-                    _eventFlow.emit(
-                        UiEvent.Navigate(Screen.MainFeedScreen.route)
-                    )
-                }
-                is Resource.Error -> {
-                    _isUserAuthenticated.value = false
-                    _eventFlow.emit(
-                        UiEvent.Navigate(Screen.LoginScreen.route)
-                    )
-                }
+            authenticateUser()
+        }
+    }
+
+    private suspend fun authenticateUser() {
+        val result = authenticateUseCase()
+        when(result) {
+            is Resource.Success -> {
+                _isUserAuthenticated.value = true
+                _eventFlow.emit(
+                    UiEvent.Navigate(Screen.MainFeedScreen.route)
+                )
+            }
+            is Resource.Error -> {
+                _isUserAuthenticated.value = false
+                _eventFlow.emit(
+                    UiEvent.Navigate(Screen.LoginScreen.route)
+                )
             }
         }
+        _keepSplashScreenOn.value = false
     }
 }

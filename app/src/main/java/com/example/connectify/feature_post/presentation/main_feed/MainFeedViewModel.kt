@@ -167,10 +167,18 @@ class MainFeedViewModel @Inject constructor(
                     deleteComment(commentId)
                 }
             }
-            is MainFeedEvent.Navigated -> {
+            is MainFeedEvent.NavigatedToSearchScreen -> {
                 _state.update {
                     it.copy(
-                        hasNavigated = true
+                        isNavigatedToSearchScreen = true
+                    )
+                }
+                resetHasNavigatedWithDelay()
+            }
+            is MainFeedEvent.NavigatedToPersonListScreen -> {
+                _state.update {
+                    it.copy(
+                        isNavigatedToPersonListScreen = true
                     )
                 }
                 resetHasNavigatedWithDelay()
@@ -251,9 +259,10 @@ class MainFeedViewModel @Inject constructor(
     private fun resetHasNavigatedWithDelay() {
         viewModelScope.launch {
             delay(500)
-            this@MainFeedViewModel._state.update {
+            _state.update {
                 it.copy(
-                    hasNavigated = false
+                    isNavigatedToSearchScreen = false,
+                    isNavigatedToPersonListScreen = false
                 )
             }
         }

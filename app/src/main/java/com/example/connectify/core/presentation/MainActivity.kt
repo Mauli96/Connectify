@@ -3,7 +3,6 @@ package com.example.connectify.core.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.rememberScaffoldState
@@ -33,17 +32,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel by viewModels<SplashViewModel>()
+    private val splashViewModel by viewModels<SplashViewModel>()
     @Inject
     lateinit var imageLoader: ImageLoader
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        var keepSplashScreenOn = true
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                keepSplashScreenOn
+                splashViewModel.keepSplashScreenOn.value
             }
         }
+        super.onCreate(savedInstanceState)
         setContent {
             ConnectifyTheme {
                 Surface(
@@ -53,15 +51,14 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val scaffoldState = rememberScaffoldState()
-                    val isUserAuthenticated by viewModel.isUserAuthenticated.collectAsStateWithLifecycle()
+                    val isUserAuthenticated by splashViewModel.isUserAuthenticated.collectAsStateWithLifecycle()
                     val splashDuration = if(isUserAuthenticated == true) 100L else Constants.SPLASH_SCREEN_DURATION
 
-                    LaunchedEffect(Unit) {
-                        viewModel.eventFlow.collectLatest { event ->
+                    LaunchedEffect(isUserAuthenticated) {
+                        splashViewModel.eventFlow.collectLatest { event ->
                             when(event) {
                                 is UiEvent.Navigate -> {
                                     delay(splashDuration)
-                                    keepSplashScreenOn = false
                                     navController.navigate(event.route) {
                                         popUpTo(0)
                                     }
@@ -83,7 +80,12 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(Screen.CreatePostScreen.route)
                         }
                     ) {
-                        Navigation(navController, scaffoldState, imageLoader, isUserAuthenticated)
+                        Navigation(
+                            navController = navController,
+                            scaffoldState = scaffoldState,
+                            imageLoader = imageLoader,
+                            isUserAuthenticated = isUserAuthenticated
+                        )
                     }
                 }
             }

@@ -26,5 +26,6 @@ sealed class ProfileEvent {
     object DisMissDropDownMenu: ProfileEvent()
     object ShowLogoutDialog: ProfileEvent()
     object DismissLogoutDialog: ProfileEvent()
+    object NavigatedToPersonListScreen: ProfileEvent()
     object Logout: ProfileEvent()
 }

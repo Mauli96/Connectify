@@ -98,6 +98,12 @@ fun MainFeedScreen(
         }
     }
 
+    LaunchedEffect(state.isNavigatedToPersonListScreen) {
+        if(state.isNavigatedToPersonListScreen) {
+            bottomSheetState.hide()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,8 +138,8 @@ fun MainFeedScreen(
                 .pullRefresh(pullRefreshState)
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { change, dragAmount ->
-                        if (dragAmount < 1.dp.toPx() && !state.hasNavigated) {
-                            viewModel.onEvent(MainFeedEvent.Navigated)
+                        if(dragAmount < 1.dp.toPx() && !state.isNavigatedToSearchScreen) {
+                            viewModel.onEvent(MainFeedEvent.NavigatedToSearchScreen)
                             onNavigate(Screen.SearchScreen.route)
                         }
                     }
@@ -265,6 +271,7 @@ fun CommentSheetContent(
                     viewModel.onEvent(MainFeedEvent.LikedComment(comment.id))
                 },
                 onLikedByClick = {
+                    viewModel.onEvent(MainFeedEvent.NavigatedToPersonListScreen)
                     onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                 },
                 onLongPress = {

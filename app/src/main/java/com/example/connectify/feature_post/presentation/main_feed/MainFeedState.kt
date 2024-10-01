@@ -9,7 +9,8 @@ data class MainFeedState(
     val isUploading: Boolean = false,
     val isBottomSheetVisible: Boolean = false,
     val isDropdownMenuVisible: Boolean = false,
-    val hasNavigated: Boolean = false,
+    val isNavigatedToSearchScreen: Boolean = false,
+    val isNavigatedToPersonListScreen: Boolean = false,
     val isDescriptionVisible: Map<String, Boolean> = emptyMap(),
     val commentFilter: CommentFilter = CommentFilter.MOST_RECENT,
 )

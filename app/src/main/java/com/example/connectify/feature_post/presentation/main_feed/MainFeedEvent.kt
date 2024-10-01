@@ -18,5 +18,6 @@ sealed class MainFeedEvent {
     object DismissDropDownMenu: MainFeedEvent()
     object ShowBottomSheet: MainFeedEvent()
     object DismissBottomSheet: MainFeedEvent()
-    object Navigated: MainFeedEvent()
+    object NavigatedToSearchScreen: MainFeedEvent()
+    object NavigatedToPersonListScreen: MainFeedEvent()
 }

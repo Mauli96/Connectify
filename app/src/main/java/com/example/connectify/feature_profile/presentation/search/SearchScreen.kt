@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ fun SearchScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val searchFieldState by viewModel.searchFieldState.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val focusRequester = remember {
         FocusRequester()
@@ -83,6 +85,7 @@ fun SearchScreen(
             ) {
                 IconButton(
                     onClick = {
+                        keyboardController?.hide()
                         onNavigateUp()
                     }
                 ) {
@@ -146,9 +149,8 @@ fun SearchScreen(
                                 viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
                             },
                             onItemClick = {
-                                onNavigate(
-                                    Screen.ProfileScreen.route + "?userId=${user.userId}"
-                                )
+                                keyboardController?.hide()
+                                onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
                             }
                         )
                     }

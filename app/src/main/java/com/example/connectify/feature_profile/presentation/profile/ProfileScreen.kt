@@ -169,6 +169,12 @@ fun ProfileScreen(
         }
     }
 
+    LaunchedEffect(state.isNavigatedToPersonListScreen) {
+        if(state.isNavigatedToPersonListScreen) {
+            bottomSheetState.hide()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -513,6 +519,7 @@ fun CommentSheetContent(
                     viewModel.onEvent(ProfileEvent.LikedComment(comment.id))
                 },
                 onLikedByClick = {
+                    viewModel.onEvent(ProfileEvent.NavigatedToPersonListScreen)
                     onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                 },
                 onLongPress = {
