@@ -56,10 +56,12 @@ import com.example.connectify.feature_post.presentation.util.PostConstants
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
 import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileEvent
 import com.example.connectify.feature_profile.presentation.util.EditProfileError
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun CreatePostScreen(
     imageLoader: ImageLoader,
@@ -186,6 +188,7 @@ fun CreatePostScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = GreenAccent
                 ),
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(40.dp)

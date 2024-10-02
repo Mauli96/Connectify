@@ -70,9 +70,8 @@ fun StandardBottomSheet(
             )
             Spacer(modifier = Modifier.height(SpaceSmall))
             HorizontalDivider(
-                modifier = Modifier
-                    .height(0.5.dp),
-                thickness = 0.5.dp,
+                modifier = Modifier.height(1.dp),
+                thickness = 0.2.dp,
                 color = HintGray
             )
             Row(

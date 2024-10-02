@@ -1,8 +1,6 @@
 package com.example.connectify.core.util
 
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
@@ -11,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import coil.ImageLoader
 import com.example.connectify.feature_activity.presentation.ActivityScreen
@@ -26,6 +25,7 @@ import com.example.connectify.feature_profile.presentation.follower.FollowerScre
 import com.example.connectify.feature_profile.presentation.following.FollowingScreen
 import com.example.connectify.feature_profile.presentation.profile.ProfileScreen
 import com.example.connectify.feature_profile.presentation.search.SearchScreen
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -37,51 +37,59 @@ fun Navigation(
 ) {
     val startDestination = when(isUserAuthenticated) {
         true -> Screen.MainFeedScreen.route
-        false -> Screen.LoginScreen.route
+        false -> Screen.AuthScreen.route
         else -> null
     }
-    val animationDuration = 500
+    val animationDuration = 300
 
     startDestination?.let {
         NavHost(
             navController = navController,
             startDestination = startDestination
         ) {
-            composable(Screen.LoginScreen.route) {
-                LoginScreen(
-                    onNavigate = navController::navigate,
-                    onLogin = {
-                        navController.popBackStack(
-                            route = Screen.LoginScreen.route,
-                            inclusive = true
-                        ) ||  navController.popBackStack(
-                            route = Screen.RegisterScreen.route,
-                            inclusive = true
-                        )
-                        navController.navigate(Screen.MainFeedScreen.route)
-                    },
-                    scaffoldState = scaffoldState
-                )
-            }
-            composable(Screen.RegisterScreen.route) {
-                RegisterScreen(
-                    onNavigate = navController::navigate,
-                    scaffoldState = scaffoldState,
-                    onPopBackStack = navController::popBackStack
-                )
+            navigation(
+                startDestination = Screen.LoginScreen.route,
+                route = Screen.AuthScreen.route
+            ) {
+                composable(Screen.LoginScreen.route) {
+                    LoginScreen(
+                        onNavigate = navController::navigate,
+                        onLogin = {
+                            navController.navigate(Screen.MainFeedScreen.route) {
+                                popUpTo(Screen.AuthScreen.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        },
+                        scaffoldState = scaffoldState
+                    )
+                }
+                composable(Screen.RegisterScreen.route) {
+                    RegisterScreen(
+                        onNavigate = navController::navigate,
+                        scaffoldState = scaffoldState
+                    )
+                }
             }
             composable(
                 route = Screen.MainFeedScreen.route,
                 exitTransition = {
                     if(targetState.destination.route == Screen.SearchScreen.route) {
-                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(animationDuration)
+                        )
                     } else {
                         null
                     }
                 },
                 popEnterTransition = {
                     if(initialState.destination.route == Screen.SearchScreen.route) {
-                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(animationDuration)
+                        )
                     } else {
                         null
                     }
@@ -128,10 +136,16 @@ fun Navigation(
                     }
                 ),
                 enterTransition = {
-                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
                 },
                 exitTransition = {
-                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
                 }
             ) {
                 val remoteUserId = it.arguments?.getString("remoteUserId")!!
@@ -151,7 +165,15 @@ fun Navigation(
                     imageLoader = imageLoader
                 )
             }
-            composable(Screen.ActivityScreen.route) {
+            composable(
+                route = Screen.ActivityScreen.route,
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
+            ) {
                 ActivityScreen(
                     scaffoldState = scaffoldState,
                     imageLoader = imageLoader,
@@ -174,17 +196,32 @@ fun Navigation(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
                     onLogout = {
-                        navController.popBackStack(
-                            route = Screen.MainFeedScreen.route,
-                            inclusive = true
-                        )
-                        navController.navigate(Screen.LoginScreen.route)
+                        navController.navigate(Screen.LoginScreen.route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     },
                     scaffoldState = scaffoldState,
                     imageLoader = imageLoader
                 )
             }
-            composable(Screen.CreatePostScreen.route) {
+            composable(
+                route = Screen.CreatePostScreen.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
+            ) {
                 CreatePostScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
@@ -198,7 +235,19 @@ fun Navigation(
                     navArgument(name = "userId") {
                         type = NavType.StringType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
             ) {
                 EditProfileScreen(
                     onNavigate = navController::navigate,
@@ -210,16 +259,28 @@ fun Navigation(
             composable(
                 route = Screen.SearchScreen.route,
                 enterTransition = {
-                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
                 },
                 exitTransition = {
-                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(animationDuration))
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
                 },
                 popEnterTransition = {
-                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
                 },
                 popExitTransition = {
-                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(animationDuration))
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
                 }
             ) {
                 SearchScreen(
@@ -234,7 +295,31 @@ fun Navigation(
                     navArgument("parentId") {
                         type = NavType.StringType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
             ) {
                 PersonListScreen(
                     onNavigate = navController::navigate,
@@ -249,7 +334,31 @@ fun Navigation(
                     navArgument("userId") {
                         type = NavType.StringType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
             ) {
                 FollowingScreen(
                     onNavigate = navController::navigate,
@@ -264,7 +373,31 @@ fun Navigation(
                     navArgument("userId") {
                         type = NavType.StringType
                     }
-                )
+                ),
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
             ) {
                 FollowerScreen(
                     onNavigate = navController::navigate,

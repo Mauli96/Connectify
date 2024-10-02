@@ -36,7 +36,7 @@ import com.example.connectify.feature_post.presentation.util.CommentFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T>PaginatedBottomSheet(
+fun <T> PaginatedBottomSheet(
     title: String,
     bottomSheetState: SheetState,
     onDismissBottomSheet: () -> Unit = {},
@@ -99,9 +99,8 @@ fun <T>PaginatedBottomSheet(
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 HorizontalDivider(
-                    modifier = Modifier
-                        .height(0.5.dp),
-                    thickness = 0.5.dp,
+                    modifier = Modifier.height(1.dp),
+                    thickness = 0.2.dp,
                     color = HintGray
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))

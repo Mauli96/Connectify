@@ -7,6 +7,7 @@ import com.example.connectify.core.domain.states.PasswordTextFieldState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
+import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.use_case.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,9 +35,6 @@ class RegisterViewModel @Inject constructor(
 
     private val _registerState = MutableStateFlow(RegisterState())
     val registerState = _registerState.asStateFlow()
-
-    private val _onRegister = MutableSharedFlow<Unit>(replay = 1)
-    val onRegister = _onRegister.asSharedFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -117,7 +115,7 @@ class RegisterViewModel @Inject constructor(
                             UiText.StringResource(R.string.success_registeration)
                         )
                     )
-                    _onRegister.emit(Unit)
+                    _eventFlow.emit(UiEvent.Navigate(Screen.LoginScreen.route))
                     _registerState.value = RegisterState(isLoading = false)
                     _usernameState.value = StandardTextFieldState()
                     _emailState.value = StandardTextFieldState()

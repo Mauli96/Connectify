@@ -45,10 +45,13 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_auth.presentation.util.AuthError
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LoginScreen(
     scaffoldState: ScaffoldState,
@@ -76,6 +79,7 @@ fun LoginScreen(
                     }
                 }
                 is UiEvent.OnLogin -> {
+                    keyboardController?.hide()
                     onLogin()
                 }
                 else -> {

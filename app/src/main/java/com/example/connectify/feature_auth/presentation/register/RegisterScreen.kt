@@ -1,6 +1,5 @@
 package com.example.connectify.feature_auth.presentation.register
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,14 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,26 +36,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
-import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
-import com.example.connectify.feature_auth.presentation.util.AuthError
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
+import com.example.connectify.feature_auth.presentation.util.AuthError
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun RegisterScreen(
     onNavigate: (String) -> Unit = {},
     scaffoldState: ScaffoldState,
-    onPopBackStack: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val usernameState by viewModel.usernameState.collectAsStateWithLifecycle()
@@ -71,12 +64,6 @@ fun RegisterScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    LaunchedEffect(key1 = true) {
-        viewModel.onRegister.collect {
-            onPopBackStack()
-        }
-    }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -89,7 +76,12 @@ fun RegisterScreen(
                         )
                     }
                 }
-                else -> Unit
+                is UiEvent.Navigate -> {
+                    onNavigate(event.route)
+                }
+                else -> {
+                    null
+                }
             }
         }
     }
