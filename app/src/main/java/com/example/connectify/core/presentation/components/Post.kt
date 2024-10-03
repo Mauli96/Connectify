@@ -79,7 +79,7 @@ fun Post(
                     .padding(
                     start = SpaceSmall,
                     end = SpaceSmall,
-                    bottom = SpaceSmall
+                    bottom = SpaceMedium
                 ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween

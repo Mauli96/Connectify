@@ -188,7 +188,6 @@ fun CreatePostScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = GreenAccent
                 ),
-                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .align(Alignment.End)
                     .height(40.dp)

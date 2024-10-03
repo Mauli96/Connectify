@@ -23,6 +23,11 @@ interface PostApi {
         @Query("pageSize") pageSize: Int
     ): List<Post>
 
+    @GET("/api/post/details")
+    suspend fun getPostDetails(
+        @Query("postId") postId: String
+    ): BasicApiResponse<Post>
+
     @GET("/api/user/posts")
     suspend fun getPostsForProfile(
         @Query("userId") userId: String,

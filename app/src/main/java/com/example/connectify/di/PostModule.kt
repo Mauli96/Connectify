@@ -9,6 +9,7 @@ import com.example.connectify.feature_post.domain.use_case.DeleteCommentUseCase
 import com.example.connectify.feature_post.domain.use_case.DeletePostUseCase
 import com.example.connectify.feature_post.domain.use_case.GetCommentsForPostUseCase
 import com.example.connectify.feature_post.domain.use_case.GetLikesForParentUseCase
+import com.example.connectify.feature_post.domain.use_case.GetPostDetailsUseCase
 import com.example.connectify.feature_post.domain.use_case.GetPostsForFollowsUseCase
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.domain.use_case.ToggleLikeForParentUseCase
@@ -52,6 +53,7 @@ object PostModule {
         return PostUseCases(
             getPostsForFollows = GetPostsForFollowsUseCase(repository),
             createPost = CreatePostUseCase(repository),
+            getPostDetails = GetPostDetailsUseCase(repository),
             getCommentsForPost = GetCommentsForPostUseCase(repository),
             createComment = CreateCommentUseCase(repository),
             toggleLikeForParent = ToggleLikeForParentUseCase(repository),
