@@ -493,6 +493,22 @@ class ProfileViewModel @Inject constructor(
                     }
                 }
             )
+            val post = pagingPostState.value.items.find { it.id == parentId }
+            if(post != null) {
+                if(post.isSaved) {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.post_saved
+                        ))
+                    )
+                } else {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.post_unsaved
+                        ))
+                    )
+                }
+            }
         }
     }
 

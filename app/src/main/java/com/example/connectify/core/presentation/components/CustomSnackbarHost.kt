@@ -5,11 +5,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import kotlinx.coroutines.delay
@@ -54,10 +58,31 @@ fun CustomSnackbarHost(
                 modifier = Modifier.padding(SpaceMedium),
                 shape = MaterialTheme.shapes.medium,
                 content = {
-                    Text(
-                        text = snackbarData.message,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = snackbarData.message,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        snackbarData.actionLabel?.let { actionLabel ->
+                            TextButton(
+                                onClick = {
+                                    snackbarData.performAction()
+                                },
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            ) {
+                                Text(
+                                    text = actionLabel.uppercase(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+
                 }
             )
         }
