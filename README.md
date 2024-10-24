@@ -46,7 +46,6 @@ com.example.connectify
 │   └── viewmodel      # ViewModels for the screens
 
 ## Screenshots
-<h2>Screenshots</h2>
 <table>
   <tr>
     <td><img src="https://github.com/user-attachments/assets/98de3208-7bcc-41ba-8afe-3dd5278cfac3" alt="Register Screen" width="400"/></td>
