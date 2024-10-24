@@ -54,46 +54,46 @@ com.example.connectify
 <img src="https://github.com/user-attachments/assets/b0063fb8-efee-4097-817b-bd6db3a22d42" alt="Login Screen" width="400"/>
 
 ### Home Screen
-![MainFeed_Screen](https://github.com/user-attachments/assets/cf62b3f2-13ca-42ca-9a9f-1a9dc488956e)
+<img src="https://github.com/user-attachments/assets/cf62b3f2-13ca-42ca-9a9f-1a9dc488956e" alt="Main Feed Screen" width="400"/>
 
 ### Search Screen
-![Search_Screen](https://github.com/user-attachments/assets/17d5dace-234e-4432-b916-1e5d27bda7bd)
+<img src="https://github.com/user-attachments/assets/17d5dace-234e-4432-b916-1e5d27bda7bd" alt="Search Screen" width="400"/>
 
 ### Chat Screen
-![Chat_Screen](https://github.com/user-attachments/assets/388dfc5d-2a05-417d-bc7c-2c446a56cce3)
+<img src="https://github.com/user-attachments/assets/388dfc5d-2a05-417d-bc7c-2c446a56cce3" alt="Chat Screen" width="400"/>
 
 ## Message Screen
-![Message_Screen](https://github.com/user-attachments/assets/72650b13-ea65-4366-80bd-eaff41d11672)
+<img src="https://github.com/user-attachments/assets/72650b13-ea65-4366-80bd-eaff41d11672" alt="Message Screen" width="400"/>
 
 ## Create Post Screen
-![Create_Post_Screen](https://github.com/user-attachments/assets/7a87392c-1343-4e48-bbc7-9dd3820c8218)
+<img src="https://github.com/user-attachments/assets/7a87392c-1343-4e48-bbc7-9dd3820c8218" alt="Create Post Screen" width="400"/>
 
 ## Activity Screen
-![Activity_Screen](https://github.com/user-attachments/assets/04484dcd-2cc5-46f4-92b0-081d1872c001)
+<img src="https://github.com/user-attachments/assets/04484dcd-2cc5-46f4-92b0-081d1872c001" alt="Activity Screen" width="400"/>
 
 ## LikeBy Screen
-![LikeBy_Screen](https://github.com/user-attachments/assets/087a3446-1f1b-493d-bfe6-cd145b525bb5)
+<img src="https://github.com/user-attachments/assets/087a3446-1f1b-493d-bfe6-cd145b525bb5" alt="Liked By Screen" width="400"/>
 
 ## Own Profile Screen
-![Own_Profile_Screen](https://github.com/user-attachments/assets/074bbefc-47db-4722-ae2f-4f228e7fa1c1)
+<img src="https://github.com/user-attachments/assets/074bbefc-47db-4722-ae2f-4f228e7fa1c1" alt="Own Profile Screen" width="400"/>
 
 ## User Profile Screen
-![User_Profile_Screen](https://github.com/user-attachments/assets/e817fb3a-2226-4158-ab1e-074267f7e7df)
+<img src="https://github.com/user-attachments/assets/e817fb3a-2226-4158-ab1e-074267f7e7df" alt="User Profile Screen" width="400"/>
 
 ## Followers Screen
-![Followers_Screen](https://github.com/user-attachments/assets/c09373fa-e8db-4499-8ebb-74199a08b31a)
+<img src="https://github.com/user-attachments/assets/c09373fa-e8db-4499-8ebb-74199a08b31a" alt="Followers Screen" width="400"/>
 
 ## Following Screen
-![Following_Screen](https://github.com/user-attachments/assets/01c90e26-aeaf-4094-b686-3e6da2af737d)
+<img src="https://github.com/user-attachments/assets/685347b5-6130-4617-88fa-2a7806385531" alt="Post Screen" width="400"/>
 
 ## Saved Post Screen
-![Saved_Post_Screen](https://github.com/user-attachments/assets/790f8279-6cd7-4f08-af20-3b27ecb1b701)
+<img src="https://github.com/user-attachments/assets/790f8279-6cd7-4f08-af20-3b27ecb1b701" alt="Saved Post Screen" width="400"/>
 
 ## Post Screen
-![Post_Screen](https://github.com/user-attachments/assets/685347b5-6130-4617-88fa-2a7806385531)
+<img src="https://github.com/user-attachments/assets/01c90e26-aeaf-4094-b686-3e6da2af737d" alt="Following Screen" width="400"/>
 
 ## Edit Profile Screen
-![Edit_Profile_Screen](https://github.com/user-attachments/assets/623b3a0b-21b1-46b8-8934-46d159eac81d)
+<img src="https://github.com/user-attachments/assets/623b3a0b-21b1-46b8-8934-46d159eac81d" alt="Edit Profile Screen" width="400"/>
 
 
 ## Installation
