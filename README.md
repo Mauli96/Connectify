@@ -15,12 +15,12 @@ Connectify is a social media application inspired by Instagram, designed to let 
 ## Tech Stack
 
 ### Android
-- **Kotlin**
-- **Jetpack Compose**: UI toolkit for modern native Android interfaces.
-- **Kotlin Coroutines**: For asynchronous programming.
-- **Paging**: For loading data in pages.
-- **Hilt**: Dependency Injection.
-- **Coil**: For image loading.
+- **Kotlin**: The primary programming language used for developing the Android application.
+- **Jetpack Compose**: UI toolkit for modern native Android interfaces, allowing for declarative UI programming.
+- **Kotlin Coroutines**: For asynchronous programming, enabling smooth and responsive UI by handling background tasks efficiently.
+- **Paging**: For loading data in pages, improving performance and user experience when displaying large data sets.
+- **Hilt**: Dependency Injection library that simplifies the process of managing dependencies and enhances testability.
+- **Coil**: An image loading library for Android, optimized for Kotlin and designed for handling image loading efficiently.
 
 ### Backend
 - **Ktor**: Asynchronous Kotlin framework for the server.
