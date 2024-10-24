@@ -1,15 +1,6 @@
-![MainFeed_Screen](https://github.com/user-attachments/assets/96d5877b-5ff9-41b2-9087-94d41543e89d)# Connectify
+# Connectify
 
 Connectify is a social media application inspired by Instagram, designed to let users share posts, explore content, and connect with others. This app is built using **Kotlin**, **Jetpack Compose**, and **Ktor** backend, with **MongoDB** as the database.
-
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Architecture](#architecture)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -57,10 +48,10 @@ com.example.connectify
 ## Screenshots
 
 ## Register Screen
-![Register_Screen](https://github.com/user-attachments/assets/98de3208-7bcc-41ba-8afe-3dd5278cfac3)
+<img src="https://github.com/user-attachments/assets/98de3208-7bcc-41ba-8afe-3dd5278cfac3" alt="Register Screen" width="400"/>
 
 ## Login Screen
-![Login_Screen](https://github.com/user-attachments/assets/b0063fb8-efee-4097-817b-bd6db3a22d42)
+<img src="https://github.com/user-attachments/assets/b0063fb8-efee-4097-817b-bd6db3a22d42" alt="Login Screen" width="400"/>
 
 ### Home Screen
 ![MainFeed_Screen](https://github.com/user-attachments/assets/cf62b3f2-13ca-42ca-9a9f-1a9dc488956e)
