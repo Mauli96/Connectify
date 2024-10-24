@@ -14,11 +14,11 @@ Connectify is a social media application inspired by Instagram, designed to let 
 
 ## Tech Stack
 
-### Frontend
+### Android
 - **Kotlin**
 - **Jetpack Compose**: UI toolkit for modern native Android interfaces.
 - **Kotlin Coroutines**: For asynchronous programming.
-- **Paging 3**: For loading data in pages.
+- **Paging**: For loading data in pages.
 - **Hilt**: Dependency Injection.
 - **Coil**: For image loading.
 
@@ -29,7 +29,7 @@ Connectify is a social media application inspired by Instagram, designed to let 
 - **Kotlin Serialization**: For JSON parsing.
 
 ### Architecture
-com.example.connectify
+com.example.connectify\n
 ├── core            # Contains shared code such as utilities, constants, or base classes
 │   └── util
 ├── data            # Contains repository implementations and data source classes
