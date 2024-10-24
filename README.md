@@ -29,21 +29,27 @@ Connectify is a social media application inspired by Instagram, designed to let 
 - **Kotlin Serialization**: For JSON parsing.
 
 ### Architecture
-com.example.connectify\n
-├── core            # Contains shared code such as utilities, constants, or base classes
-│   └── util
-├── data            # Contains repository implementations and data source classes
-│   └── repository
-│   └── remote      # Network layer
-│   └── local       # Local data handling (e.g., Room or MongoDB)
-├── domain          # Domain logic and business rules
-│   └── models      # Core business models (Post, User)
-│   └── usecases    # Use cases like saving a post, getting posts, etc.
-├── presentation    # UI-related code
-│   └── ui
-│       └── components # Composable components like Snackbar, PostCard, etc.
-│       └── screens    # Individual screens (MainFeed, Search, etc.)
-│   └── viewmodel      # ViewModels for the screens
+<div>
+  <pre>
+    <code>
+      com.example.connectify
+      ├── core            # Contains shared code such as utilities, constants, or base classes
+      │   └── util
+      ├── data            # Contains repository implementations and data source classes
+      │   ├── repository
+      │   ├── remote      # Network layer
+      │   └── local       # Local data handling (e.g., Room or MongoDB)
+      ├── domain          # Domain logic and business rules
+      │   ├── models      # Core business models (Post, User)
+      │   └── usecases    # Use cases like saving a post, getting posts, etc.
+      ├── presentation     # UI-related code
+      │   ├── ui
+      │   │   ├── components # Composable components like Snackbar, PostCard, etc.
+      │   │   └── screens    # Individual screens (MainFeed, Search, etc.)
+      │   └── viewmodel      # ViewModels for the screens
+    </code>
+  </pre>
+</div>
 
 ## Screenshots
 <table>
