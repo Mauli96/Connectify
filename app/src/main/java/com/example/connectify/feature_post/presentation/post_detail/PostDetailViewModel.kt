@@ -123,6 +123,13 @@ class PostDetailViewModel @Inject constructor(
                     )
                 }
             }
+            is PostDetailEvent.SavePost -> {
+                val isSaved = state.value.post?.isSaved == true
+                toggleSavePost(
+                    parentId = event.postId,
+                    isSaved = isSaved
+                )
+            }
             is PostDetailEvent.SelectComment -> {
                 _state.update {
                     it.copy(
@@ -221,6 +228,47 @@ class PostDetailViewModel @Inject constructor(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
                     )
+                }
+            }
+        }
+    }
+
+    private fun toggleSavePost(
+        parentId: String,
+        isSaved: Boolean
+    ) {
+        viewModelScope.launch {
+            _state.update { 
+                it.copy(
+                    post = state.value.post?.copy(
+                        isSaved = !isSaved
+                    )
+                )
+            }
+            val result = postUseCases.toggleSavePost(
+                postId = parentId,
+                isSaved = isSaved
+            )
+            when(result) {
+                is Resource.Success -> {
+                    if(isSaved) {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                            uiText = UiText.StringResource(R.string.post_unsaved)
+                        ))
+                    } else {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                            uiText = UiText.StringResource(R.string.post_saved)
+                        ))
+                    }
+                }
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            post = state.value.post?.copy(
+                                isSaved = !isSaved
+                            )
+                        )
+                    }
                 }
             }
         }

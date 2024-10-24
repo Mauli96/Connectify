@@ -255,6 +255,9 @@ fun ProfileScreen(
                     onShareClick = {
                         context.sendSharePostIntent(post.id)
                     },
+                    onSaveClick = {
+                        viewmodel.onEvent(ProfileEvent.SavePost(post.id))
+                    },
                     onLikedByClick = {
                         onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                     },
@@ -325,6 +328,9 @@ fun ProfileScreen(
                     },
                     onEditClick = {
                         onNavigate(Screen.EditProfileScreen.route + "/${profile.userId}")
+                    },
+                    onSavedClick = {
+                        onNavigate(Screen.SavedPostScreen.route)
                     },
                     onLogoutClick = {
                         viewmodel.onEvent(ProfileEvent.ShowLogoutDialog)

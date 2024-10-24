@@ -58,6 +58,7 @@ fun Post(
     onLikedByClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
+    onSaveClick: () -> Unit = {},
     onUsernameClick: () -> Unit = {},
     onMoreItemClick: (String) -> Unit = {},
     isDescriptionVisible: Boolean,
@@ -156,6 +157,7 @@ fun Post(
                 ActionRow(
                     modifier = Modifier.fillMaxWidth(),
                     isLiked = post.isLiked,
+                    isSaved = post.isSaved,
                     likeCount = post.likeCount,
                     commentCount = post.commentCount,
                     onLikeClick = onLikeClick,
@@ -163,6 +165,7 @@ fun Post(
                         onCommentClick()
                     },
                     onShareClick = onShareClick,
+                    onSaveClick = onSaveClick,
                     onLikedByClick = onLikedByClick
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
@@ -218,11 +221,13 @@ fun Post(
 fun ActionRow(
     modifier: Modifier = Modifier,
     isLiked: Boolean = false,
+    isSaved: Boolean = false,
     likeCount: Int = 0,
     commentCount: Int = 0,
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
     onShareClick: () -> Unit = {},
+    onSaveClick: () -> Unit,
     onLikedByClick: () -> Unit = {}
 ) {
     Row(
@@ -240,14 +245,18 @@ fun ActionRow(
             onLikedByClick = onLikedByClick
         )
         Icon(
-            painter = painterResource(id = R.drawable.unsave_icon),
+            painter = if(isSaved) {
+                painterResource(id = R.drawable.save_icon)
+            } else {
+                painterResource(id = R.drawable.unsave_icon)
+            },
             contentDescription = stringResource(id = R.string.save_post),
             modifier = Modifier
                 .size(IconSizeSmall)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-
+                            onSaveClick()
                         }
                     )
                 }

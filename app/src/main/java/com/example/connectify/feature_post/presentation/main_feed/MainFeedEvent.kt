@@ -6,6 +6,7 @@ sealed class MainFeedEvent {
     data class LikedPost(val postId: String): MainFeedEvent()
     data class LikedComment(val commentId: String): MainFeedEvent()
     data class EnteredComment(val comment: String): MainFeedEvent()
+    data class SavePost(val postId: String): MainFeedEvent()
     data class SelectPost(val postId: String): MainFeedEvent()
     data class SelectComment(val commentId: String): MainFeedEvent()
     data class ChangeCommentFilter(val filterType: CommentFilter): MainFeedEvent()

@@ -135,6 +135,9 @@ fun PostDetailScreen(
                                     onShareClick = {
                                         context.sendSharePostIntent(post.id)
                                     },
+                                    onSaveClick = {
+                                        viewModel.onEvent(PostDetailEvent.SavePost(post.id))
+                                    },
                                     onLikedByClick = {
                                         onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                                     },

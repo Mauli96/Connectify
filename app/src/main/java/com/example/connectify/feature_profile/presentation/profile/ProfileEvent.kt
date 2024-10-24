@@ -8,6 +8,7 @@ sealed class ProfileEvent {
     data class LikedPost(val postId: String): ProfileEvent()
     data class LikedComment(val commentId: String): ProfileEvent()
     data class EnteredComment(val comment: String): ProfileEvent()
+    data class SavePost(val postId: String): ProfileEvent()
     data class SelectPost(val postId: String): ProfileEvent()
     data class SelectComment(val commentId: String): ProfileEvent()
     data class ChangeCommentFilter(val filterType: CommentFilter): ProfileEvent()

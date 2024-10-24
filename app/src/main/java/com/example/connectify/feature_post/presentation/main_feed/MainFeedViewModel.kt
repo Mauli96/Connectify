@@ -13,6 +13,7 @@ import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
 import com.example.connectify.core.util.PostLiker
+import com.example.connectify.core.util.PostSaver
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
@@ -31,6 +32,7 @@ import javax.inject.Inject
 class MainFeedViewModel @Inject constructor(
     private val postUseCases: PostUseCases,
     private val postLiker: PostLiker,
+    private val postSaver: PostSaver,
     private val commentLiker: CommentLiker,
     private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
 ) : ViewModel() {
@@ -142,6 +144,9 @@ class MainFeedViewModel @Inject constructor(
                         error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
                     )
                 }
+            }
+            is MainFeedEvent.SavePost -> {
+                toggleSavePost(parentId = event.postId)
             }
             is MainFeedEvent.SelectPost -> {
                 _state.update {
@@ -371,6 +376,28 @@ class MainFeedViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun toggleSavePost(parentId: String) {
+        viewModelScope.launch {
+            postSaver.toggleSave(
+                posts = pagingPostState.value.items,
+                parentId = parentId,
+                onRequest = { isSaved ->
+                    postUseCases.toggleSavePost(
+                        postId = parentId,
+                        isSaved = isSaved
+                    )
+                },
+                onStateUpdated = { posts ->
+                    _pagingPostState.update {
+                        it.copy(
+                            items = posts
+                        )
+                    }
+                }
+            )
         }
     }
 

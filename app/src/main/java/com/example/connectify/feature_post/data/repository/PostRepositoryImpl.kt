@@ -262,4 +262,55 @@ class PostRepositoryImpl(
             )
         }
     }
+
+    override suspend fun getSavedPosts(
+        page: Int,
+        pageSize: Int
+    ): Resource<List<Post>> {
+        return try {
+            val posts = api.getSavedPosts(
+                page = page,
+                pageSize = pageSize
+            )
+            Resource.Success(data = posts)
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun savePost(postId: String): SimpleResource {
+        return try {
+            api.savePost(postId)
+            Resource.Success(Unit)
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun removeSavedPost(postId: String): SimpleResource {
+        return try {
+            api.removeSavedPost(postId)
+            Resource.Success(Unit)
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
 }

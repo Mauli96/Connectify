@@ -114,4 +114,7 @@
     <string name="filter_comments">Filter comments</string>
     <string name="save_post">Save post</string>
     <string name="read_less">Read less</string>
+    <string name="saved">Saved</string>
+    <string name="post_saved">Post saved</string>
+    <string name="post_unsaved">Post unsaved</string>
 </resources>

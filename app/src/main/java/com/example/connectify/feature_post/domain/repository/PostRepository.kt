@@ -50,4 +50,13 @@ interface PostRepository {
     suspend fun deletePost(postId: String): SimpleResource
 
     suspend fun deleteComment(commentId: String) : SimpleResource
+
+    suspend fun getSavedPosts(
+        page: Int,
+        pageSize: Int
+    ): Resource<List<Post>>
+
+    suspend fun savePost(postId: String): SimpleResource
+
+    suspend fun removeSavedPost(postId: String): SimpleResource
 }

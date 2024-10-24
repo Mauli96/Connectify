@@ -174,6 +174,9 @@ fun MainFeedScreen(
                         onShareClick = {
                             context.sendSharePostIntent(post.id)
                         },
+                        onSaveClick = {
+                            viewModel.onEvent(MainFeedEvent.SavePost(post.id))
+                        },
                         onLikedByClick = {
                             onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                         },

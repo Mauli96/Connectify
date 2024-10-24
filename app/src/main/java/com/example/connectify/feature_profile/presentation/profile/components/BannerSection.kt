@@ -76,6 +76,7 @@ fun BannerSection(
     isOwnProfile: Boolean = false,
     onNavigateUp: () -> Unit = {},
     onEditClick: () -> Unit = {},
+    onSavedClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onGitHubClick: () -> Unit = {},
     onInstagramClick: () -> Unit = {},
@@ -137,6 +138,36 @@ fun BannerSection(
                         onClick = {
                             onDismissDropdownMenu()
                             onEditClick()
+                        }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .height(0.2.dp),
+                        thickness = 0.2.dp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Spacer(modifier = Modifier.width(SpaceSmall))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.unsave_icon),
+                                    contentDescription = stringResource(id = R.string.saved),
+                                    modifier = Modifier.size(IconSizeSmall)
+                                )
+                                Spacer(modifier = Modifier.width(SpaceSmall))
+                                Text(
+                                    text = stringResource(id = R.string.saved),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(modifier = Modifier.width(SpaceLarge))
+                            }
+                        },
+                        onClick = {
+                            onDismissDropdownMenu()
+                            onSavedClick()
                         }
                     )
                     HorizontalDivider(

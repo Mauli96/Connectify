@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,6 +24,7 @@ import com.example.connectify.feature_post.presentation.create_post.CreatePostSc
 import com.example.connectify.feature_post.presentation.main_feed.MainFeedScreen
 import com.example.connectify.feature_post.presentation.person_list.PersonListScreen
 import com.example.connectify.feature_post.presentation.post_detail.PostDetailScreen
+import com.example.connectify.feature_post.presentation.save_post.SavedPostScreen
 import com.example.connectify.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.example.connectify.feature_profile.presentation.follower.FollowerScreen
 import com.example.connectify.feature_profile.presentation.following.FollowingScreen
@@ -146,7 +148,7 @@ fun Navigation(
                 },
                 exitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(animationDuration)
                     )
                 }
@@ -454,6 +456,40 @@ fun Navigation(
                     onNavigateUp = navController::navigateUp,
                     scaffoldState = scaffoldState,
                     imageLoader = imageLoader
+                )
+            }
+            composable(
+                route = Screen.SavedPostScreen.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
+            ) {
+                SavedPostScreen(
+                    imageLoader = imageLoader,
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp,
+                    scaffoldState = scaffoldState,
                 )
             }
         }

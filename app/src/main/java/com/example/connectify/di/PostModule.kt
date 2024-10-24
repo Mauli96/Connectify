@@ -11,7 +11,9 @@ import com.example.connectify.feature_post.domain.use_case.GetCommentsForPostUse
 import com.example.connectify.feature_post.domain.use_case.GetLikesForParentUseCase
 import com.example.connectify.feature_post.domain.use_case.GetPostDetailsUseCase
 import com.example.connectify.feature_post.domain.use_case.GetPostsForFollowsUseCase
+import com.example.connectify.feature_post.domain.use_case.GetSavedPostsUseCase
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
+import com.example.connectify.feature_post.domain.use_case.ToggleSavePostUseCase
 import com.example.connectify.feature_post.domain.use_case.ToggleLikeForParentUseCase
 import com.google.gson.Gson
 import dagger.Module
@@ -59,7 +61,9 @@ object PostModule {
             toggleLikeForParent = ToggleLikeForParentUseCase(repository),
             getLikesForParent = GetLikesForParentUseCase(repository),
             deletePost = DeletePostUseCase(repository),
-            deleteComment = DeleteCommentUseCase(repository)
+            deleteComment = DeleteCommentUseCase(repository),
+            getSavedPosts = GetSavedPostsUseCase(repository),
+            toggleSavePost = ToggleSavePostUseCase(repository)
         )
     }
 }

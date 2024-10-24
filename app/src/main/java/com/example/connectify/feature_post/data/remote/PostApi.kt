@@ -81,6 +81,21 @@ interface PostApi {
         @Query("commentId") commentId: String
     )
 
+    @GET("/api/post/save/get")
+    suspend fun getSavedPosts(
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
+    ): List<Post>
+
+    @POST("/api/post/save")
+    suspend fun savePost(
+        @Query("postId") postId: String
+    ): BasicApiResponse<Unit>
+
+    @DELETE("/api/post/unsave")
+    suspend fun removeSavedPost(
+        @Query("postId") postId: String
+    ): BasicApiResponse<Unit>
 
     companion object {
         const val BASE_URL = "http://192.168.0.209:8001/"

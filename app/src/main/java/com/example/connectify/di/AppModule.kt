@@ -12,7 +12,9 @@ import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.DefaultCommentLiker
 import com.example.connectify.core.util.DefaultPostLiker
+import com.example.connectify.core.util.DefaultPostSaver
 import com.example.connectify.core.util.PostLiker
+import com.example.connectify.core.util.PostSaver
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -75,6 +77,12 @@ object AppModule {
     @Singleton
     fun provideCommentLiker(): CommentLiker {
         return DefaultCommentLiker()
+    }
+
+    @Provides
+    @Singleton
+    fun providePostSaver(): PostSaver {
+        return DefaultPostSaver()
     }
 
     @Provides
