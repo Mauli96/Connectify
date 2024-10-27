@@ -197,6 +197,7 @@ fun CreatePostScreen(
                     LinearProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(3.dp)
                             .align(CenterVertically),
                         color = MaterialTheme.colorScheme.onPrimary,
                         trackColor = MaterialTheme.colorScheme.primary

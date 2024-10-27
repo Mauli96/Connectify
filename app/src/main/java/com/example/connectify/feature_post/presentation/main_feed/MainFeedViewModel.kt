@@ -1,6 +1,5 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
@@ -404,13 +403,13 @@ class MainFeedViewModel @Inject constructor(
                if(post.isSaved) {
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
-                            R.string.post_saved
+                            R.string.successfully_saved_post
                         ))
                     )
                 } else {
                    _eventFlow.emit(
                        UiEvent.ShowSnackbar(UiText.StringResource(
-                           R.string.post_unsaved
+                           R.string.successfully_unsaved_post
                        ))
                    )
                }

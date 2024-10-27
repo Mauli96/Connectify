@@ -88,7 +88,8 @@ fun MainFeedScreen(
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
+                        message = event.uiText.asString(context),
+                        actionLabel = "VIEW"
                     )
                 }
                 else -> {

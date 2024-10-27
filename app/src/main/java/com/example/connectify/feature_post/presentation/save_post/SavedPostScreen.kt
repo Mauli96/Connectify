@@ -3,6 +3,7 @@ package com.example.connectify.feature_post.presentation.save_post
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -28,6 +30,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
@@ -76,29 +79,36 @@ fun SavedPostScreen(
             showBackArrow = true,
         )
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(
-                count = pagingPostState.items.size,
-                key = { i ->
-                    val post = pagingPostState.items[i]
-                    post.id
-                }
-            ) { i ->
-                val post = pagingPostState.items[i]
-                if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
-                    viewModel.loadNextPosts()
-                }
-                PostImageItem(
-                    imageLoader = imageLoader,
-                    post = post,
-                    onPostImageClick = {
-                        onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(
+                    count = pagingPostState.items.size,
+                    key = { i ->
+                        val post = pagingPostState.items[i]
+                        post.id
                     }
+                ) { i ->
+                    val post = pagingPostState.items[i]
+                    if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                        viewModel.loadNextPosts()
+                    }
+                    PostImageItem(
+                        imageLoader = imageLoader,
+                        post = post,
+                        onPostImageClick = {
+                            onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+                        }
+                    )
+                }
+            }
+            if(pagingPostState.isLoading) {
+                CustomCircularProgressIndicator(
+                    modifier = Modifier.align(Center)
                 )
             }
         }

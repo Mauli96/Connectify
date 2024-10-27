@@ -75,6 +75,7 @@ import com.example.connectify.core.util.openUrlInBrowser
 import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
 import com.example.connectify.core.presentation.components.Comment
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
 import kotlinx.coroutines.flow.collectLatest
@@ -159,7 +160,8 @@ fun ProfileScreen(
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
+                        message = event.uiText.asString(context),
+                        actionLabel = "VIEW"
                     )
                 }
                 else -> {
@@ -454,11 +456,8 @@ fun ProfileScreen(
             }
         }
         if(state.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Center),
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 2.dp,
-                trackColor = Color.White
+            CustomCircularProgressIndicator(
+                modifier = Modifier.align(Center)
             )
         }
     }

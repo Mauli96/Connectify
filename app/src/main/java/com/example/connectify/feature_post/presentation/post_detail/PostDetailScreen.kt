@@ -34,6 +34,7 @@ import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.Comment
 import com.example.connectify.core.presentation.components.CommentFilterDropdown
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.SendTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
@@ -71,7 +72,8 @@ fun PostDetailScreen(
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
+                        message = event.uiText.asString(context),
+                        actionLabel = "VIEW"
                     )
                 }
                 else -> {
@@ -149,11 +151,8 @@ fun PostDetailScreen(
                             }
                         }
                         if(state.isLoadingPost) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Center),
-                                color = MaterialTheme.colorScheme.primary,
-                                strokeWidth = 2.dp,
-                                trackColor = Color.White
+                            CustomCircularProgressIndicator(
+                                modifier = Modifier.align(Center)
                             )
                         }
                     }

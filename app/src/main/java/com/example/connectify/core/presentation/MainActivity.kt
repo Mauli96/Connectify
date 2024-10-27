@@ -73,7 +73,10 @@ class MainActivity : ComponentActivity() {
                         showBottomBar = shouldShowBottomBar(navBackStackEntry),
                         state = scaffoldState,
                         snackbarHost = {
-                            CustomSnackbarHost(snackbarHostState = scaffoldState.snackbarHostState)
+                            CustomSnackbarHost(
+                                snackbarHostState = scaffoldState.snackbarHostState,
+                                onNavigate = navController::navigate
+                            )
                         },
                         modifier = Modifier.fillMaxSize(),
                         onFabClick = {

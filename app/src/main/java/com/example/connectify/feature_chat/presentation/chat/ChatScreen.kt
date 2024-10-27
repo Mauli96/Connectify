@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -128,11 +129,8 @@ fun ChatScreen(
             )
         }
         if(state.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Center),
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 2.dp,
-                trackColor = Color.White
+            CustomCircularProgressIndicator(
+                modifier = Modifier.align(Center)
             )
         }
     }

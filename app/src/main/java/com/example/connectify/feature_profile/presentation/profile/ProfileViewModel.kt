@@ -498,13 +498,13 @@ class ProfileViewModel @Inject constructor(
                 if(post.isSaved) {
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
-                            R.string.post_saved
+                            R.string.successfully_saved_post
                         ))
                     )
                 } else {
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
-                            R.string.post_unsaved
+                            R.string.successfully_unsaved_post
                         ))
                     )
                 }

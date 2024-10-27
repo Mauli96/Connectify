@@ -13,7 +13,6 @@ import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
-import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.presentation.util.CommentError
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -253,11 +252,11 @@ class PostDetailViewModel @Inject constructor(
                 is Resource.Success -> {
                     if(isSaved) {
                         _eventFlow.emit(UiEvent.ShowSnackbar(
-                            uiText = UiText.StringResource(R.string.post_unsaved)
+                            uiText = UiText.StringResource(R.string.successfully_unsaved_post)
                         ))
                     } else {
                         _eventFlow.emit(UiEvent.ShowSnackbar(
-                            uiText = UiText.StringResource(R.string.post_saved)
+                            uiText = UiText.StringResource(R.string.successfully_saved_post)
                         ))
                     }
                 }

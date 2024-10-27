@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,10 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -49,9 +44,11 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.domain.models.Skill
@@ -140,12 +137,6 @@ fun BannerSection(
                             onEditClick()
                         }
                     )
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .height(0.2.dp),
-                        thickness = 0.2.dp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
                     DropdownMenuItem(
                         text = {
                             Row(
@@ -171,10 +162,9 @@ fun BannerSection(
                         }
                     )
                     HorizontalDivider(
-                        modifier = Modifier
-                            .height(0.2.dp),
-                        thickness = 0.2.dp,
-                        color = MaterialTheme.colorScheme.onBackground
+                        thickness = 0.5.dp,
+                        color = HintGray,
+                        modifier = Modifier.padding(start = SpaceMediumLarge)
                     )
                     DropdownMenuItem(
                         text = {
