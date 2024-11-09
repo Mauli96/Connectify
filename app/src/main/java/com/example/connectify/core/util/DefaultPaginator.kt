@@ -7,6 +7,8 @@ class DefaultPaginator<T>(
     private val onError: suspend (UiText) -> Unit
 ) : Paginator<T> {
 
+    private var page = 0
+
     override suspend fun loadFirstItems() {
         onLoadUpdated(true)
         val result = onRequest(0)
@@ -23,8 +25,6 @@ class DefaultPaginator<T>(
             }
         }
     }
-
-    private var page = 1
 
     override suspend fun loadNextItems() {
         onLoadUpdated(true)

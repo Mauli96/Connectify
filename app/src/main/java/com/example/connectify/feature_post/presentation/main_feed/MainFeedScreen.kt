@@ -1,6 +1,7 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,10 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,16 +45,18 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.components.Comment
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.IconSizeLarge
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
-import com.example.connectify.core.presentation.components.Comment
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -146,49 +151,68 @@ fun MainFeedScreen(
                     }
                 }
         ) {
-            LazyColumn {
-                items(
-                    count = pagingPostState.items.size,
-                    key = { i ->
-                        val post = pagingPostState.items[i]
-                        post.id
-                    }
-                ) { i ->
-                    val post = pagingPostState.items[i]
-                    if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
-                        viewModel.loadNextPosts()
-                    }
-                    Post(
-                        post = post,
-                        imageLoader = imageLoader,
-                        onUsernameClick = {
-                            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
-                        },
-                        onLikeClick = {
-                            viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
-                        },
-                        onCommentClick = {
-                            viewModel.onEvent(MainFeedEvent.SelectPost(post.id))
-                            viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
-                            viewModel.onEvent(MainFeedEvent.LoadComments)
-                        },
-                        onShareClick = {
-                            context.sendSharePostIntent(post.id)
-                        },
-                        onSaveClick = {
-                            viewModel.onEvent(MainFeedEvent.SavePost(post.id))
-                        },
-                        onLikedByClick = {
-                            onNavigate(Screen.PersonListScreen.route + "/${post.id}")
-                        },
-                        isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
-                        onDescriptionToggle = {
-                            viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
-                        }
+            if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_feed),
+                        contentDescription = null,
+                        modifier = Modifier.size(100.dp)
                     )
-                    Spacer(modifier = Modifier.height(SpaceSmall))
-                    if(i == pagingPostState.items.size - 1) {
-                        Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    Text(
+                        text = stringResource(R.string.feed_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                LazyColumn {
+                    items(
+                        count = pagingPostState.items.size,
+                        key = { i ->
+                            val post = pagingPostState.items[i]
+                            post.id
+                        }
+                    ) { i ->
+                        val post = pagingPostState.items[i]
+                        if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                            viewModel.loadNextPosts()
+                        }
+                        Post(
+                            post = post,
+                            imageLoader = imageLoader,
+                            onUsernameClick = {
+                                onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                            },
+                            onLikeClick = {
+                                viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
+                            },
+                            onCommentClick = {
+                                viewModel.onEvent(MainFeedEvent.SelectPost(post.id))
+                                viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
+                                viewModel.onEvent(MainFeedEvent.LoadComments)
+                            },
+                            onShareClick = {
+                                context.sendSharePostIntent(post.id)
+                            },
+                            onSaveClick = {
+                                viewModel.onEvent(MainFeedEvent.SavePost(post.id))
+                            },
+                            onLikedByClick = {
+                                onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                            },
+                            isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
+                            onDescriptionToggle = {
+                                viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(SpaceSmall))
+                        if(i == pagingPostState.items.size - 1) {
+                            Spacer(modifier = Modifier.height(50.dp))
+                        }
                     }
                 }
             }

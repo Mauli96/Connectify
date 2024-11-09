@@ -1,7 +1,9 @@
 package com.example.connectify.core.presentation.components
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigation
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.BottomNavItem
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.util.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
@@ -67,7 +70,7 @@ fun StandardScaffold(
                     modifier = Modifier.fillMaxWidth(),
                     backgroundColor = MaterialTheme.colorScheme.background,
                     cutoutShape = CircleShape,
-                    elevation = 5.dp
+                    elevation = 50.dp
                 ) {
                     BottomNavigation(
                         backgroundColor = MaterialTheme.colorScheme.background
@@ -98,10 +101,10 @@ fun StandardScaffold(
                     onClick = onFabClick,
                     shape = CircleShape,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
+                    Image(
+                        painter = painterResource(R.drawable.plus_icon),
                         contentDescription = stringResource(id = R.string.make_post),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        modifier = Modifier.size(IconSizeSmall)
                     )
                 }
             }

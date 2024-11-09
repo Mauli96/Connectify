@@ -95,12 +95,12 @@ class SearchViewModel @Inject constructor(
         }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(ProfileConstants.SEARCH_DELAY)
             _state.update {
                 it.copy(
                     isLoading = true
                 )
             }
+            delay(ProfileConstants.SEARCH_DELAY)
             val result = profileUseCases.searchUser(query)
             when(result) {
                 is Resource.Success -> {

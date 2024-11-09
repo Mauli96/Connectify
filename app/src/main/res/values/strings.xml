@@ -117,4 +117,8 @@
     <string name="saved">Saved</string>
     <string name="successfully_saved_post">Successfully saved post</string>
     <string name="successfully_unsaved_post">Successfully unsaved post</string>
+    <string name="notification_permission_denied">Enable notifications in settings</string>
+    <string name="feed_empty">No posts yet. Start following people or create your first post!</string>
+    <string name="no_user_found">No user found with this username.</string>
+    <string name="no_saved_post">You haven\'t saved any posts yet.</string>
 </resources>

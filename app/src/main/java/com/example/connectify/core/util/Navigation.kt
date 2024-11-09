@@ -6,7 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,7 +29,6 @@ import com.example.connectify.feature_profile.presentation.follower.FollowerScre
 import com.example.connectify.feature_profile.presentation.following.FollowingScreen
 import com.example.connectify.feature_profile.presentation.profile.ProfileScreen
 import com.example.connectify.feature_profile.presentation.search.SearchScreen
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -194,6 +192,12 @@ fun Navigation(
                         nullable = true
                         defaultValue = null
                     }
+                ),
+                deepLinks = listOf(
+                    navDeepLink {
+                        action = Intent.ACTION_VIEW
+                        uriPattern = "https://connectify.com/profile"
+                    }
                 )
             ) {
                 ProfileScreen(
@@ -338,7 +342,8 @@ fun Navigation(
                 SearchScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    imageLoader = imageLoader,
+                    scaffoldState = scaffoldState,
+                    imageLoader = imageLoader
                 )
             }
             composable(

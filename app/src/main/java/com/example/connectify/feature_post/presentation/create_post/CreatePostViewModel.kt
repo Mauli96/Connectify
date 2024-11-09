@@ -1,5 +1,7 @@
 package com.example.connectify.feature_post.presentation.create_post
 
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
@@ -20,7 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
-    private val postUseCases: PostUseCases
+    private val postUseCases: PostUseCases,
+    private val notificationBuilder: NotificationCompat.Builder,
+    private val notificationManager: NotificationManagerCompat
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreatePostState())
@@ -74,6 +78,14 @@ class CreatePostViewModel @Inject constructor(
             )
             when(result) {
                 is Resource.Success ->{
+                    try {
+                        notificationManager.notify(1, notificationBuilder.build())
+                    } catch(e: SecurityException) {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                            uiText = UiText.StringResource(R.string.notification_permission_denied)
+                        ))
+                    }
+
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = UiText.StringResource(R.string.post_created)
                     ))

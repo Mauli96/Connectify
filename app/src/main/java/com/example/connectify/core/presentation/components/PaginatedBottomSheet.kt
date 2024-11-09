@@ -154,11 +154,8 @@ fun <T> PaginatedBottomSheet(
                 }
             }
             if(isListLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Center),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 2.dp,
-                    trackColor = Color.White
+                CustomCircularProgressIndicator(
+                    modifier = Modifier.align(Center)
                 )
             }
         }

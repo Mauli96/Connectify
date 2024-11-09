@@ -137,7 +137,11 @@ class MessageViewModel @Inject constructor(
             return
         }
         val chatId = savedStateHandle.get<String>("chatId")
-        chatUseCases.sendMessage(toId, messageTextFieldState.value.text, chatId)
+        chatUseCases.sendMessage(
+            toId = toId,
+            text = messageTextFieldState.value.text,
+            chatId = chatId
+        )
         _messageTextFieldState.value = StandardTextFieldState()
         _state.update {
             it.copy(

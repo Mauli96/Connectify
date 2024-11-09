@@ -75,6 +75,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
+    implementation("androidx.compose.foundation:foundation:1.4.3")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("androidx.compose.material:material:1.7.0")
     implementation("androidx.paging:paging-compose:3.3.2")

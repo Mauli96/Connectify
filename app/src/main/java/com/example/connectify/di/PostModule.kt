@@ -1,5 +1,17 @@
 package com.example.connectify.di
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
+import com.example.connectify.R
+import com.example.connectify.core.presentation.MainActivity
 import com.example.connectify.feature_post.data.remote.PostApi
 import com.example.connectify.feature_post.data.repository.PostRepositoryImpl
 import com.example.connectify.feature_post.domain.repository.PostRepository
@@ -19,6 +31,7 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -65,5 +78,53 @@ object PostModule {
             getSavedPosts = GetSavedPostsUseCase(repository),
             toggleSavePost = ToggleSavePostUseCase(repository)
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificationBuilder(
+        @ApplicationContext context: Context
+    ): NotificationCompat.Builder {
+        val flag = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE
+        } else {
+            0
+        }
+        val clickIntent = Intent(
+            Intent.ACTION_VIEW,
+            "https://connectify.com/profile".toUri(),
+            context,
+            MainActivity::class.java
+        )
+        val clickPendingIntent: PendingIntent = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(clickIntent)
+            getPendingIntent(1, flag)
+        }
+
+        return NotificationCompat.Builder(context, "post_notification_channel")
+            .setContentTitle("Post Created")
+            .setContentText("Your post was successfully shared with your followers!")
+            .setSmallIcon(R.drawable.ic_logo)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(clickPendingIntent)
+            .setAutoCancel(true)
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificationManager(
+        @ApplicationContext context: Context
+    ): NotificationManagerCompat {
+        val notificationManager = NotificationManagerCompat.from(context)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "post_notification_channel",
+                "Post Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            context.getSystemService(NotificationManager::class.java)
+                ?.createNotificationChannel(channel)
+        }
+        return notificationManager
     }
 }
