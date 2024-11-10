@@ -8,10 +8,12 @@ import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
+import com.example.connectify.core.domain.use_case.GetPostDownloadUrlUseCase
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
+import com.example.connectify.core.util.PostDownloader
 import com.example.connectify.core.util.PostLiker
 import com.example.connectify.core.util.PostSaver
 import com.example.connectify.core.util.Resource
@@ -35,6 +37,8 @@ class MainFeedViewModel @Inject constructor(
     private val postSaver: PostSaver,
     private val commentLiker: CommentLiker,
     private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
+    private val getPostDownloadUrlUseCase: GetPostDownloadUrlUseCase,
+    private val postDownloader: PostDownloader
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainFeedState())
@@ -148,16 +152,29 @@ class MainFeedViewModel @Inject constructor(
             is MainFeedEvent.SavePost -> {
                 toggleSavePost(parentId = event.postId)
             }
-            is MainFeedEvent.SelectPost -> {
+            is MainFeedEvent.SelectPostId -> {
                 _state.update {
                     it.copy(
                         selectedPostId = event.postId
                     )
                 }
             }
+            is MainFeedEvent.SelectPostUsername -> {
+                _state.update {
+                    it.copy(
+                        selectedPostUsername = event.postUsername,
+                        isOwnPost = event.isOwnPost
+                    )
+                }
+            }
             is MainFeedEvent.DeletePost -> {
                 _state.value.selectedPostId?.let { postId ->
                     deletePost(postId)
+                }
+            }
+            is MainFeedEvent.DownloadPost -> {
+                _state.value.selectedPostId?.let { postId ->
+                    getPostDownloadUrl(postId)
                 }
             }
             is MainFeedEvent.SelectComment -> {
@@ -207,6 +224,20 @@ class MainFeedViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = false
+                    )
+                }
+            }
+            is MainFeedEvent.ShowCommentBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        isCommentBottomSheetVisible = true
+                    )
+                }
+            }
+            is MainFeedEvent.DismissCommentBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        isCommentBottomSheetVisible = false
                     )
                 }
             }
@@ -293,6 +324,29 @@ class MainFeedViewModel @Inject constructor(
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getPostDownloadUrl(postId: String) {
+        viewModelScope.launch {
+            val result = getPostDownloadUrlUseCase(postId)
+            when(result) {
+                is Resource.Success -> {
+                    postDownloader.downloadFile(result.data.toString())
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_downloaded_post
                         ))
                     )
                 }

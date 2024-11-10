@@ -12,6 +12,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import com.example.connectify.R
 import com.example.connectify.core.presentation.MainActivity
+import com.example.connectify.core.util.DefaultPostDownloader
+import com.example.connectify.core.util.PostDownloader
 import com.example.connectify.feature_post.data.remote.PostApi
 import com.example.connectify.feature_post.data.repository.PostRepositoryImpl
 import com.example.connectify.feature_post.domain.repository.PostRepository
@@ -126,5 +128,13 @@ object PostModule {
                 ?.createNotificationChannel(channel)
         }
         return notificationManager
+    }
+
+    @Singleton
+    @Provides
+    fun providePostDownloader(
+        @ApplicationContext context: Context
+    ): PostDownloader {
+        return DefaultPostDownloader(context)
     }
 }

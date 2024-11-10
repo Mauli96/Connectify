@@ -8,9 +8,11 @@ import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
+import com.example.connectify.core.domain.use_case.GetPostDownloadUrlUseCase
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
+import com.example.connectify.core.util.PostDownloader
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
@@ -28,6 +30,8 @@ import javax.inject.Inject
 class PostDetailViewModel @Inject constructor(
     private val postUseCases: PostUseCases,
     private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
+    private val getPostDownloadUrlUseCase: GetPostDownloadUrlUseCase,
+    private val postDownloader: PostDownloader,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -129,6 +133,17 @@ class PostDetailViewModel @Inject constructor(
                     isSaved = isSaved
                 )
             }
+            is PostDetailEvent.SelectPostUsername -> {
+                _state.update {
+                    it.copy(
+                        selectedPostUsername = event.postUsername,
+                        isOwnPost = event.isOwnPost
+                    )
+                }
+            }
+            is PostDetailEvent.DownloadPost -> {
+                getPostDownloadUrl(savedStateHandle.get<String>("postId") ?: "")
+            }
             is PostDetailEvent.SelectComment -> {
                 _state.update {
                     it.copy(
@@ -144,6 +159,9 @@ class PostDetailViewModel @Inject constructor(
                 }
                 loadInitialComments()
             }
+            is PostDetailEvent.DeletePost -> {
+                deletePost(savedStateHandle.get<String>("postId") ?: "")
+            }
             is PostDetailEvent.DeleteComment -> {
                 _state.value.selectedCommentId?.let { commentId ->
                     deleteComment(commentId)
@@ -153,6 +171,20 @@ class PostDetailViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isDescriptionVisible = !state.value.isDescriptionVisible
+                    )
+                }
+            }
+            is PostDetailEvent.ShowBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = true
+                    )
+                }
+            }
+            is PostDetailEvent.DismissBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = false
                     )
                 }
             }
@@ -191,6 +223,56 @@ class PostDetailViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> {
                     _profilePictureState.value = result.data.toString()
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getPostDownloadUrl(postId: String) {
+        viewModelScope.launch {
+            val result = getPostDownloadUrlUseCase(postId)
+            when(result) {
+                is Resource.Success -> {
+                    postDownloader.downloadFile(result.data.toString())
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_downloaded_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deletePost(postId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deletePost(postId)
+            when(result) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            post = null
+                        )
+                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_post
+                        ))
+                    )
                 }
                 is Resource.Error -> {
                     _eventFlow.emit(

@@ -49,7 +49,7 @@ fun ChatItem(
     modifier: Modifier = Modifier,
     scope: CoroutineScope = rememberCoroutineScope(),
     onItemClick: (Chat) -> Unit,
-    onLongPress: (String) -> Unit = {}
+    onLongPress: () -> Unit = {}
 ) {
     Card(
         modifier = modifier,
@@ -71,7 +71,7 @@ fun ChatItem(
                         },
                         onLongPress = {
                             scope.launch {
-                                onLongPress(item.chatId)
+                                onLongPress()
                                 vibrate(context)
                             }
                         }

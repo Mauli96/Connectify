@@ -32,7 +32,8 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.SelectChat -> {
                 _state.update {
                     it.copy(
-                        selectedChat = event.chatId
+                        selectedChat = event.chatId,
+                        selectedChatName = event.chatName
                     )
                 }
             }

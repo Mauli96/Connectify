@@ -5,9 +5,12 @@ import com.example.connectify.feature_post.presentation.util.CommentFilter
 data class MainFeedState(
     val profilePicture: String? = null,
     val selectedPostId: String? = null,
+    val selectedPostUsername: String? = null,
+    val isOwnPost: Boolean? = false,
     val selectedCommentId: String? = null,
     val isUploading: Boolean = false,
     val isBottomSheetVisible: Boolean = false,
+    val isCommentBottomSheetVisible: Boolean = false,
     val isDropdownMenuVisible: Boolean = false,
     val isNavigatedToSearchScreen: Boolean = false,
     val isNavigatedToPersonListScreen: Boolean = false,

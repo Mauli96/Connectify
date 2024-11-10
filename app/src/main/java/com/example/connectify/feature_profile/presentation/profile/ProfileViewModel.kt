@@ -10,11 +10,13 @@ import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
+import com.example.connectify.core.domain.use_case.GetPostDownloadUrlUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.core.util.ParentType
+import com.example.connectify.core.util.PostDownloader
 import com.example.connectify.core.util.PostLiker
 import com.example.connectify.core.util.PostSaver
 import com.example.connectify.core.util.Resource
@@ -40,9 +42,11 @@ class ProfileViewModel @Inject constructor(
     private val commentLiker: CommentLiker,
     private val postUseCases: PostUseCases,
     private val getOwnUserId: GetOwnUserIdUseCase,
-    private val savedStateHandle: SavedStateHandle,
     private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
     private val toggleFollowStateForUserUseCase: ToggleFollowStateForUserUseCase,
+    private val getPostDownloadUrlUseCase: GetPostDownloadUrlUseCase,
+    private val postDownloader: PostDownloader,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -182,16 +186,29 @@ class ProfileViewModel @Inject constructor(
             is ProfileEvent.SavePost -> {
                 toggleSavePost(parentId = event.postId)
             }
-            is ProfileEvent.SelectPost -> {
+            is ProfileEvent.SelectPostId -> {
                 _state.update {
                     it.copy(
                         selectedPostId = event.postId
                     )
                 }
             }
+            is ProfileEvent.SelectPostUsername -> {
+                _state.update {
+                    it.copy(
+                        selectedPostUsername = event.postUsername,
+                        isOwnPost = event.isOwnPost
+                    )
+                }
+            }
             is ProfileEvent.DeletePost -> {
                 _state.value.selectedPostId?.let { postId ->
                     deletePost(postId)
+                }
+            }
+            is ProfileEvent.DownloadPost -> {
+                _state.value.selectedPostId?.let { postId ->
+                    getPostDownloadUrl(postId)
                 }
             }
             is ProfileEvent.SelectComment -> {
@@ -438,6 +455,29 @@ class ProfileViewModel @Inject constructor(
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getPostDownloadUrl(postId: String) {
+        viewModelScope.launch {
+            val result = getPostDownloadUrlUseCase(postId)
+            when(result) {
+                is Resource.Success -> {
+                    postDownloader.downloadFile(result.data.toString())
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_downloaded_post
                         ))
                     )
                 }

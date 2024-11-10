@@ -59,4 +59,6 @@ interface PostRepository {
     suspend fun savePost(postId: String): SimpleResource
 
     suspend fun removeSavedPost(postId: String): SimpleResource
+
+    suspend fun getPostDownloadUrl(postId: String): Resource<String>
 }

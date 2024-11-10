@@ -121,4 +121,6 @@
     <string name="feed_empty">No posts yet. Start following people or create your first post!</string>
     <string name="no_user_found">No user found with this username.</string>
     <string name="no_saved_post">You haven\'t saved any posts yet.</string>
+    <string name="successfully_downloaded_post">Successfully downloaded post!</string>
+    <string name="download">Download</string>
 </resources>

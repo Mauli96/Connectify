@@ -60,7 +60,7 @@ fun Post(
     onShareClick: () -> Unit = {},
     onSaveClick: () -> Unit = {},
     onUsernameClick: () -> Unit = {},
-    onMoreItemClick: (String) -> Unit = {},
+    onMoreItemClick: () -> Unit = {},
     isDescriptionVisible: Boolean,
     onDescriptionToggle: () -> Unit = {},
 ) {
@@ -130,9 +130,7 @@ fun Post(
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onTap = {
-                                    if(post.isOwnPost) {
-                                        onMoreItemClick(post.id)
-                                    }
+                                    onMoreItemClick()
                                 }
                             )
                         }

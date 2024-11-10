@@ -89,7 +89,7 @@ class PostRepositoryImpl(
         return try {
             val response = api.getPostDetails(postId = postId)
             if(response.successful) {
-                Resource.Success(response.data)
+                Resource.Success(data = response.data)
             } else {
                 response.message?.let { msg ->
                     Resource.Error(UiText.DynamicString(msg))
@@ -303,6 +303,27 @@ class PostRepositoryImpl(
         return try {
             api.removeSavedPost(postId)
             Resource.Success(Unit)
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun getPostDownloadUrl(postId: String): Resource<String> {
+        return try {
+            val response = api.getPostDownloadUrl(postId = postId)
+            if(response.successful) {
+                Resource.Success(data = response.data)
+            } else {
+                response.message?.let { msg ->
+                    Resource.Error(UiText.DynamicString(msg))
+                } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
+            }
         } catch(e: IOException) {
             Resource.Error(
                 uiText = UiText.StringResource(R.string.error_couldnt_reach_server)

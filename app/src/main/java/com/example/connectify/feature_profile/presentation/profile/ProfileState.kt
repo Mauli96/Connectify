@@ -7,6 +7,8 @@ data class ProfileState(
     val profile: Profile? = null,
     val profilePicture: String? = null,
     val selectedPostId: String? = null,
+    val selectedPostUsername: String? = null,
+    val isOwnPost: Boolean? = false,
     val selectedCommentId: String? = null,
     val isLoading: Boolean = false,
     val isUploading: Boolean = false,

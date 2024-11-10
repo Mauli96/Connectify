@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
@@ -39,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -243,14 +241,11 @@ fun ProfileScreen(
                 Post(
                     post = post,
                     imageLoader = imageLoader,
-                    onUsernameClick = {
-                        onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
-                    },
                     onLikeClick = {
                         viewmodel.onEvent(ProfileEvent.LikedPost(post.id))
                     },
                     onCommentClick = {
-                        viewmodel.onEvent(ProfileEvent.SelectPost(post.id))
+                        viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
                         viewmodel.onEvent(ProfileEvent.ShowBottomSheet)
                         viewmodel.onEvent(ProfileEvent.LoadComments)
                     },
@@ -264,7 +259,8 @@ fun ProfileScreen(
                         onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                     },
                     onMoreItemClick = {
-                        viewmodel.onEvent(ProfileEvent.SelectPost(post.id))
+                        viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
+                        viewmodel.onEvent(ProfileEvent.SelectPostUsername(post.username, post.isOwnPost))
                         viewmodel.onEvent(ProfileEvent.ShowDeleteSheet)
                     },
                     isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
@@ -383,9 +379,15 @@ fun ProfileScreen(
         )
         if(state.isDeleteSheetVisible) {
             StandardBottomSheet(
-                title = stringResource(id = R.string.delete_post),
+                title = state.selectedPostUsername.toString(),
                 bottomSheetState = bottomSheetState,
+                showDownloadOption = true,
+                showDeleteOption = state.isOwnPost == true,
                 onDismissRequest = {
+                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
+                },
+                onDownloadClick = {
+                    viewmodel.onEvent(ProfileEvent.DownloadPost)
                     viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
                 },
                 onDeleteClick = {

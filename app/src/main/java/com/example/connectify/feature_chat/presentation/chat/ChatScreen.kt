@@ -103,8 +103,8 @@ fun ChatScreen(
                         onItemClick = {
                             onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}?isOnline=${chat.online}?lastSeen=${chat.lastSeen}")
                         },
-                        onLongPress = { id ->
-                            viewModel.onEvent(ChatEvent.SelectChat(id))
+                        onLongPress = {
+                            viewModel.onEvent(ChatEvent.SelectChat(chat.chatId, chat.remoteUsername))
                             viewModel.onEvent(ChatEvent.ShowBottomSheet)
                         }
                     )
@@ -114,8 +114,9 @@ fun ChatScreen(
         }
         if(state.isBottomSheetVisible) {
             StandardBottomSheet(
-                title = stringResource(id = R.string.delete_chat),
+                title = state.selectedChatName.toString(),
                 bottomSheetState = bottomSheetState,
+                showDeleteOption = true,
                 onDismissRequest = {
                     viewModel.onEvent(ChatEvent.DismissBottomSheet)
                 },

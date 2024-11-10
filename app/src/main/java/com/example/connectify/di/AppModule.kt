@@ -8,6 +8,7 @@ import coil.decode.SvgDecoder
 import com.example.connectify.core.domain.repository.ProfileRepository
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
+import com.example.connectify.core.domain.use_case.GetPostDownloadUrlUseCase
 import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.DefaultCommentLiker
@@ -15,6 +16,7 @@ import com.example.connectify.core.util.DefaultPostLiker
 import com.example.connectify.core.util.DefaultPostSaver
 import com.example.connectify.core.util.PostLiker
 import com.example.connectify.core.util.PostSaver
+import com.example.connectify.feature_post.domain.repository.PostRepository
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -101,5 +103,11 @@ object AppModule {
     @Singleton
     fun provideGetOwnProfilePictureUseCase(profileRepository: ProfileRepository): GetOwnProfilePictureUseCase {
         return GetOwnProfilePictureUseCase(profileRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetPostDownloadUrlUseCase(postRepository: PostRepository): GetPostDownloadUrlUseCase {
+        return GetPostDownloadUrlUseCase(postRepository)
     }
 }

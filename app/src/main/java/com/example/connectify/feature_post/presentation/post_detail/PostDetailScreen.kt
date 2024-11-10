@@ -37,6 +37,7 @@ import com.example.connectify.core.presentation.components.CommentFilterDropdown
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.SendTextField
+import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -45,8 +46,10 @@ import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.presentation.util.showKeyboard
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
+import com.example.connectify.feature_post.presentation.main_feed.MainFeedEvent
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailScreen(
     scaffoldState: ScaffoldState,
@@ -61,6 +64,9 @@ fun PostDetailScreen(
     val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
     val commentState by viewModel.commentState.collectAsStateWithLifecycle()
     val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     val context = LocalContext.current
 
     val focusRequester = remember {
@@ -143,12 +149,38 @@ fun PostDetailScreen(
                                     onLikedByClick = {
                                         onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                                     },
+                                    onMoreItemClick = {
+                                        viewModel.onEvent(PostDetailEvent.SelectPostUsername(post.username, post.isOwnPost))
+                                        viewModel.onEvent(PostDetailEvent.ShowBottomSheet)
+                                    },
                                     isDescriptionVisible = state.isDescriptionVisible,
                                     onDescriptionToggle = {
                                         viewModel.onEvent(PostDetailEvent.OnDescriptionToggle)
                                     }
                                 )
                             }
+                        }
+                        if(state.isBottomSheetVisible) {
+                            StandardBottomSheet(
+                                title = state.selectedPostUsername.toString(),
+                                showDownloadOption = true,
+                                showDeleteOption = state.isOwnPost == true,
+                                bottomSheetState = bottomSheetState,
+                                onDismissRequest = {
+                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                },
+                                onDownloadClick = {
+                                    viewModel.onEvent(PostDetailEvent.DownloadPost)
+                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                },
+                                onDeleteClick = {
+                                    viewModel.onEvent(PostDetailEvent.DeletePost)
+                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                },
+                                onCancelClick = {
+                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                }
+                            )
                         }
                         if(state.isLoadingPost) {
                             CustomCircularProgressIndicator(

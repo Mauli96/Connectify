@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,8 +47,8 @@ import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.components.Comment
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
+import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
-import com.example.connectify.core.presentation.ui.theme.IconSizeLarge
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -57,6 +56,7 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
+import com.example.connectify.feature_profile.presentation.profile.ProfileEvent
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -191,8 +191,8 @@ fun MainFeedScreen(
                                 viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
                             },
                             onCommentClick = {
-                                viewModel.onEvent(MainFeedEvent.SelectPost(post.id))
-                                viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
+                                viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
+                                viewModel.onEvent(MainFeedEvent.ShowCommentBottomSheet)
                                 viewModel.onEvent(MainFeedEvent.LoadComments)
                             },
                             onShareClick = {
@@ -203,6 +203,11 @@ fun MainFeedScreen(
                             },
                             onLikedByClick = {
                                 onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                            },
+                            onMoreItemClick = {
+                                viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
+                                viewModel.onEvent(MainFeedEvent.SelectPostUsername(post.username, post.isOwnPost))
+                                viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
                             },
                             isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
                             onDescriptionToggle = {
@@ -227,6 +232,24 @@ fun MainFeedScreen(
                 commentTextFieldState = commentTextFieldState,
                 state = state
             )
+            if(state.isBottomSheetVisible) {
+                StandardBottomSheet(
+                    title = state.selectedPostUsername.toString(),
+                    showDownloadOption = true,
+                    showDeleteOption = state.isOwnPost == true,
+                    bottomSheetState = bottomSheetState,
+                    onDismissRequest = {
+                        viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                    },
+                    onDownloadClick = {
+                        viewModel.onEvent(MainFeedEvent.DownloadPost)
+                        viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                    },
+                    onCancelClick = {
+                        viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                    }
+                )
+            }
             PullRefreshIndicator(
                 refreshing = pagingPostState.isLoading,
                 state = pullRefreshState,
@@ -251,12 +274,12 @@ fun CommentSheetContent(
     commentTextFieldState: StandardTextFieldState,
     state: MainFeedState
 ) {
-    if(state.isBottomSheetVisible) {
+    if(state.isCommentBottomSheetVisible) {
         PaginatedBottomSheet(
             title = stringResource(R.string.comments),
             bottomSheetState = bottomSheetState,
             onDismissBottomSheet = {
-                viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                viewModel.onEvent(MainFeedEvent.DismissCommentBottomSheet)
             },
             items = pagingCommentState.items,
             isListLoading = pagingCommentState.isLoading,

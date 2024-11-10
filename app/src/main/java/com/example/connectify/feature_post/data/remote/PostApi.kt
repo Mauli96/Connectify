@@ -97,6 +97,11 @@ interface PostApi {
         @Query("postId") postId: String
     ): BasicApiResponse<Unit>
 
+    @GET("api/post/download")
+    suspend fun getPostDownloadUrl(
+        @Query("postId") postId: String
+    ): BasicApiResponse<String>
+
     companion object {
         const val BASE_URL = "http://192.168.0.209:8001/"
     }
