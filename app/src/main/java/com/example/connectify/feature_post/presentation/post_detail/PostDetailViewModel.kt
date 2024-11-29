@@ -1,0 +1,515 @@
+package com.example.connectify.feature_post.presentation.post_detail
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.connectify.R
+import com.example.connectify.core.domain.models.Comment
+import com.example.connectify.core.domain.states.PagingState
+import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
+import com.example.connectify.core.domain.use_case.GetPostDownloadUrlUseCase
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.DefaultPaginator
+import com.example.connectify.core.util.ParentType
+import com.example.connectify.core.util.PostDownloader
+import com.example.connectify.core.util.Resource
+import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_post.domain.use_case.PostUseCases
+import com.example.connectify.feature_post.presentation.util.CommentError
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class PostDetailViewModel @Inject constructor(
+    private val postUseCases: PostUseCases,
+    private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
+    private val getPostDownloadUrlUseCase: GetPostDownloadUrlUseCase,
+    private val postDownloader: PostDownloader,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(PostDetailState())
+    val state = _state.asStateFlow()
+
+    private val _pagingCommentState = MutableStateFlow<PagingState<Comment>>(PagingState())
+    val pagingCommentState = _pagingCommentState.asStateFlow()
+
+    private val _profilePictureState = MutableStateFlow("")
+    val profilePictureState = _profilePictureState.asStateFlow()
+
+    private val _commentTextFieldState = MutableStateFlow(StandardTextFieldState(error = CommentError.FieldEmpty))
+    val commentTextFieldState = _commentTextFieldState.asStateFlow()
+
+    private val _commentState = MutableStateFlow(CommentState())
+    val commentState = _commentState.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    private val commentPaginator = DefaultPaginator(
+        onLoadUpdated = { isLoading ->
+            _pagingCommentState.update {
+                it.copy(
+                    isLoading = isLoading
+                )
+            }
+        },
+        onRequest = { page ->
+            val filterType = commentState.value.commentFilter
+            savedStateHandle.get<String>("postId")?.let { postId ->
+                postUseCases.getCommentsForPost(
+                    postId = postId,
+                    filterType = filterType,
+                    page = page
+                )
+            } ?: Resource.Error(UiText.unknownError())
+        },
+        onSuccess = { comments, firstPage ->
+            _pagingCommentState.update {
+                it.copy(
+                    items = if(firstPage) comments else pagingCommentState.value.items + comments,
+                    endReached = comments.isEmpty()
+                )
+            }
+        },
+        onError = { uiText ->
+            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+        }
+    )
+
+    init {
+        savedStateHandle.get<String>("postId")?.let { postId ->
+            loadPostDetails(postId)
+            loadInitialComments()
+            getOwnProfilePicture()
+        }
+    }
+
+    fun onEvent(event: PostDetailEvent) {
+        when(event) {
+            is PostDetailEvent.LikePost -> {
+                val isLiked = state.value.post?.isLiked == true
+                toggleLikeForParent(
+                    parentId = state.value.post?.id ?: return,
+                    parentType = ParentType.Post.type,
+                    isLiked = isLiked
+                )
+            }
+            is PostDetailEvent.Comment -> {
+                createComment(
+                    postId = savedStateHandle.get<String>("postId") ?: "",
+                    comment = commentTextFieldState.value.text
+                )
+            }
+            is PostDetailEvent.LikeComment -> {
+                val isLiked = pagingCommentState.value.items.find {
+                    it.id == event.commentId
+                }?.isLiked == true
+                toggleLikeForParent(
+                    parentId = event.commentId,
+                    parentType = ParentType.Comment.type,
+                    isLiked = isLiked
+                )
+            }
+            is PostDetailEvent.EnteredComment -> {
+                _commentTextFieldState.update {
+                    it.copy(
+                        text = event.comment,
+                        error = if(event.comment.isBlank()) CommentError.FieldEmpty else null
+                    )
+                }
+            }
+            is PostDetailEvent.SavePost -> {
+                val isSaved = state.value.post?.isSaved == true
+                toggleSavePost(
+                    parentId = event.postId,
+                    isSaved = isSaved
+                )
+            }
+            is PostDetailEvent.SelectPostUsername -> {
+                _state.update {
+                    it.copy(
+                        selectedPostUsername = event.postUsername,
+                        isOwnPost = event.isOwnPost
+                    )
+                }
+            }
+            is PostDetailEvent.DownloadPost -> {
+                getPostDownloadUrl(savedStateHandle.get<String>("postId") ?: "")
+            }
+            is PostDetailEvent.SelectComment -> {
+                _state.update {
+                    it.copy(
+                        selectedCommentId = event.commentId
+                    )
+                }
+            }
+            is PostDetailEvent.ChangeCommentFilter -> {
+                _commentState.update {
+                    it.copy(
+                        commentFilter = event.filterType
+                    )
+                }
+                loadInitialComments()
+            }
+            is PostDetailEvent.DeletePost -> {
+                deletePost(savedStateHandle.get<String>("postId") ?: "")
+            }
+            is PostDetailEvent.DeleteComment -> {
+                _state.value.selectedCommentId?.let { commentId ->
+                    deleteComment(commentId)
+                }
+            }
+            is PostDetailEvent.OnDescriptionToggle -> {
+                _state.update {
+                    it.copy(
+                        isDescriptionVisible = !state.value.isDescriptionVisible
+                    )
+                }
+            }
+            is PostDetailEvent.ShowBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = true
+                    )
+                }
+            }
+            is PostDetailEvent.DismissBottomSheet -> {
+                _state.update {
+                    it.copy(
+                        isBottomSheetVisible = false
+                    )
+                }
+            }
+            is PostDetailEvent.ShowDropDownMenu -> {
+                _state.update {
+                    it.copy(
+                        isDropdownExpanded = true
+                    )
+                }
+            }
+            is PostDetailEvent.DismissDropDownMenu -> {
+                _state.update {
+                    it.copy(
+                        isDropdownExpanded = false
+                    )
+                }
+            }
+        }
+    }
+
+    private fun loadInitialComments() {
+        viewModelScope.launch {
+            commentPaginator.loadFirstItems()
+        }
+    }
+
+    fun loadNextComments() {
+        viewModelScope.launch {
+            commentPaginator.loadNextItems()
+        }
+    }
+
+    private fun getOwnProfilePicture() {
+        viewModelScope.launch {
+            val result = getOwnProfilePictureUseCase()
+            when(result) {
+                is Resource.Success -> {
+                    _profilePictureState.value = result.data.toString()
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getPostDownloadUrl(postId: String) {
+        viewModelScope.launch {
+            val result = getPostDownloadUrlUseCase(postId)
+            when(result) {
+                is Resource.Success -> {
+                    postDownloader.downloadFile(result.data.toString())
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_downloaded_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deletePost(postId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deletePost(postId)
+            when(result) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            post = null
+                        )
+                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_post
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun deleteComment(commentId: String) {
+        viewModelScope.launch {
+            val result = postUseCases.deleteComment(commentId)
+            when(result) {
+                is Resource.Success -> {
+                    _pagingCommentState.update {
+                        it.copy(
+                            items = pagingCommentState.value.items.filter { comment ->
+                                comment.id != commentId
+                            }
+                        )
+                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(UiText.StringResource(
+                            R.string.successfully_deleted_comment
+                        ))
+                    )
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleSavePost(
+        parentId: String,
+        isSaved: Boolean
+    ) {
+        viewModelScope.launch {
+            _state.update { 
+                it.copy(
+                    post = state.value.post?.copy(
+                        isSaved = !isSaved
+                    )
+                )
+            }
+            val result = postUseCases.toggleSavePost(
+                postId = parentId,
+                isSaved = isSaved
+            )
+            when(result) {
+                is Resource.Success -> {
+                    if(isSaved) {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                            uiText = UiText.StringResource(R.string.successfully_unsaved_post)
+                        ))
+                    } else {
+                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                            uiText = UiText.StringResource(R.string.successfully_saved_post)
+                        ))
+                    }
+                }
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            post = state.value.post?.copy(
+                                isSaved = !isSaved
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun toggleLikeForParent(
+        parentId: String,
+        parentType: Int,
+        isLiked: Boolean
+    ) {
+        viewModelScope.launch {
+            val currentLikeCount = state.value.post?.likeCount ?: 0
+            when(parentType) {
+                ParentType.Post.type -> {
+                    val post = state.value.post
+                    _state.update {
+                        it.copy(
+                            post = state.value.post?.copy(
+                                isLiked = !isLiked,
+                                likeCount = if(isLiked) {
+                                    post?.likeCount?.minus(1) ?: 0
+                                } else post?.likeCount?.plus(1) ?: 0
+                            )
+                        )
+                    }
+                }
+                ParentType.Comment.type -> {
+                    _pagingCommentState.update {
+                        it.copy(
+                            items = pagingCommentState.value.items.map { comment ->
+                                if(comment.id == parentId) {
+                                    comment.copy(
+                                        isLiked = !isLiked,
+                                        likeCount = if(isLiked) {
+                                            comment.likeCount - 1
+                                        } else comment.likeCount + 1
+                                    )
+                                } else comment
+                            }
+                        )
+                    }
+                }
+            }
+            val result = postUseCases.toggleLikeForParent(
+                parentId = parentId,
+                parentType = parentType,
+                isLiked = isLiked
+            )
+            when(result) {
+                is Resource.Success -> Unit
+                is Resource.Error -> {
+                    when(parentType) {
+                        ParentType.Post.type -> {
+                            _state.update {
+                                it.copy(
+                                    post = state.value.post?.copy(
+                                        isLiked = isLiked,
+                                        likeCount = currentLikeCount
+                                    )
+                                )
+                            }
+                        }
+                        ParentType.Comment.type -> {
+                            _pagingCommentState.update {
+                                it.copy(
+                                    items = pagingCommentState.value.items.map { comment ->
+                                        if(comment.id == parentId) {
+                                            comment.copy(
+                                                isLiked = isLiked,
+                                                likeCount = if(comment.isLiked) {
+                                                    comment.likeCount - 1
+                                                } else comment.likeCount + 1
+                                            )
+                                        } else comment
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createComment(
+        postId: String,
+        comment: String
+    ) {
+        viewModelScope.launch {
+            _commentState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+            val result = postUseCases.createComment(
+                postId = postId,
+                comment = comment
+            )
+            when(result) {
+                is Resource.Success -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                        uiText = UiText.StringResource(R.string.comment_posted)
+                    ))
+                    _commentState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    _commentTextFieldState.update {
+                        it.copy(
+                            text = "",
+                            error = CommentError.FieldEmpty
+                        )
+                    }
+                    loadInitialComments()
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                        uiText = result.uiText ?: UiText.unknownError()
+                    ))
+                    _commentState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadPostDetails(postId: String) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoadingPost = true
+                )
+            }
+            val result = postUseCases.getPostDetails(postId)
+            when(result) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            post = result.data,
+                            isLoadingPost = false
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoadingPost = false
+                        )
+                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                }
+            }
+        }
+    }
+}

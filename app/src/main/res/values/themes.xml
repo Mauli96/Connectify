@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Connectify" parent="android:Theme.Material.Light.NoActionBar" >
+        <item name="android:statusBarColor" tools:targetApi="l">@color/dark_gray</item>
+    </style>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/dark_gray</item>
+        <item name="postSplashScreenTheme">@style/Theme.Connectify</item>
+    </style>
+
+</resources>
