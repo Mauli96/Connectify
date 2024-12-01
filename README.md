@@ -54,32 +54,32 @@ Connectify is a social media application inspired by Instagram, designed to let 
 ## Screenshots
 <table>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/98de3208-7bcc-41ba-8afe-3dd5278cfac3" alt="Register Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/b0063fb8-efee-4097-817b-bd6db3a22d42" alt="Login Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/cf62b3f2-13ca-42ca-9a9f-1a9dc488956e" alt="Main Feed Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Register_Screen.png" alt="Register Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Login_Screen.png" alt="Login Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Main_Feed_Screen.png" alt="Main Feed Screen" width="400"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/17d5dace-234e-4432-b916-1e5d27bda7bd" alt="Search Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/388dfc5d-2a05-417d-bc7c-2c446a56cce3" alt="Chat Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/72650b13-ea65-4366-80bd-eaff41d11672" alt="Message Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Search_Screen.png" alt="Search Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Chat_Screen.png" alt="Chat Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Message_Screen.png" alt="Message Screen" width="400"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/7a87392c-1343-4e48-bbc7-9dd3820c8218" alt="Create Post Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Create_Post_Screen.png" alt="Create Post Screen" width="400"/></td>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Activity_Screen.png" alt="Activity Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/087a3446-1f1b-493d-bfe6-cd145b525bb5" alt="Liked By Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Liked_By_Screen.png" alt="Liked By Screen" width="400"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/074bbefc-47db-4722-ae2f-4f228e7fa1c1" alt="Own Profile Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/e817fb3a-2226-4158-ab1e-074267f7e7df" alt="User Profile Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/c09373fa-e8db-4499-8ebb-74199a08b31a" alt="Followers Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Own_Profile_Screen.png" alt="Own Profile Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/User_Profile_Screen.png" alt="User Profile Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Follwers_Screen.png" alt="Followers Screen" width="400"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/685347b5-6130-4617-88fa-2a7806385531" alt="Post Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/790f8279-6cd7-4f08-af20-3b27ecb1b701" alt="Saved Post Screen" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/01c90e26-aeaf-4094-b686-3e6da2af737d" alt="Following Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Post_Screen.png" alt="Post Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Saved_Post_Screen.png" alt="Saved Post Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Following_Screen.png" alt="Following Screen" width="400"/></td>
   </tr>
   <tr>
-    <td colspan="3"><img src="https://github.com/user-attachments/assets/623b3a0b-21b1-46b8-8934-46d159eac81d" alt="Edit Profile Screen" width="400"/></td>
+    <td colspan="3"><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Edit_Profile_Screen.png" alt="Edit Profile Screen" width="400"/></td>
   </tr>
 </table>
 
