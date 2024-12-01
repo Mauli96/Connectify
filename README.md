@@ -56,7 +56,7 @@ Connectify is a social media application inspired by Instagram, designed to let 
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Register_Screen.png" alt="Register Screen" width="400"/></td>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Login_Screen.png" alt="Login Screen" width="400"/></td>
-    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Main_Feed_Screen.png" alt="Main Feed Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/MainFeed_Screen.png" alt="Main Feed Screen" width="400"/></td>
   </tr>
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Search_Screen.png" alt="Search Screen" width="400"/></td>
@@ -66,12 +66,12 @@ Connectify is a social media application inspired by Instagram, designed to let 
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Create_Post_Screen.png" alt="Create Post Screen" width="400"/></td>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Activity_Screen.png" alt="Activity Screen" width="400"/></td>
-    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Liked_By_Screen.png" alt="Liked By Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/LikedBy_Screen.png" alt="Liked By Screen" width="400"/></td>
   </tr>
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Own_Profile_Screen.png" alt="Own Profile Screen" width="400"/></td>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/User_Profile_Screen.png" alt="User Profile Screen" width="400"/></td>
-    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Follwers_Screen.png" alt="Followers Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Followers_Screen.png" alt="Followers Screen" width="400"/></td>
   </tr>
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Post_Screen.png" alt="Post Screen" width="400"/></td>
