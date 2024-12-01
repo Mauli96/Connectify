@@ -66,7 +66,7 @@ Connectify is a social media application inspired by Instagram, designed to let 
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Create_Post_Screen.png" alt="Create Post Screen" width="400"/></td>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Activity_Screen.png" alt="Activity Screen" width="400"/></td>
-    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/LikedBy_Screen.png" alt="Liked By Screen" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/LikeBy_Screen.png" alt="Liked By Screen" width="400"/></td>
   </tr>
   <tr>
     <td><img src="https://raw.githubusercontent.com/Mauli96/Connectify/refs/heads/main/app/src/main/java/com/example/connectify/assets/screenshots/Own_Profile_Screen.png" alt="Own Profile Screen" width="400"/></td>
