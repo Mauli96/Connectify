@@ -66,12 +66,11 @@ fun SearchScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val searchFieldState by viewModel.searchFieldState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     val focusRequester = remember {
         FocusRequester()
     }
-
-    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->

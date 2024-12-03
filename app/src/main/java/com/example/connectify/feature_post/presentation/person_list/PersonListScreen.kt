@@ -59,6 +59,7 @@ fun PersonListScreen(
             }
         }
     }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

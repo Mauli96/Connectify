@@ -16,10 +16,13 @@ import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,16 +41,28 @@ class MessageViewModel @Inject constructor(
     val messageTextFieldState = _messageTextFieldState.asStateFlow()
 
     private val _profilePictureState = MutableStateFlow("")
-    val profilePictureState = _profilePictureState.asStateFlow()
+    val profilePictureState = _profilePictureState
+        .onStart { getOwnProfilePicture() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, "")
 
     private val _pagingState = MutableStateFlow<PagingState<Message>>(PagingState())
-    val pagingState = _pagingState.asStateFlow()
+    val pagingState = _pagingState
+        .onStart {
+            loadInitialMessages()
+            observeChatEvents()
+            observeChatMessages()
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
     private val _messageUpdatedEvent = MutableSharedFlow<MessageUpdateEvent>(replay = 1)
     val messageReceived = _messageUpdatedEvent.asSharedFlow()
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    init {
+        chatUseCases.initializeRepository()
+    }
 
     private val paginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
@@ -80,12 +95,48 @@ class MessageViewModel @Inject constructor(
         }
     )
 
-    init {
-        chatUseCases.initializeRepository()
-        loadInitialMessages()
-        observeChatEvents()
-        observeChatMessages()
-        getOwnProfilePicture()
+    fun onEvent(event: MessageEvent) {
+        when(event) {
+            is MessageEvent.EnteredMessage -> {
+                _messageTextFieldState.update {
+                    it.copy(text = event.message)
+                }
+                _state.update {
+                    it.copy(
+                        canSendMessage = event.message.isNotBlank()
+                    )
+                }
+            }
+            is MessageEvent.SendMessage -> {
+                sendMessage()
+            }
+            is MessageEvent.SelectMessage -> {
+                _state.update {
+                    it.copy(
+                        selectedMessageId = event.messageId
+                    )
+                }
+            }
+            is MessageEvent.DeleteMessage -> {
+                _state.value.selectedMessageId?.let { messageId ->
+                    deleteMessage(messageId)
+                }
+            }
+            is MessageEvent.ShowDialog -> {
+                _state.update {
+                    it.copy(
+                        isDialogVisible = true
+                    )
+                }
+            }
+            is MessageEvent.DismissDialog -> {
+                _state.update {
+                    it.copy(
+                        isDialogVisible = false
+                    )
+                }
+            }
+        }
     }
 
     private fun observeChatMessages() {
@@ -147,50 +198,6 @@ class MessageViewModel @Inject constructor(
             it.copy(
                 canSendMessage = false
             )
-        }
-    }
-
-    fun onEvent(event: MessageEvent) {
-        when(event) {
-            is MessageEvent.EnteredMessage -> {
-                _messageTextFieldState.update {
-                    it.copy(text = event.message)
-                }
-                _state.update {
-                    it.copy(
-                        canSendMessage = event.message.isNotBlank()
-                    )
-                }
-            }
-            is MessageEvent.SendMessage -> {
-                sendMessage()
-            }
-            is MessageEvent.SelectMessage -> {
-                _state.update {
-                    it.copy(
-                        selectedMessageId = event.messageId
-                    )
-                }
-            }
-            is MessageEvent.DeleteMessage -> {
-                _state.value.selectedMessageId?.let { messageId ->
-                    deleteMessage(messageId)
-                }
-            }
-            is MessageEvent.ShowDialog -> {
-                _state.update {
-                    it.copy(
-                        isDialogVisible = true
-                    )
-                }
-            }
-            is MessageEvent.DismissDialog -> {
-                _state.update {
-                    it.copy(
-                        isDialogVisible = false
-                    )
-                }
-            }
         }
     }
 

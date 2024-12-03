@@ -72,10 +72,11 @@ fun MainFeedScreen(
     val pagingPostState by viewModel.pagingPostState.collectAsStateWithLifecycle()
     val pagingCommentState by viewModel.pagingCommentState.collectAsStateWithLifecycle()
     val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    val context = LocalContext.current
 
     val focusRequester = remember {
         FocusRequester()

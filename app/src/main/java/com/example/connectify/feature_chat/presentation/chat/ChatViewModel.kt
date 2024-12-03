@@ -10,8 +10,11 @@ import com.example.connectify.feature_chat.domain.use_case.ChatUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +25,9 @@ class ChatViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
-    val state = _state.asStateFlow()
+    val state = _state
+        .onStart { loadChats() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, ChatState())
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -59,11 +64,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    init {
-        loadChats()
-    }
-
-    fun loadChats() {
+    private fun loadChats() {
         viewModelScope.launch {
             _state.update {
                 it.copy(

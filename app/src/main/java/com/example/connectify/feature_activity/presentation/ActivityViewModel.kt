@@ -2,7 +2,6 @@ package com.example.connectify.feature_activity.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
@@ -11,8 +10,10 @@ import com.example.connectify.feature_activity.domain.use_case.GetActivitiesUseC
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +24,9 @@ class ActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _pagingState = MutableStateFlow<PagingState<Activity>>(PagingState())
-    val pagingState = _pagingState.asStateFlow()
+    val pagingState = _pagingState
+        .onStart { loadInitialActivities() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -51,11 +54,6 @@ class ActivityViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
         }
     )
-
-    init {
-        loadInitialActivities()
-    }
-
 
     fun loadNextActivities() {
         viewModelScope.launch {

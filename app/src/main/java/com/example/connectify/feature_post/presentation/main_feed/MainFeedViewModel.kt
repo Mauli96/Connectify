@@ -24,8 +24,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,7 +48,9 @@ class MainFeedViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private val _pagingPostState = MutableStateFlow<PagingState<Post>>(PagingState())
-    val pagingPostState = _pagingPostState.asStateFlow()
+    val pagingPostState = _pagingPostState
+        .onStart { loadInitialPosts() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
     private val _pagingCommentState = MutableStateFlow<PagingState<Comment>>(PagingState())
     val pagingCommentState = _pagingCommentState.asStateFlow()
@@ -110,10 +115,6 @@ class MainFeedViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
         }
     )
-
-    init {
-        loadInitialPosts()
-    }
 
     fun onEvent(event: MainFeedEvent) {
         when(event) {

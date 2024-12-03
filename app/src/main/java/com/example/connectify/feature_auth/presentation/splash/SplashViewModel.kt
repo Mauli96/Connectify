@@ -9,9 +9,12 @@ import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,33 +27,31 @@ class SplashViewModel @Inject constructor(
     val keepSplashScreenOn = _keepSplashScreenOn.asStateFlow()
 
     private val _isUserAuthenticated = MutableStateFlow<Boolean?>(null)
-    val isUserAuthenticated = _isUserAuthenticated.asStateFlow()
+    val isUserAuthenticated = _isUserAuthenticated
+        .onStart { authenticateUser() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    init {
+    private fun authenticateUser() {
         viewModelScope.launch {
-            authenticateUser()
-        }
-    }
-
-    private suspend fun authenticateUser() {
-        val result = authenticateUseCase()
-        when(result) {
-            is Resource.Success -> {
-                _isUserAuthenticated.value = true
-                _eventFlow.emit(
-                    UiEvent.Navigate(Screen.MainFeedScreen.route)
-                )
+            val result = authenticateUseCase()
+            when(result) {
+                is Resource.Success -> {
+                    _isUserAuthenticated.value = true
+                    _eventFlow.emit(
+                        UiEvent.Navigate(Screen.MainFeedScreen.route)
+                    )
+                }
+                is Resource.Error -> {
+                    _isUserAuthenticated.value = false
+                    _eventFlow.emit(
+                        UiEvent.Navigate(Screen.LoginScreen.route)
+                    )
+                }
             }
-            is Resource.Error -> {
-                _isUserAuthenticated.value = false
-                _eventFlow.emit(
-                    UiEvent.Navigate(Screen.LoginScreen.route)
-                )
-            }
+            _keepSplashScreenOn.value = false
         }
-        _keepSplashScreenOn.value = false
     }
 }

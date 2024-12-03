@@ -20,8 +20,11 @@ import com.example.connectify.feature_post.presentation.util.CommentError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,10 +42,14 @@ class PostDetailViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private val _pagingCommentState = MutableStateFlow<PagingState<Comment>>(PagingState())
-    val pagingCommentState = _pagingCommentState.asStateFlow()
+    val pagingCommentState = _pagingCommentState
+        .onStart { loadInitialComments() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
     private val _profilePictureState = MutableStateFlow("")
-    val profilePictureState = _profilePictureState.asStateFlow()
+    val profilePictureState = _profilePictureState
+        .onStart { getOwnProfilePicture() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, "")
 
     private val _commentTextFieldState = MutableStateFlow(StandardTextFieldState(error = CommentError.FieldEmpty))
     val commentTextFieldState = _commentTextFieldState.asStateFlow()
@@ -52,6 +59,12 @@ class PostDetailViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    init {
+        savedStateHandle.get<String>("postId")?.let { postId ->
+            loadPostDetails(postId)
+        }
+    }
 
     private val commentPaginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
@@ -83,14 +96,6 @@ class PostDetailViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
         }
     )
-
-    init {
-        savedStateHandle.get<String>("postId")?.let { postId ->
-            loadPostDetails(postId)
-            loadInitialComments()
-            getOwnProfilePicture()
-        }
-    }
 
     fun onEvent(event: PostDetailEvent) {
         when(event) {

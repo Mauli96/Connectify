@@ -55,7 +55,6 @@ fun SavedPostScreen(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
-        viewModel.loadInitialPosts()
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {

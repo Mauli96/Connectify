@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +31,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -71,15 +69,13 @@ fun EditProfileScreen(
     profilePictureSize: Dp = ProfilePictureSizeLarge
 ) {
 
-    val profileState by viewModel.profileState.collectAsStateWithLifecycle()
+    val editProfileState by viewModel.editProfileState.collectAsStateWithLifecycle()
     val usernameState by viewModel.usernameState.collectAsStateWithLifecycle()
     val githubTextFieldState by viewModel.githubTextFieldState.collectAsStateWithLifecycle()
     val instagramTextFieldState by viewModel.instagramTextFieldState.collectAsStateWithLifecycle()
     val linkedInTextFieldState by viewModel.linkedInTextFieldState.collectAsStateWithLifecycle()
     val bioState by viewModel.bioState.collectAsStateWithLifecycle()
     val skills by viewModel.skills.collectAsStateWithLifecycle()
-    val bannerUri by viewModel.bannerUri.collectAsStateWithLifecycle()
-    val profileUri by viewModel.profileUri.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val cropBannerImageLauncher = rememberLauncherForActivityResult(
@@ -160,11 +156,11 @@ fun EditProfileScreen(
             ) {
                 BannerEditSection(
                     bannerImage = rememberAsyncImagePainter(
-                        model = bannerUri ?: profileState.profile?.bannerUrl,
+                        model = editProfileState.bannerUri ?: editProfileState.profile?.bannerUrl,
                         imageLoader = imageLoader
                     ),
                     profileImage = rememberAsyncImagePainter(
-                        model = profileUri ?: profileState.profile?.profilePictureUrl,
+                        model = editProfileState.profileUri ?: editProfileState.profile?.profilePictureUrl,
                         imageLoader = imageLoader
                     ),
                     profilePictureSize = profilePictureSize,
@@ -318,7 +314,7 @@ fun EditProfileScreen(
 
             }
         }
-        if(profileState.isLoading) {
+        if(editProfileState.isLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)
             )

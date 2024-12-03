@@ -28,8 +28,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,7 +56,9 @@ class ProfileViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private val _pagingPostState = MutableStateFlow<PagingState<Post>>(PagingState())
-    val pagingPostState = _pagingPostState.asStateFlow()
+    val pagingPostState = _pagingPostState
+        .onStart { loadInitialPosts() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
     private val _pagingCommentState = MutableStateFlow<PagingState<Comment>>(PagingState())
     val pagingCommentState = _pagingCommentState.asStateFlow()
@@ -66,6 +71,11 @@ class ProfileViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    init {
+        val userId = savedStateHandle.get<String>("userId") ?: getOwnUserId()
+        getProfile(userId)
+    }
 
     private val postPaginator = DefaultPaginator(
         onLoadUpdated = { isLoading ->
@@ -125,10 +135,6 @@ class ProfileViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
         }
     )
-
-    init {
-        loadInitialPosts()
-    }
 
     fun setExpandedRatio(ratio: Float) {
         _toolbarState.update {
@@ -404,14 +410,14 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun getProfile(userId: String?) {
+    private fun getProfile(userId: String) {
         viewModelScope.launch {
             _state.update {
                 it.copy(
                     isLoading = true
                 )
             }
-            val result = profileUseCases.getProfile(userId = userId ?: getOwnUserId())
+            val result = profileUseCases.getProfile(userId = userId)
             when(result) {
                 is Resource.Success -> {
                     _state.update {

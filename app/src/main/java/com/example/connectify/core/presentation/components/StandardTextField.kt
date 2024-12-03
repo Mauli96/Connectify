@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +23,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -142,16 +140,17 @@ fun StandardTextField(
                                         testTag = TestTags.PASSWORD_TOGGLE
                                     }) {
                                 Icon(
-                                    imageVector = if(showPasswordToggle) {
-                                        Icons.Filled.VisibilityOff
+                                    painter = if(showPasswordToggle) {
+                                        painterResource(R.drawable.visibilityoff_icon)
                                     } else {
-                                        Icons.Filled.Visibility
+                                        painterResource(R.drawable.visibility_icon)
                                     },
                                     contentDescription = if(showPasswordToggle) {
                                         stringResource(id = R.string.password_visible_content_description)
                                     } else {
                                         stringResource(id = R.string.password_hidden_content_description)
                                     },
+                                    modifier = Modifier.size(IconSizeSmall),
                                     tint = MaterialTheme.colorScheme.onPrimary,
                                 )
                             }

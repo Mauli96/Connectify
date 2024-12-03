@@ -50,10 +50,9 @@ fun ChatScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val bottomSheetState = rememberModalBottomSheetState()
-
     val context = LocalContext.current
+
     LaunchedEffect(key1 = true) {
-        viewModel.loadChats()
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
