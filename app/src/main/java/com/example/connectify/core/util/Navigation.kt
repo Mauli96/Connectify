@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ScaffoldState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -34,7 +34,7 @@ import com.example.connectify.feature_profile.presentation.search.SearchScreen
 @Composable
 fun Navigation(
     navController: NavHostController,
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     imageLoader: ImageLoader,
     isUserAuthenticated: Boolean?
 ) {
@@ -91,7 +91,7 @@ fun Navigation(
                                 launchSingleTop = true
                             }
                         },
-                        scaffoldState = scaffoldState
+                        snackbarHostState = snackbarHostState
                     )
                 }
                 composable(
@@ -123,7 +123,7 @@ fun Navigation(
                 ) {
                     RegisterScreen(
                         onNavigate = navController::navigate,
-                        scaffoldState = scaffoldState
+                        snackbarHostState = snackbarHostState
                     )
                 }
             }
@@ -153,7 +153,7 @@ fun Navigation(
                 MainFeedScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -161,7 +161,7 @@ fun Navigation(
                 ChatScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -213,7 +213,7 @@ fun Navigation(
                     remoteUsername = remoteUsername,
                     isOnline = isOnline,
                     lastSeen = lastSeen,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     encodedRemoteUserProfilePictureUrl = remoteUserProfilePictureUrl,
                     onNavigateUp = navController::navigateUp,
                     onNavigate = navController::navigate,
@@ -230,7 +230,7 @@ fun Navigation(
                 }
             ) {
                 ActivityScreen(
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader,
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
@@ -263,7 +263,7 @@ fun Navigation(
                             launchSingleTop = true
                         }
                     },
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -285,7 +285,7 @@ fun Navigation(
                 CreatePostScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -332,7 +332,7 @@ fun Navigation(
                 PostDetailScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -359,7 +359,7 @@ fun Navigation(
                 EditProfileScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -393,7 +393,7 @@ fun Navigation(
                 SearchScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -432,7 +432,7 @@ fun Navigation(
                 PersonListScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -471,7 +471,7 @@ fun Navigation(
                 FollowingScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -510,7 +510,7 @@ fun Navigation(
                 FollowerScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
             }
@@ -545,7 +545,7 @@ fun Navigation(
                     imageLoader = imageLoader,
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
-                    scaffoldState = scaffoldState,
+                    snackbarHostState = snackbarHostState,
                 )
             }
         }

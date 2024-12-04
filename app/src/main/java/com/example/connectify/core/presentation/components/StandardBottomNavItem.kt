@@ -3,10 +3,18 @@ package com.example.connectify.core.presentation.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.HintGray
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 
 @Composable
-@Throws(IllegalArgumentException::class)
 fun RowScope.StandardBottomNavItem(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
@@ -36,6 +44,7 @@ fun RowScope.StandardBottomNavItem(
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
+
     if(alertCount != null && alertCount < 0) {
         throw IllegalArgumentException("Alert count can't be negative")
     }
@@ -46,22 +55,33 @@ fun RowScope.StandardBottomNavItem(
         ), label = ""
     )
 
-    BottomNavigationItem(
+    NavigationBarItem(
         selected = selected,
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        selectedContentColor = selectedColor,
-        unselectedContentColor = unselectedColor,
+        colors = NavigationBarItemColors(
+            selectedIconColor = Color.Transparent,
+            selectedTextColor = Color.Transparent,
+            selectedIndicatorColor = Color.Transparent,
+            unselectedIconColor = Color.Transparent,
+            unselectedTextColor = Color.Transparent,
+            disabledIconColor = Color.Transparent,
+            disabledTextColor = Color.Transparent
+        ),
         icon = {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(SpaceSmall)
+                    .padding(
+                        start = SpaceSmall,
+                        end = SpaceSmall,
+                        bottom = SpaceMedium
+                    )
                     .drawBehind {
-                        if(lineLength.value > 0f) {
+                        if (lineLength.value > 0f) {
                             drawLine(
-                                color = if(selected) selectedColor
+                                color = if (selected) selectedColor
                                 else unselectedColor,
                                 start = Offset(
                                     size.width / 2f - lineLength.value * 15.dp.toPx(),
@@ -75,8 +95,6 @@ fun RowScope.StandardBottomNavItem(
                                 cap = StrokeCap.Round
                             )
                         }
-
-
                     }
             ) {
                 if(icon != null) {
@@ -85,7 +103,9 @@ fun RowScope.StandardBottomNavItem(
                         contentDescription = contentDescription,
                         modifier = Modifier
                             .size(22.dp)
-                            .align(Alignment.Center)
+                            .align(Alignment.Center),
+                        tint = if(selected) selectedColor
+                        else unselectedColor
                     )
                 }
                 if(alertCount != null) {

@@ -20,10 +20,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -59,6 +59,8 @@ import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.components.Comment
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
@@ -72,8 +74,6 @@ import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.openUrlInBrowser
 import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
-import com.example.connectify.core.presentation.components.Comment
-import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
 import kotlinx.coroutines.flow.collectLatest
@@ -81,7 +81,7 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
@@ -155,7 +155,7 @@ fun ProfileScreen(
         viewmodel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
+                    snackbarHostState.showSnackbar(
                         message = event.uiText.asString(context),
                         actionLabel = "VIEW"
                     )

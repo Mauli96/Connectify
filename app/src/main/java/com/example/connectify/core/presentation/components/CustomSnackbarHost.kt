@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,10 +25,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -95,12 +97,14 @@ fun CustomSnackbarHost(
         exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
     ) {
         currentSnackbarData?.let { snackbarData ->
-            val icon = iconProvider(snackbarData.message)
-            val showAction = snackbarData.message.contains(stringResource(R.string.successfully_saved_post), ignoreCase = true)
+            val icon = iconProvider(snackbarData.visuals.message)
+            val showAction = snackbarData.visuals.message.contains(stringResource(R.string.successfully_saved_post), ignoreCase = true)
 
             Snackbar(
                 modifier = Modifier.padding(SpaceMedium),
                 shape = MaterialTheme.shapes.medium,
+                containerColor = Color(0xff322f2f),
+                contentColor = MaterialTheme.colorScheme.onBackground,
                 content = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -113,7 +117,7 @@ fun CustomSnackbarHost(
                             modifier = Modifier.size(IconSizeSmall)
                         )
                         Text(
-                            text = snackbarData.message,
+                            text = snackbarData.visuals.message,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier
                                 .padding(start = SpaceSmall)
@@ -123,7 +127,7 @@ fun CustomSnackbarHost(
                 },
                 action = {
                     if(showAction) {
-                        snackbarData.actionLabel?.let { actionLabel ->
+                        snackbarData.visuals.actionLabel?.let { actionLabel ->
                             TextButton(
                                 onClick = {
                                     snackbarData.performAction()

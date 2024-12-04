@@ -5,11 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val scaffoldState = rememberScaffoldState()
+                    val snackbarHostState = remember { SnackbarHostState() }
                     val isUserAuthenticated by splashViewModel.isUserAuthenticated.collectAsStateWithLifecycle()
                     val splashDuration = if(isUserAuthenticated == true) 100L else Constants.SPLASH_SCREEN_DURATION
 
@@ -71,21 +72,17 @@ class MainActivity : ComponentActivity() {
                     StandardScaffold(
                         navController = navController,
                         showBottomBar = shouldShowBottomBar(navBackStackEntry),
-                        state = scaffoldState,
                         snackbarHost = {
                             CustomSnackbarHost(
-                                snackbarHostState = scaffoldState.snackbarHostState,
+                                snackbarHostState = snackbarHostState,
                                 onNavigate = navController::navigate
                             )
                         },
-                        modifier = Modifier.fillMaxSize(),
-                        onFabClick = {
-                            navController.navigate(Screen.CreatePostScreen.route)
-                        }
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         Navigation(
                             navController = navController,
-                            scaffoldState = scaffoldState,
+                            snackbarHostState = snackbarHostState,
                             imageLoader = imageLoader,
                             isUserAuthenticated = isUserAuthenticated
                         )

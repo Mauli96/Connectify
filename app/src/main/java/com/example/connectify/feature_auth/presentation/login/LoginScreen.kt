@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LoginScreen(
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     onNavigate: (String) -> Unit = {},
     onLogin: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel()
@@ -71,7 +71,7 @@ fun LoginScreen(
                 is UiEvent.ShowSnackbar -> {
                     keyboardController?.hide()
                     GlobalScope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
+                        snackbarHostState.showSnackbar(
                             message = event.uiText.asString(context)
                         )
                     }

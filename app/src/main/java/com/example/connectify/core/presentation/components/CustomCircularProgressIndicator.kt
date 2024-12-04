@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.connectify.core.presentation.ui.theme.DarkerGreen
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
 
 @Composable
@@ -30,17 +29,19 @@ fun CustomCircularProgressIndicator(
 ) {
     val gradientBrush = Brush.sweepGradient(
         colors = listOf(
-            DarkerGreen,
+            GreenAccent,
             GreenAccent
         )
     )
-    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    val infiniteTransition = rememberInfiniteTransition(label = "RotationAnimation")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 700, easing = LinearEasing)
-        ), label = ""
+        ),
+        label = "RotationValue"
     )
 
     Box(
@@ -50,10 +51,11 @@ fun CustomCircularProgressIndicator(
             .rotate(rotation)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val sweepAngle = 270f
+            val sweepAngle = 270f // Covers 3/4th of the circle for gap effect
+            val startAngle = -45f // Start at an offset to create a gap
             drawArc(
                 brush = gradientBrush,
-                startAngle = 0f,
+                startAngle = startAngle,
                 sweepAngle = sweepAngle,
                 useCenter = false,
                 style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)

@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.2"
+agp = "8.7.3"
 animation = "1.7.5"
 coilCompose = "2.7.0"
 coilSvg = "2.7.0"
@@ -29,7 +29,6 @@ activityCompose = "1.9.3"
 composeBom = "2024.11.00"
 lifecycleViewmodelCompose = "2.8.7"
 loggingInterceptor = "5.0.0-alpha.14"
-material = "1.7.5"
 messageAdapterGson = "0.1.12"
 mockk = "1.13.11"
 mockkAndroid = "1.13.11"
@@ -62,7 +61,6 @@ androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecy
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelCompose" }
-androidx-material = { group = "androidx.compose.material", name = "material", version.ref = "material" }
 androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingCompose" }

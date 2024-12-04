@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RegisterScreen(
     onNavigate: (String) -> Unit = {},
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val usernameState by viewModel.usernameState.collectAsStateWithLifecycle()
@@ -71,7 +71,7 @@ fun RegisterScreen(
                 is UiEvent.ShowSnackbar -> {
                     keyboardController?.hide()
                     GlobalScope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
+                        snackbarHostState.showSnackbar(
                             message = event.uiText.asString(context)
                         )
                     }
