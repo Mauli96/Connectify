@@ -45,6 +45,7 @@ timber = "5.0.1"
 truth = "1.4.2"
 ucrop = "2.2.8"
 websocketOkhttp = "0.1.12"
+credentials = "1.5.0-beta01"
 
 [libraries]
 accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
@@ -104,6 +105,8 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 ucrop = { group = "com.github.yalantis", name = "ucrop", version.ref = "ucrop" }
 websocket-okhttp = { group = "com.tinder.scarlet", name = "websocket-okhttp", version.ref = "websocketOkhttp" }
+androidx-credentials-core = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-compat = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

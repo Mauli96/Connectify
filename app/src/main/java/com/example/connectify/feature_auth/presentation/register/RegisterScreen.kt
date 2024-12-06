@@ -1,5 +1,6 @@
 package com.example.connectify.feature_auth.presentation.register
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -44,6 +47,7 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
+import com.example.connectify.feature_auth.data.credential_manager.AccountManager
 import com.example.connectify.feature_auth.presentation.util.AuthError
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -55,6 +59,7 @@ import kotlinx.coroutines.launch
 fun RegisterScreen(
     onNavigate: (String) -> Unit = {},
     snackbarHostState: SnackbarHostState,
+    onRegister: () -> Unit = {},
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val usernameState by viewModel.usernameState.collectAsStateWithLifecycle()
@@ -64,6 +69,10 @@ fun RegisterScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+
+    val accountManager = remember {
+        AccountManager(context as ComponentActivity)
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -78,6 +87,13 @@ fun RegisterScreen(
                 }
                 is UiEvent.Navigate -> {
                     onNavigate(event.route)
+                }
+                is UiEvent.OnRegister -> {
+                    onRegister()
+                    accountManager.signUp(
+                        email = emailState.text,
+                        password = passwordState.text
+                    )
                 }
                 else -> {
                     null

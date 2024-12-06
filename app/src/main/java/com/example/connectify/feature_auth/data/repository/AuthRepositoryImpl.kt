@@ -6,9 +6,9 @@ import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_auth.data.remote.AuthApi
 import com.example.connectify.feature_auth.data.remote.request.CreateAccountRequest
 import com.example.connectify.feature_auth.data.remote.request.LoginRequest
-import com.example.connectify.feature_auth.data.remote.AuthApi
 import com.example.connectify.feature_auth.domain.repository.AuthRepository
 import okio.IOException
 import retrofit2.HttpException

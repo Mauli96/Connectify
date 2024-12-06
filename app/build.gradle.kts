@@ -68,6 +68,10 @@ dependencies {
     implementation(libs.androidx.animation)
     implementation(libs.androidx.core.splashscreen)
 
+    // Google Credential Manager
+    implementation(libs.androidx.credentials.core)
+    implementation(libs.androidx.credentials.compat)
+
     // Image Loading (Coil)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)

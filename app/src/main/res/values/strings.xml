@@ -63,7 +63,7 @@
     <string name="error_unknown">Unknown error</string>
     <string name="error_couldnt_reach_server">Oops! Couldn\'t reach server. Check your internet connection.</string>
     <string name="oops_something_went_wrong">Oops! Something went wrong. Please try again.</string>
-    <string name="success_registeration">Successfully registered an account. You can login now.</string>
+    <string name="success_registeration">Successfully registered an account.</string>
     <string name="error_file_not_found">Oops! The file couldn\'t be found.</string>
     <string name="post_image">Post image</string>
     <string name="post_created">Successfully created post</string>
@@ -123,4 +123,10 @@
     <string name="no_saved_post">You haven\'t saved any posts yet.</string>
     <string name="successfully_downloaded_post">Successfully downloaded post!</string>
     <string name="download">Download</string>
+    <string name="error_no_credentials">Error no credentials</string>
+    <string name="sign_up_canceled">Signup process canceled. Please try again.\n</string>
+    <string name="sign_up_failed">Signup failed. Please try again later.</string>
+    <string name="login_canceled">Login canceled. No credentials were selected.</string>
+    <string name="login_failed">Login failed. Please try again later.</string>
+    <string name="no_credentials">No credentials found. Please try again or manually enter your details.</string>
 </resources>

@@ -8,6 +8,7 @@ import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_auth.domain.models.SignInResult
 import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
     private val _emailState = MutableStateFlow(StandardTextFieldState())
@@ -49,6 +50,50 @@ class LoginViewModel @Inject constructor(
                     it.copy(
                         text = event.password
                     )
+                }
+            }
+            is LoginEvent.OnSignIn -> {
+                when(event.result) {
+                    is SignInResult.Success -> {
+                        _emailState.update {
+                            it.copy(
+                                text = event.result.email
+                            )
+                        }
+                        _passwordState.update {
+                            it.copy(
+                                text = event.result.password
+                            )
+                        }
+                        login()
+                    }
+                    is SignInResult.Cancelled -> {
+                        viewModelScope.launch {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    UiText.StringResource(R.string.login_canceled)
+                                )
+                            )
+                        }
+                    }
+                    is SignInResult.Failure -> {
+                        viewModelScope.launch {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    UiText.StringResource(R.string.login_failed)
+                                )
+                            )
+                        }
+                    }
+                    is SignInResult.NoCredentials -> {
+                        viewModelScope.launch {
+                            _eventFlow.emit(
+                                UiEvent.ShowSnackbar(
+                                    UiText.StringResource(R.string.no_credentials)
+                                )
+                            )
+                        }
+                    }
                 }
             }
             is LoginEvent.TogglePasswordVisibility -> {
@@ -95,8 +140,10 @@ class LoginViewModel @Inject constructor(
             }
             when(loginResult.result) {
                 is Resource.Success -> {
-                    UiEvent.ShowSnackbar(
-                        UiText.StringResource(R.string.success_login)
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            UiText.StringResource(R.string.success_login)
+                        )
                     )
                     _eventFlow.emit(UiEvent.OnLogin)
                     _loginState.update {

@@ -123,6 +123,14 @@ fun Navigation(
                 ) {
                     RegisterScreen(
                         onNavigate = navController::navigate,
+                        onRegister = {
+                            navController.navigate(Screen.MainFeedScreen.route) {
+                                popUpTo(Screen.AuthScreen.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        },
                         snackbarHostState = snackbarHostState
                     )
                 }

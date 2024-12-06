@@ -9,6 +9,7 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import com.example.connectify.feature_auth.domain.use_case.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
 
     private val _emailState = MutableStateFlow(StandardTextFieldState())
@@ -118,12 +120,16 @@ class RegisterViewModel @Inject constructor(
             }
             when(registerResult.result) {
                 is Resource.Success -> {
+                    val loginResult = loginUseCase(
+                        email = emailState.value.text,
+                        password = passwordState.value.text
+                    )
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
                             UiText.StringResource(R.string.success_registeration)
                         )
                     )
-                    _eventFlow.emit(UiEvent.Navigate(Screen.LoginScreen.route))
+                    _eventFlow.emit(UiEvent.OnRegister)
                     _registerState.update {
                         it.copy(isLoading = false)
                     }
