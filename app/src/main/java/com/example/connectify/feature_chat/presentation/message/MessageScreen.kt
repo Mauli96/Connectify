@@ -1,6 +1,7 @@
 package com.example.connectify.feature_chat.presentation.message
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -37,13 +40,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.SendTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
+import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediumSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -80,6 +90,12 @@ fun MessageScreen(
         encodedRemoteUserProfilePictureUrl.decodeBase64()?.string(Charset.defaultCharset())
     }
 
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.hii_message))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
@@ -111,11 +127,11 @@ fun MessageScreen(
 
     Box(
         modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Center
+            .fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             StandardToolbar(
                 onNavigateUp = onNavigateUp,
@@ -160,43 +176,66 @@ fun MessageScreen(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(
-                            start = SpaceMedium,
-                            end = SpaceMedium
+                if(!pagingState.isLoading && pagingState.items.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLargeExtra),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
+                            },
                         )
-                        .imePadding()
-                ) {
-                    items(
-                        count = pagingState.items.size,
-                        key = { i ->
+                        Text(
+                            text = stringResource(R.string.no_messages_found),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(
+                                start = SpaceMedium,
+                                end = SpaceMedium
+                            )
+                            .imePadding()
+                    ) {
+                        items(
+                            count = pagingState.items.size,
+                            key = { i ->
+                                val message = pagingState.items[i]
+                                message.id
+                            }
+                        ) { i ->
                             val message = pagingState.items[i]
-                            message.id
+                            if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
+                                viewModel.loadNextMessages()
+                            }
+                            if(message.fromId == remoteUserId) {
+                                RemoteMessage(
+                                    message = message,
+                                    formattedTime = message.formattedTime
+                                )
+                            } else {
+                                OwnMessage(
+                                    message = message,
+                                    formattedTime = message.formattedTime,
+                                    onLongPress = { id ->
+                                        viewModel.onEvent(MessageEvent.SelectMessage(id))
+                                        viewModel.onEvent(MessageEvent.ShowDialog)
+                                    }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
-                    ) { i ->
-                        val message = pagingState.items[i]
-                        if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
-                            viewModel.loadNextMessages()
-                        }
-                        if(message.fromId == remoteUserId) {
-                            RemoteMessage(
-                                message = message,
-                                formattedTime = message.formattedTime
-                            )
-                        } else {
-                            OwnMessage(
-                                message = message,
-                                formattedTime = message.formattedTime,
-                                onLongPress = { id ->
-                                    viewModel.onEvent(MessageEvent.SelectMessage(id))
-                                    viewModel.onEvent(MessageEvent.ShowDialog)
-                                }
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(5.dp))
                     }
                 }
                 if(state.isDialogVisible) {
@@ -237,19 +276,19 @@ fun MessageScreen(
                         }
                     }
                 }
-                SendTextField(
-                    state = messageTextFieldState,
-                    canSendMessage = state.canSendMessage,
-                    onValueChange = {
-                        viewModel.onEvent(MessageEvent.EnteredMessage(it))
-                    },
-                    onSend = {
-                        viewModel.onEvent(MessageEvent.SendMessage)
-                    },
-                    ownProfilePicture = profilePictureState,
-                    hint = stringResource(id = R.string.enter_a_message)
-                )
             }
+            SendTextField(
+                state = messageTextFieldState,
+                canSendMessage = state.canSendMessage,
+                onValueChange = {
+                    viewModel.onEvent(MessageEvent.EnteredMessage(it))
+                },
+                onSend = {
+                    viewModel.onEvent(MessageEvent.SendMessage)
+                },
+                ownProfilePicture = profilePictureState,
+                hint = stringResource(id = R.string.enter_a_message)
+            )
         }
         if(pagingState.isLoading) {
             CustomCircularProgressIndicator(

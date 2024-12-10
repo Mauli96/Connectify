@@ -54,9 +54,9 @@ fun LikeButton(
 
     Icon(
         painter = if(isLiked) {
-            painterResource(id = R.drawable.like_icon)
+            painterResource(id = R.drawable.ic_like)
         } else {
-            painterResource(id = R.drawable.unlike_icon)
+            painterResource(id = R.drawable.ic_unlike)
         },
         contentDescription = if(isLiked) {
             stringResource(id = R.string.unlike)

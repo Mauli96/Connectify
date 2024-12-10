@@ -77,9 +77,9 @@ fun CommentFilterDropdown(
             Spacer(modifier = Modifier.width(SpaceSmall))
             Icon(
                 painter = if(expanded) {
-                    painterResource(R.drawable.drop_down_up_icon)
+                    painterResource(R.drawable.ic_drop_down_up)
                 } else {
-                    painterResource(R.drawable.drop_down_icon)
+                    painterResource(R.drawable.ic_drop_down)
                 },
                 contentDescription = stringResource(id = R.string.filter_comments),
                 tint = MaterialTheme.colorScheme.onBackground,

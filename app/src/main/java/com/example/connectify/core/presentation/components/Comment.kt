@@ -209,7 +209,7 @@ fun Comment(
                         ) {
                             Spacer(modifier = Modifier.width(SpaceSmall))
                             Icon(
-                                painter = painterResource(id = R.drawable.delete_icon),
+                                painter = painterResource(id = R.drawable.ic_delete),
                                 contentDescription = stringResource(id = R.string.log_out),
                                 modifier = Modifier.size(IconSizeSmall),
                                 tint = Color.Red
@@ -236,7 +236,7 @@ fun Comment(
                         ) {
                             Spacer(modifier = Modifier.width(SpaceSmall))
                             Icon(
-                                painter = painterResource(id = R.drawable.cancel_icon),
+                                painter = painterResource(id = R.drawable.ic_cancel),
                                 contentDescription = stringResource(id = R.string.edit_profile),
                                 modifier = Modifier.size(IconSizeSmall)
                             )

@@ -129,4 +129,11 @@
     <string name="login_canceled">Login canceled. No credentials were selected.</string>
     <string name="login_failed">Login failed. Please try again later.</string>
     <string name="no_credentials">No credentials found. Please try again or manually enter your details.</string>
+    <string name="no_comments_yet">No comments yet. Start the conversation!</string>
+    <string name="no_chats_found">No chats found. Start a new conversation to connect with your friends!</string>
+    <string name="no_messages_found">No messages here yet. Say something to start the conversation!</string>
+    <string name="no_followers">No followers yet. Start sharing to grow your audience!</string>
+    <string name="no_followings">You\'re not following anyone yet. Discover and connect with others!</string>
+    <string name="no_activity">No recent activity. Start exploring and connecting with others!</string>
+    <string name="no_posts_for_profile">No posts yet. Start sharing your moments!</string>
 </resources>

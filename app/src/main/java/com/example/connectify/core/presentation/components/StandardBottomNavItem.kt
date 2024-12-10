@@ -45,11 +45,11 @@ fun RowScope.StandardBottomNavItem(
     onClick: () -> Unit
 ) {
 
-    if(alertCount != null && alertCount < 0) {
+    if (alertCount != null && alertCount < 0) {
         throw IllegalArgumentException("Alert count can't be negative")
     }
     val lineLength = animateFloatAsState(
-        targetValue = if(selected) 1f else 0f,
+        targetValue = if (selected) 1f else 0f,
         animationSpec = tween(
             durationMillis = 300
         ), label = ""
@@ -72,7 +72,10 @@ fun RowScope.StandardBottomNavItem(
         icon = {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .size(
+                        width = 40.dp,
+                        height = 50.dp
+                    )
                     .padding(
                         start = SpaceSmall,
                         end = SpaceSmall,
@@ -97,19 +100,19 @@ fun RowScope.StandardBottomNavItem(
                         }
                     }
             ) {
-                if(icon != null) {
+                if (icon != null) {
                     Icon(
                         painter = icon,
                         contentDescription = contentDescription,
                         modifier = Modifier
                             .size(22.dp)
                             .align(Alignment.Center),
-                        tint = if(selected) selectedColor
+                        tint = if (selected) selectedColor
                         else unselectedColor
                     )
                 }
-                if(alertCount != null) {
-                    val alertText = if(alertCount > 99) {
+                if (alertCount != null) {
+                    val alertText = if (alertCount > 99) {
                         "99+"
                     } else {
                         alertCount.toString()

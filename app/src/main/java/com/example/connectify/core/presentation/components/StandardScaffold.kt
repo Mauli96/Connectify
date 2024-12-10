@@ -28,27 +28,27 @@ fun StandardScaffold(
     bottomNavItem: List<BottomNavItem> = listOf(
         BottomNavItem(
             route = Screen.MainFeedScreen.route,
-            icon = painterResource(id = R.drawable.home_icon),
+            icon = painterResource(id = R.drawable.ic_home),
             contentDescription = "Home"
         ),
         BottomNavItem(
             route = Screen.ChatScreen.route,
-            icon = painterResource(id = R.drawable.message_icon),
+            icon = painterResource(id = R.drawable.ic_message),
             contentDescription = "Message"
         ),
         BottomNavItem(
             route = Screen.CreatePostScreen.route,
-            icon = painterResource(id = R.drawable.post_icon),
+            icon = painterResource(id = R.drawable.ic_post),
             contentDescription = "Post"
         ),
         BottomNavItem(
             route = Screen.ActivityScreen.route,
-            icon = painterResource(id = R.drawable.notification_icon),
+            icon = painterResource(id = R.drawable.ic_notification),
             contentDescription = "Activity"
         ),
         BottomNavItem(
             route = Screen.ProfileScreen.route,
-            icon = painterResource(id = R.drawable.person_icon),
+            icon = painterResource(id = R.drawable.ic_person),
             contentDescription = "Profile"
         )
     ),

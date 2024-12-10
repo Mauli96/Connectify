@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -32,10 +33,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.LottieIconSize
+import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
@@ -53,6 +61,12 @@ fun SavedPostScreen(
     val pagingPostState by viewModel.pagingPostState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_activity))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
@@ -68,35 +82,40 @@ fun SavedPostScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        StandardToolbar(
-            onNavigateUp = onNavigateUp,
-            title = {
-                Text(
-                    text = stringResource(id = R.string.saved),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            showBackArrow = true,
-        )
-
-        Box(
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
+            StandardToolbar(
+                onNavigateUp = onNavigateUp,
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.saved),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                showBackArrow = true,
+            )
             if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
                 Column(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = SpaceLargeExtra),
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.no_saved_post),
-                        contentDescription = null,
-                        modifier = Modifier.size(100.dp)
+                    LottieAnimation(
+                        modifier = Modifier.size(LottieIconSize),
+                        composition = composition,
+                        progress = {
+                            progress
+                        },
                     )
-                    Spacer(modifier = Modifier.height(SpaceMedium))
                     Text(
                         text = stringResource(R.string.no_saved_post),
                         style = MaterialTheme.typography.bodyMedium,
@@ -131,12 +150,11 @@ fun SavedPostScreen(
                     }
                 }
             }
-
-            if(pagingPostState.isLoading) {
-                CustomCircularProgressIndicator(
-                    modifier = Modifier.align(Center)
-                )
-            }
+        }
+        if(pagingPostState.isLoading) {
+            CustomCircularProgressIndicator(
+                modifier = Modifier.align(Center)
+            )
         }
     }
 }

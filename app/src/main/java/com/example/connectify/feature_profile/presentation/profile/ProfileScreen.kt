@@ -47,6 +47,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -54,6 +55,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.User
@@ -64,8 +70,10 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
+import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -151,6 +159,12 @@ fun ProfileScreen(
         }
     }
 
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_posts_for_profile))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
     LaunchedEffect(key1 = true) {
         viewmodel.eventFlow.collectLatest { event ->
             when(event) {
@@ -225,50 +239,75 @@ fun ProfileScreen(
             item {
                 Spacer(modifier = Modifier.height(SpaceMedium))
             }
-            items(
-                count = pagingPostState.items.size,
-                key = { i ->
-                    val post = pagingPostState.items[i]
-                    post.id
-                }
-            ) { i ->
-                val post = pagingPostState.items[i]
-                if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
-                    viewmodel.loadNextPosts()
-                }
-                Post(
-                    post = post,
-                    imageLoader = imageLoader,
-                    onLikeClick = {
-                        viewmodel.onEvent(ProfileEvent.LikedPost(post.id))
-                    },
-                    onCommentClick = {
-                        viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
-                        viewmodel.onEvent(ProfileEvent.ShowBottomSheet)
-                        viewmodel.onEvent(ProfileEvent.LoadComments)
-                    },
-                    onShareClick = {
-                        context.sendSharePostIntent(post.id)
-                    },
-                    onSaveClick = {
-                        viewmodel.onEvent(ProfileEvent.SavePost(post.id))
-                    },
-                    onLikedByClick = {
-                        onNavigate(Screen.PersonListScreen.route + "/${post.id}")
-                    },
-                    onMoreItemClick = {
-                        viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
-                        viewmodel.onEvent(ProfileEvent.SelectPostUsername(post.username, post.isOwnPost))
-                        viewmodel.onEvent(ProfileEvent.ShowDeleteSheet)
-                    },
-                    isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
-                    onDescriptionToggle = {
-                        viewmodel.onEvent(ProfileEvent.OnDescriptionToggle(post.id))
+            if(!pagingPostState.isLoading && pagingPostState.items.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLarge),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
+                            },
+                        )
+                        Text(
+                            text = stringResource(R.string.no_posts_for_profile),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
                     }
-                )
-                Spacer(modifier = Modifier.height(SpaceSmall))
-                if(i == pagingPostState.items.size - 1) {
-                    Spacer(modifier = Modifier.height(50.dp))
+                }
+            } else {
+                items(
+                    count = pagingPostState.items.size,
+                    key = { i ->
+                        val post = pagingPostState.items[i]
+                        post.id
+                    }
+                ) { i ->
+                    val post = pagingPostState.items[i]
+                    if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                        viewmodel.loadNextPosts()
+                    }
+                    Post(
+                        post = post,
+                        imageLoader = imageLoader,
+                        onLikeClick = {
+                            viewmodel.onEvent(ProfileEvent.LikedPost(post.id))
+                        },
+                        onCommentClick = {
+                            viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
+                            viewmodel.onEvent(ProfileEvent.ShowBottomSheet)
+                            viewmodel.onEvent(ProfileEvent.LoadComments)
+                        },
+                        onShareClick = {
+                            context.sendSharePostIntent(post.id)
+                        },
+                        onSaveClick = {
+                            viewmodel.onEvent(ProfileEvent.SavePost(post.id))
+                        },
+                        onLikedByClick = {
+                            onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                        },
+                        onMoreItemClick = {
+                            viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
+                            viewmodel.onEvent(ProfileEvent.SelectPostUsername(post.username, post.isOwnPost))
+                            viewmodel.onEvent(ProfileEvent.ShowDeleteSheet)
+                        },
+                        isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
+                        onDescriptionToggle = {
+                            viewmodel.onEvent(ProfileEvent.OnDescriptionToggle(post.id))
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceSmall))
+                    if(i == pagingPostState.items.size - 1) {
+                        Spacer(modifier = Modifier.height(50.dp))
+                    }
                 }
             }
         }

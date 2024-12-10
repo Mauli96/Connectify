@@ -46,10 +46,12 @@ truth = "1.4.2"
 ucrop = "2.2.8"
 websocketOkhttp = "0.1.12"
 credentials = "1.5.0-beta01"
+airbnbLottieCompose = "6.6.1"
 
 [libraries]
 accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
 accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanistPagerIndicators" }
+airbnb-lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "airbnbLottieCompose" }
 androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

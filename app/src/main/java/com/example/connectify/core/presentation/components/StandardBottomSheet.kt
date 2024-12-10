@@ -59,7 +59,7 @@ fun StandardBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                painter = painterResource(R.drawable.line_icon),
+                painter = painterResource(R.drawable.ic_line),
                 contentDescription = null,
                 modifier = Modifier.size(IconSizeMedium),
                 tint = Color.Gray
@@ -91,7 +91,7 @@ fun StandardBottomSheet(
                 ) {
                     Spacer(modifier = Modifier.width(SpaceMedium))
                     Icon(
-                        painter = painterResource(id = R.drawable.download_icon),
+                        painter = painterResource(id = R.drawable.ic_download),
                         contentDescription = null,
                         modifier = Modifier.size(IconSizeSmall),
                     )
@@ -120,7 +120,7 @@ fun StandardBottomSheet(
                 ) {
                     Spacer(modifier = Modifier.width(SpaceMedium))
                     Image(
-                        painter = painterResource(id = R.drawable.delete_icon),
+                        painter = painterResource(id = R.drawable.ic_delete),
                         contentDescription = null,
                         modifier = Modifier.size(IconSizeSmall)
                     )
@@ -147,7 +147,7 @@ fun StandardBottomSheet(
             ) {
                 Spacer(modifier = Modifier.width(SpaceMedium))
                 Icon(
-                    painter = painterResource(id = R.drawable.cancel_icon),
+                    painter = painterResource(id = R.drawable.ic_cancel),
                     contentDescription = null,
                     modifier = Modifier.size(IconSizeSmall)
                 )

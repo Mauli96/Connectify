@@ -68,6 +68,9 @@ dependencies {
     implementation(libs.androidx.animation)
     implementation(libs.androidx.core.splashscreen)
 
+    // Lottie animation compose
+    implementation(libs.airbnb.lottie.compose)
+
     // Google Credential Manager
     implementation(libs.androidx.credentials.core)
     implementation(libs.androidx.credentials.compat)

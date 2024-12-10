@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -133,7 +132,7 @@ fun RegisterScreen(
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 },
-                leadingIcon = painterResource(id = R.drawable.email_icon),
+                leadingIcon = painterResource(id = R.drawable.ic_email),
                 error = when(emailState.error) {
                     is AuthError.FieldEmpty -> {
                         stringResource(id = R.string.this_field_cant_be_empty)
@@ -164,7 +163,7 @@ fun RegisterScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = painterResource(id = R.drawable.person_icon),
+                leadingIcon = painterResource(id = R.drawable.ic_person),
                 hint = stringResource(id = R.string.username)
             )
             Spacer(modifier = Modifier.height(SpaceMedium))
@@ -191,7 +190,7 @@ fun RegisterScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = painterResource(id = R.drawable.password_icon),
+                leadingIcon = painterResource(id = R.drawable.ic_password),
                 showPasswordToggle = passwordState.isPasswordVisible,
                 onPasswordToggleClick = {
                     viewModel.onEvent(RegisterEvent.TogglePasswordVisibility)

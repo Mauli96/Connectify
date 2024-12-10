@@ -40,12 +40,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardSearchField
 import com.example.connectify.core.presentation.components.UserProfileItem
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.LottieIconSize
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
+import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -72,6 +80,12 @@ fun SearchScreen(
         FocusRequester()
     }
 
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_result_found))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
@@ -93,10 +107,12 @@ fun SearchScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             Row(
                 modifier = Modifier
@@ -130,7 +146,7 @@ fun SearchScreen(
                     placeholderText = stringResource(id = R.string.search_for_user),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.search_icon),
+                            painter = painterResource(id = R.drawable.ic_search),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.background,
                             modifier = Modifier.size(IconSizeSmall)
@@ -155,48 +171,47 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Column(
-                modifier = Modifier
-                    .padding(top = SpaceMedium)
-                    .fillMaxSize()
-            ) {
-                if(state.userItems.isEmpty() && searchFieldState.text.isNotEmpty() && !state.isLoading) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.no_user_found),
-                            contentDescription = null,
-                            modifier = Modifier.size(100.dp)
+            if(state.userItems.isEmpty() && searchFieldState.text.isNotEmpty() && !state.isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = SpaceLargeExtra),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LottieAnimation(
+                        modifier = Modifier.size(LottieIconSize),
+                        composition = composition,
+                        progress = {
+                            progress
+                        },
+                    )
+                    Text(
+                        text = stringResource(R.string.no_user_found),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = SpaceMedium)
+                ) {
+                    items(state.userItems) { user ->
+                        UserProfileItem(
+                            user = user,
+                            imageLoader = imageLoader,
+                            modifier = Modifier.fillMaxWidth(),
+                            isFollowing = user.isFollowing,
+                            onActionItemClick = {
+                                viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
+                            },
+                            onItemClick = {
+                                keyboardController?.hide()
+                                onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
+                            }
                         )
-                        Spacer(modifier = Modifier.height(SpaceMedium))
-                        Text(
-                            text = stringResource(R.string.no_user_found),
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(state.userItems) { user ->
-                            UserProfileItem(
-                                user = user,
-                                imageLoader = imageLoader,
-                                modifier = Modifier.fillMaxWidth(),
-                                isFollowing = user.isFollowing,
-                                onActionItemClick = {
-                                    viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
-                                },
-                                onItemClick = {
-                                    keyboardController?.hide()
-                                    onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
-                                }
-                            )
-                        }
                     }
                 }
             }

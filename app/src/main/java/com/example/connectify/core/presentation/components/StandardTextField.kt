@@ -141,9 +141,9 @@ fun StandardTextField(
                                     }) {
                                 Icon(
                                     painter = if(showPasswordToggle) {
-                                        painterResource(R.drawable.visibilityoff_icon)
+                                        painterResource(R.drawable.ic_visibility_off)
                                     } else {
-                                        painterResource(R.drawable.visibility_icon)
+                                        painterResource(R.drawable.ic_visibility)
                                     },
                                     contentDescription = if(showPasswordToggle) {
                                         stringResource(id = R.string.password_visible_content_description)

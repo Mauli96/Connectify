@@ -123,7 +123,7 @@ fun Post(
                     }
                 }
                 Icon(
-                    painter = painterResource(R.drawable.more_item_icon),
+                    painter = painterResource(R.drawable.ic_more_item),
                     contentDescription = stringResource(R.string.more_items),
                     modifier = Modifier
                         .size(IconSizeSmall)
@@ -244,9 +244,9 @@ fun ActionRow(
         )
         Icon(
             painter = if(isSaved) {
-                painterResource(id = R.drawable.save_icon)
+                painterResource(id = R.drawable.ic_save)
             } else {
-                painterResource(id = R.drawable.unsave_icon)
+                painterResource(id = R.drawable.ic_unsave)
             },
             contentDescription = stringResource(id = R.string.save_post),
             modifier = Modifier
@@ -300,7 +300,7 @@ fun EngagementButtons(
         }
         Spacer(modifier = Modifier.width(SpaceMediumLarge))
         Icon(
-            painter = painterResource(id = R.drawable.comment_icon),
+            painter = painterResource(id = R.drawable.ic_comment),
             contentDescription = stringResource(id = R.string.comment),
             modifier = Modifier
                 .size(IconSizeSmall)
@@ -322,7 +322,7 @@ fun EngagementButtons(
         }
         Spacer(modifier = Modifier.width(SpaceMediumLarge))
         Icon(
-            painter = painterResource(id = R.drawable.share_icon),
+            painter = painterResource(id = R.drawable.ic_share),
             contentDescription = stringResource(id = R.string.share),
             modifier = Modifier
                 .size(IconSizeSmall)

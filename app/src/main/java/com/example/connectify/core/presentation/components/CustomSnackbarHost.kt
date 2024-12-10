@@ -5,7 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,12 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
-import com.example.connectify.core.presentation.ui.theme.HintGray
-import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.util.Screen
@@ -41,7 +42,7 @@ import kotlinx.coroutines.delay
 fun CustomSnackbarHost(
     snackbarHostState: SnackbarHostState,
     onNavigate: (String) -> Unit = {},
-    iconProvider: @Composable (String) -> Painter = { message ->
+    lottieIconProvider: @Composable (String) -> Int = { message ->
         // Define string resources
         val successRegisterationText = stringResource(R.string.success_registeration)
         val successLoginText = stringResource(R.string.success_login)
@@ -55,20 +56,21 @@ fun CustomSnackbarHost(
         val errorServerText = stringResource(R.string.error_couldnt_reach_server)
         val errorWentWrongText = stringResource(R.string.oops_something_went_wrong)
 
+
         // Return the appropriate icon based on the message
         when {
             message.contains(successRegisterationText, ignoreCase = true) ||
                     message.contains(successLoginText, ignoreCase = true) ||
                     message.contains(createPostText, ignoreCase = true) ||
-                    message.contains(savePostText, ignoreCase = true) -> painterResource(R.drawable.check_icon)
+                    message.contains(savePostText, ignoreCase = true) -> R.raw.success
             message.contains(unSavePostText, ignoreCase = true) ||
                     message.contains(deletePostText, ignoreCase = true) ||
                     message.contains(deleteChatText, ignoreCase = true) ||
-                    message.contains(deleteCommentText, ignoreCase = true) -> painterResource(R.drawable.remove_icon)
+                    message.contains(deleteCommentText, ignoreCase = true) -> R.raw.delete
             message.contains(errorUnknownText, ignoreCase = true) ||
                     message.contains(errorServerText, ignoreCase = true) ||
-                    message.contains(errorWentWrongText, ignoreCase = true) -> painterResource(R.drawable.error_icon)
-            else -> painterResource(R.drawable.info_icon)
+                    message.contains(errorWentWrongText, ignoreCase = true) -> R.raw.error
+            else -> R.raw.info
         }
     }
 ) {
@@ -97,7 +99,12 @@ fun CustomSnackbarHost(
         exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
     ) {
         currentSnackbarData?.let { snackbarData ->
-            val icon = iconProvider(snackbarData.visuals.message)
+            val animationResource = lottieIconProvider(snackbarData.visuals.message)
+            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(animationResource))
+            val progress by animateLottieCompositionAsState(
+                composition = composition,
+                iterations = 1
+            )
             val showAction = snackbarData.visuals.message.contains(stringResource(R.string.successfully_saved_post), ignoreCase = true)
 
             Snackbar(
@@ -111,10 +118,12 @@ fun CustomSnackbarHost(
                         horizontalArrangement = Arrangement.Start,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Image(
-                            painter = icon,
-                            contentDescription = null,
-                            modifier = Modifier.size(IconSizeSmall)
+                        LottieAnimation(
+                            modifier = Modifier.size(IconSizeMedium),
+                            composition = composition,
+                            progress = {
+                                progress
+                            }
                         )
                         Text(
                             text = snackbarData.visuals.message,

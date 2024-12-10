@@ -38,12 +38,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -68,6 +74,7 @@ fun CreatePostScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val descriptionState by viewModel.descriptionState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val cropActivityLauncher = rememberLauncherForActivityResult(
         contract = CropActivityResultContract(4f, 5f)
@@ -82,7 +89,11 @@ fun CreatePostScreen(
         }
     }
 
-    val context = LocalContext.current
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.add_images))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -139,11 +150,12 @@ fun CreatePostScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.add_icon),
-                    contentDescription = stringResource(id = R.string.choose_image),
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(IconSizeMedium)
+                LottieAnimation(
+                    modifier = Modifier.size(150.dp),
+                    composition = composition,
+                    progress = {
+                        progress
+                    },
                 )
                 state.imageUri?.let { uri ->
                     Image(
@@ -206,7 +218,7 @@ fun CreatePostScreen(
                     )
                     Spacer(modifier = Modifier.width(SpaceSmall))
                     Icon(
-                        painter = painterResource(id = R.drawable.post_icon),
+                        painter = painterResource(id = R.drawable.ic_post_send),
                         contentDescription = null,
                         modifier = Modifier.size(IconSizeSmall)
                     )

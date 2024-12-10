@@ -3,12 +3,14 @@ package com.example.connectify.feature_post.presentation.main_feed
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
@@ -40,6 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.states.PagingState
@@ -50,6 +57,8 @@ import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.LottieIconSize
+import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -80,6 +89,12 @@ fun MainFeedScreen(
     val focusRequester = remember {
         FocusRequester()
     }
+
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_posts_found))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = pagingPostState.isLoading,
@@ -130,7 +145,7 @@ fun MainFeedScreen(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.search_icon),
+                        painter = painterResource(id = R.drawable.ic_search),
                         contentDescription = stringResource(id = R.string.search_for_users),
                         tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(IconSizeSmall)
@@ -153,15 +168,19 @@ fun MainFeedScreen(
         ) {
             if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
                 Column(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = SpaceLargeExtra),
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.empty_feed),
-                        contentDescription = null,
-                        modifier = Modifier.size(100.dp)
+                    LottieAnimation(
+                        modifier = Modifier.size(LottieIconSize),
+                        composition = composition,
+                        progress = {
+                            progress
+                        },
                     )
-                    Spacer(modifier = Modifier.height(SpaceMedium))
                     Text(
                         text = stringResource(R.string.feed_empty),
                         style = MaterialTheme.typography.bodyMedium,
@@ -169,7 +188,10 @@ fun MainFeedScreen(
                     )
                 }
             } else {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                     items(
                         count = pagingPostState.items.size,
                         key = { i ->

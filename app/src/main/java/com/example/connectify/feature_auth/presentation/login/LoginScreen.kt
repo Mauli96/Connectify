@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -137,7 +136,7 @@ fun LoginScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = painterResource(id = R.drawable.email_icon),
+                leadingIcon = painterResource(id = R.drawable.ic_email),
                 hint = stringResource(id = R.string.login_hint)
             )
             Spacer(modifier = Modifier.height(SpaceMedium))
@@ -158,7 +157,7 @@ fun LoginScreen(
                     }
                     else -> ""
                 },
-                leadingIcon = painterResource(id = R.drawable.password_icon),
+                leadingIcon = painterResource(id = R.drawable.ic_password),
                 showPasswordToggle = passwordState.isPasswordVisible,
                 onPasswordToggleClick = {
                     viewModel.onEvent(LoginEvent.TogglePasswordVisibility)

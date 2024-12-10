@@ -120,7 +120,7 @@ fun BannerSection(
                             ) {
                                 Spacer(modifier = Modifier.width(SpaceSmall))
                                 Icon(
-                                    painter = painterResource(id = R.drawable.edit_icon),
+                                    painter = painterResource(id = R.drawable.ic_edit),
                                     contentDescription = stringResource(id = R.string.edit_profile),
                                     modifier = Modifier.size(IconSizeSmall)
                                 )
@@ -144,7 +144,7 @@ fun BannerSection(
                             ) {
                                 Spacer(modifier = Modifier.width(SpaceSmall))
                                 Icon(
-                                    painter = painterResource(id = R.drawable.unsave_icon),
+                                    painter = painterResource(id = R.drawable.ic_unsave),
                                     contentDescription = stringResource(id = R.string.saved),
                                     modifier = Modifier.size(IconSizeSmall)
                                 )
@@ -173,7 +173,7 @@ fun BannerSection(
                             ) {
                                 Spacer(modifier = Modifier.width(SpaceSmall))
                                 Icon(
-                                    painter = painterResource(id = R.drawable.logout_icon),
+                                    painter = painterResource(id = R.drawable.ic_logout),
                                     contentDescription = stringResource(id = R.string.log_out),
                                     modifier = Modifier.size(IconSizeSmall),
                                     tint = Color.Red
@@ -221,7 +221,7 @@ fun BannerSection(
                         }
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.more_item_icon),
+                            painter = painterResource(R.drawable.ic_more_item),
                             contentDescription = stringResource(id = R.string.more_items),
                             modifier = Modifier.size(IconSizeSmall)
                         )
@@ -279,7 +279,7 @@ fun BannerSection(
                     modifier = Modifier.size(iconSize)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_github_icon_1),
+                        painter = painterResource(id = R.drawable.ic_github),
                         contentDescription = "GitHub",
                         modifier = Modifier.size(iconSize)
                     )
@@ -291,7 +291,7 @@ fun BannerSection(
                     modifier = Modifier.size(iconSize)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_instagram_logo),
+                        painter = painterResource(id = R.drawable.ic_instagram),
                         contentDescription = "Instagram",
                         modifier = Modifier.size(iconSize)
                     )
@@ -303,7 +303,7 @@ fun BannerSection(
                     modifier = Modifier.size(iconSize)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_linkedin_icon_1),
+                        painter = painterResource(id = R.drawable.ic_linkedin),
                         contentDescription = "LinkedIn",
                         modifier = Modifier.size(iconSize)
                     )
