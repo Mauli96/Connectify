@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -40,8 +41,9 @@ import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
-import com.example.connectify.core.presentation.ui.theme.LottieIconSize
+import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.feature_post.presentation.util.CommentFilter
 
@@ -52,7 +54,8 @@ fun <T> PaginatedBottomSheet(
     bottomSheetState: SheetState,
     onDismissBottomSheet: () -> Unit = {},
     items: List<T> = emptyList(),
-    isListLoading: Boolean = false,
+    isFirstLoading: Boolean = false,
+    isNextLoading: Boolean = false,
     endReached: Boolean = false,
     loadNextPage: () -> Unit = {},
     selectedFilter: CommentFilter = CommentFilter.MOST_RECENT,
@@ -124,7 +127,7 @@ fun <T> PaginatedBottomSheet(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    if(!isListLoading && items.isEmpty()) {
+                    if(items.isEmpty() && !isFirstLoading && !isNextLoading) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -175,10 +178,23 @@ fun <T> PaginatedBottomSheet(
                                 }
                             ) { index ->
                                 val item = items[index]
-                                if(index >= items.size - 1 && !endReached && !isListLoading) {
+                                if(index >= items.size - 1 && !endReached
+                                    && !isFirstLoading && !isNextLoading) {
                                     loadNextPage()
                                 }
                                 itemContent(index, item)
+                            }
+                            if(isNextLoading) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = SpaceMedium),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CustomCircularProgressIndicator()
+                                    }
+                                }
                             }
                         }
                     }
@@ -193,7 +209,7 @@ fun <T> PaginatedBottomSheet(
                     focusRequester = focusRequester,
                 )
             }
-            if(isListLoading) {
+            if(isFirstLoading) {
                 CustomCircularProgressIndicator(
                     modifier = Modifier.align(Center)
                 )

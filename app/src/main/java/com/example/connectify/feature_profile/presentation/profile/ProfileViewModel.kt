@@ -86,10 +86,17 @@ class ProfileViewModel @Inject constructor(
     }
 
     private val postPaginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingPostState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingPostState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },
@@ -114,10 +121,17 @@ class ProfileViewModel @Inject constructor(
     )
 
     private val commentPaginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingCommentState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingCommentState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },

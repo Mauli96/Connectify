@@ -104,7 +104,7 @@ fun ChatScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if(!state.isLoading && state.chats.isEmpty()) {
+                if(state.chats.isEmpty() && !state.isLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

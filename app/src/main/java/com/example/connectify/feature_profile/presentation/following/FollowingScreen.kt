@@ -100,7 +100,7 @@ fun FollowingScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if(!state.isLoading && state.users.isEmpty()) {
+                if(state.users.isEmpty() && !state.isLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

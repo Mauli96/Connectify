@@ -73,10 +73,17 @@ class MessageViewModel @Inject constructor(
     }
 
     private val paginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },

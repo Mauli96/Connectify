@@ -40,6 +40,7 @@ import com.example.connectify.core.presentation.components.SendTextField
 import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.DarkGray
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
@@ -214,7 +215,7 @@ fun PostDetailScreen(
                     }
                 ) { i ->
                     val comment = pagingCommentState.items[i]
-                    if(i >= pagingCommentState.items.size - 1 && !pagingCommentState.endReached && !pagingCommentState.isLoading) {
+                    if(i >= pagingCommentState.items.size - 1 && !pagingCommentState.endReached && !pagingCommentState.isFirstLoading) {
                         viewModel.loadNextComments()
                     }
                     Comment(
@@ -236,6 +237,18 @@ fun PostDetailScreen(
                             viewModel.onEvent(PostDetailEvent.DeleteComment)
                         }
                     )
+                }
+                if(pagingCommentState.isNextLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = SpaceMedium),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CustomCircularProgressIndicator()
+                        }
+                    }
                 }
             }
             SendTextField(

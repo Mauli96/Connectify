@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.End
@@ -240,7 +241,7 @@ fun ProfileScreen(
             item {
                 Spacer(modifier = Modifier.height(SpaceMedium))
             }
-            if(!pagingPostState.isLoading && pagingPostState.items.isEmpty()) {
+            if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                 item {
                     Column(
                         modifier = Modifier
@@ -272,7 +273,8 @@ fun ProfileScreen(
                     }
                 ) { i ->
                     val post = pagingPostState.items[i]
-                    if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                    if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached
+                        && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                         viewModel.loadNextPosts()
                     }
                     Post(
@@ -306,8 +308,17 @@ fun ProfileScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
-                    if(i == pagingPostState.items.size - 1) {
-                        Spacer(modifier = Modifier.height(50.dp))
+                }
+                if(pagingPostState.isNextLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = SpaceMedium),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CustomCircularProgressIndicator()
+                        }
                     }
                 }
             }
@@ -500,7 +511,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .align(Alignment.TopCenter)
         )
-        if(state.isLoading) {
+        if(state.isLoading || pagingPostState.isFirstLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)
             )
@@ -529,7 +540,8 @@ fun CommentSheetContent(
                 viewModel.onEvent(ProfileEvent.DismissBottomSheet)
             },
             items = pagingCommentState.items,
-            isListLoading = pagingCommentState.isLoading,
+            isFirstLoading = pagingCommentState.isFirstLoading,
+            isNextLoading = pagingCommentState.isNextLoading,
             endReached = pagingCommentState.endReached,
             loadNextPage = {
                 viewModel.loadNextComments()

@@ -40,10 +40,17 @@ class ActivityViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     private val paginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },
@@ -63,15 +70,15 @@ class ActivityViewModel @Inject constructor(
         }
     )
 
-    fun loadNextActivities() {
-        viewModelScope.launch {
-            paginator.loadNextItems()
-        }
-    }
-
     private fun loadInitialActivities() {
         viewModelScope.launch {
             paginator.loadFirstItems()
+        }
+    }
+
+    fun loadNextActivities() {
+        viewModelScope.launch {
+            paginator.loadNextItems()
         }
     }
 }

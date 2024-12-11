@@ -75,10 +75,17 @@ class PostDetailViewModel @Inject constructor(
     }
 
     private val commentPaginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingCommentState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingCommentState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },

@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -107,7 +105,7 @@ fun SavedPostScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
+                if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && pagingPostState.isNextLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -143,7 +141,7 @@ fun SavedPostScreen(
                             }
                         ) { i ->
                             val post = pagingPostState.items[i]
-                            if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                            if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isFirstLoading) {
                                 viewModel.loadNextPosts()
                             }
                             PostImageItem(
@@ -154,6 +152,18 @@ fun SavedPostScreen(
                                 }
                             )
                         }
+                        if(pagingPostState.isNextLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = SpaceMedium),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomCircularProgressIndicator()
+                                }
+                            }
+                        }
                     }
                 }
                 ConnectivityBanner(
@@ -163,7 +173,7 @@ fun SavedPostScreen(
                 )
             }
         }
-        if(pagingPostState.isLoading) {
+        if(pagingPostState.isFirstLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)
             )

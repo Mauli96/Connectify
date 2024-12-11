@@ -70,10 +70,17 @@ class MainFeedViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     private val postPaginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingPostState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingPostState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },
@@ -94,10 +101,17 @@ class MainFeedViewModel @Inject constructor(
     )
 
     private val commentPaginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingCommentState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingCommentState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },
@@ -279,12 +293,14 @@ class MainFeedViewModel @Inject constructor(
 
     fun loadInitialPosts() {
         viewModelScope.launch {
+            println("loadInitialPosts called")
             postPaginator.loadFirstItems()
         }
     }
 
     fun loadNextPosts() {
         viewModelScope.launch {
+            println("loadNextPosts called")
             postPaginator.loadNextItems()
         }
     }

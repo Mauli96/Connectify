@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -56,7 +57,6 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediu
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
-import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
@@ -180,7 +180,7 @@ fun MessageScreen(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                if(!pagingState.isLoading && pagingState.items.isEmpty()) {
+                if(pagingState.items.isEmpty() && !pagingState.isFirstLoading && !pagingState.isNextLoading ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -212,6 +212,18 @@ fun MessageScreen(
                             )
                             .imePadding()
                     ) {
+                        if(pagingState.isNextLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = SpaceMedium),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomCircularProgressIndicator()
+                                }
+                            }
+                        }
                         items(
                             count = pagingState.items.size,
                             key = { i ->
@@ -220,7 +232,8 @@ fun MessageScreen(
                             }
                         ) { i ->
                             val message = pagingState.items[i]
-                            if(i >= pagingState.items.size - 1 && !pagingState.endReached && !pagingState.isLoading) {
+                            if(i >= pagingState.items.size - 1 && !pagingState.endReached
+                                && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextMessages()
                             }
                             if(message.fromId == remoteUserId) {
@@ -300,7 +313,7 @@ fun MessageScreen(
                 .align(Alignment.TopCenter)
                 .padding(top = 50.dp)
         )
-        if(pagingState.isLoading) {
+        if(pagingState.isFirstLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)
             )

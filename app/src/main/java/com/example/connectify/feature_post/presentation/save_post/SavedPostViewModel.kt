@@ -8,17 +8,13 @@ import com.example.connectify.core.domain.states.NetworkConnectionState
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
-import com.example.connectify.core.util.Resource
-import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
-import com.example.connectify.feature_post.presentation.main_feed.MainFeedState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -44,10 +40,17 @@ class SavedPostViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     private val postPaginator = DefaultPaginator(
-        onLoadUpdated = { isLoading ->
+        onFirstLoadUpdated = { isFirstLoading ->
             _pagingPostState.update {
                 it.copy(
-                    isLoading = isLoading
+                    isFirstLoading = isFirstLoading
+                )
+            }
+        },
+        onNextLoadUpdated = { isNextLoading ->
+            _pagingPostState.update {
+                it.copy(
+                    isNextLoading = isNextLoading
                 )
             }
         },

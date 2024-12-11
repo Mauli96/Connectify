@@ -1,7 +1,6 @@
 package com.example.connectify.feature_post.presentation.main_feed
 
 import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
@@ -53,6 +53,7 @@ import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.components.Comment
 import com.example.connectify.core.presentation.components.ConnectivityBanner
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
@@ -99,7 +100,7 @@ fun MainFeedScreen(
     )
 
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = pagingPostState.isLoading,
+        refreshing = pagingPostState.isFirstLoading,
         onRefresh = {
             viewModel.loadInitialPosts()
         }
@@ -160,7 +161,7 @@ fun MainFeedScreen(
                 .fillMaxSize()
                 .pullRefresh(pullRefreshState)
                 .pointerInput(Unit) {
-                    detectHorizontalDragGestures { change, dragAmount ->
+                    detectHorizontalDragGestures { _, dragAmount ->
                         if(dragAmount < 1.dp.toPx() && !state.isNavigatedToSearchScreen) {
                             viewModel.onEvent(MainFeedEvent.NavigatedToSearchScreen)
                             onNavigate(Screen.SearchScreen.route)
@@ -168,7 +169,7 @@ fun MainFeedScreen(
                     }
                 }
         ) {
-            if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
+            if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -202,7 +203,8 @@ fun MainFeedScreen(
                         }
                     ) { i ->
                         val post = pagingPostState.items[i]
-                        if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                        if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached
+                            && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                             viewModel.loadNextPosts()
                         }
                         Post(
@@ -239,8 +241,17 @@ fun MainFeedScreen(
                             }
                         )
                         Spacer(modifier = Modifier.height(SpaceSmall))
-                        if(i == pagingPostState.items.size - 1) {
-                            Spacer(modifier = Modifier.height(50.dp))
+                    }
+                    if(pagingPostState.isNextLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = SpaceMedium),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CustomCircularProgressIndicator()
+                            }
                         }
                     }
                 }
@@ -275,7 +286,7 @@ fun MainFeedScreen(
                 )
             }
             PullRefreshIndicator(
-                refreshing = pagingPostState.isLoading,
+                refreshing = pagingPostState.isFirstLoading,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
                 backgroundColor = MaterialTheme.colorScheme.primary,
@@ -311,7 +322,8 @@ fun CommentSheetContent(
                 viewModel.onEvent(MainFeedEvent.DismissCommentBottomSheet)
             },
             items = pagingCommentState.items,
-            isListLoading = pagingCommentState.isLoading,
+            isFirstLoading = pagingCommentState.isFirstLoading,
+            isNextLoading = pagingCommentState.isNextLoading,
             endReached = pagingCommentState.endReached,
             loadNextPage = {
                 viewModel.loadNextComments()

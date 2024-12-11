@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +41,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
+import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.feature_activity.presentation.components.ActivityItem
@@ -53,7 +55,7 @@ fun ActivityScreen(
     onNavigateUp: () -> Unit = {},
     viewModel: ActivityViewModel = hiltViewModel()
 ) {
-    val state by viewModel.pagingState.collectAsStateWithLifecycle()
+    val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -99,7 +101,7 @@ fun ActivityScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if(!state.isLoading && state.items.isEmpty()) {
+                if(pagingState.items.isEmpty() && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -123,14 +125,15 @@ fun ActivityScreen(
                 } else {
                     LazyColumn {
                         items(
-                            count = state.items.size,
+                            count = pagingState.items.size,
                             key = { i ->
-                                val activity = state.items[i]
+                                val activity = pagingState.items[i]
                                 activity.id
                             }
                         ) { i ->
-                            val activity = state.items[i]
-                            if(i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
+                            val activity = pagingState.items[i]
+                            if(i >= pagingState.items.size - 1 && !pagingState.endReached
+                                && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextActivities()
                             }
                             ActivityItem(
@@ -154,8 +157,17 @@ fun ActivityScreen(
                                 color = HintGray
                             )
                         }
-                        item {
-                            Spacer(modifier = Modifier.height(90.dp))
+                        if(pagingState.isNextLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = SpaceMedium),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomCircularProgressIndicator()
+                                }
+                            }
                         }
                     }
                 }
@@ -166,7 +178,7 @@ fun ActivityScreen(
                 )
             }
         }
-        if(state.isLoading) {
+        if(pagingState.isFirstLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)
             )
