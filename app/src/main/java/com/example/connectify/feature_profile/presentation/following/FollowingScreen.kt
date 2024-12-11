@@ -31,6 +31,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.components.UserProfileItem
@@ -53,6 +54,7 @@ fun FollowingScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val ownUserId by viewModel.ownUserId.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_users_for_this))
@@ -94,48 +96,57 @@ fun FollowingScreen(
                     )
                 }
             )
-
-            if(!state.isLoading && state.users.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceLargeExtra),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(LottieIconSize),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    Text(
-                        text = stringResource(R.string.no_followings),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(state.users) { user ->
-                        UserProfileItem(
-                            user = user,
-                            imageLoader = imageLoader,
-                            modifier = Modifier.fillMaxWidth(),
-                            isFollowing = user.isFollowing,
-                            onItemClick = {
-                                onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if(!state.isLoading && state.users.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLargeExtra),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
                             },
-                            onActionItemClick = {
-                                viewModel.onEvent(FollowingEvent.ToggleFollowStateForUser(user.userId))
-                            },
-                            ownUserId = ownUserId
+                        )
+                        Text(
+                            text = stringResource(R.string.no_followings),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
                         )
                     }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(state.users) { user ->
+                            UserProfileItem(
+                                user = user,
+                                imageLoader = imageLoader,
+                                modifier = Modifier.fillMaxWidth(),
+                                isFollowing = user.isFollowing,
+                                onItemClick = {
+                                    onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
+                                },
+                                onActionItemClick = {
+                                    viewModel.onEvent(FollowingEvent.ToggleFollowStateForUser(user.userId))
+                                },
+                                ownUserId = ownUserId
+                            )
+                        }
+                    }
                 }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
         }
         if(state.isLoading) {

@@ -3,6 +3,8 @@ package com.example.connectify.feature_chat.presentation.message
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.core.data.connectivity.ConnectivityObserver
+import com.example.connectify.core.domain.states.NetworkConnectionState
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
@@ -17,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -32,6 +35,7 @@ class MessageViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
     private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val connectivityObserver: ConnectivityObserver
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MessageState())
@@ -56,6 +60,10 @@ class MessageViewModel @Inject constructor(
 
     private val _messageUpdatedEvent = MutableSharedFlow<MessageUpdateEvent>(replay = 1)
     val messageReceived = _messageUpdatedEvent.asSharedFlow()
+
+    val networkState: StateFlow<NetworkConnectionState> =
+        connectivityObserver.networkConnection
+            .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()

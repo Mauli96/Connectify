@@ -46,6 +46,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardSearchField
 import com.example.connectify.core.presentation.components.UserProfileItem
@@ -73,6 +74,7 @@ fun SearchScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val searchFieldState by viewModel.searchFieldState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 
@@ -171,49 +173,59 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            if(state.userItems.isEmpty() && searchFieldState.text.isNotEmpty() && !state.isLoading) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceLargeExtra),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(LottieIconSize),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    Text(
-                        text = stringResource(R.string.no_user_found),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceMedium)
-                ) {
-                    items(state.userItems) { user ->
-                        UserProfileItem(
-                            user = user,
-                            imageLoader = imageLoader,
-                            modifier = Modifier.fillMaxWidth(),
-                            isFollowing = user.isFollowing,
-                            onActionItemClick = {
-                                viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if(state.userItems.isEmpty() && searchFieldState.text.isNotEmpty() && !state.isLoading) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLargeExtra),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
                             },
-                            onItemClick = {
-                                keyboardController?.hide()
-                                onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
-                            }
+                        )
+                        Text(
+                            text = stringResource(R.string.no_user_found),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
                         )
                     }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceMedium)
+                    ) {
+                        items(state.userItems) { user ->
+                            UserProfileItem(
+                                user = user,
+                                imageLoader = imageLoader,
+                                modifier = Modifier.fillMaxWidth(),
+                                isFollowing = user.isFollowing,
+                                onActionItemClick = {
+                                    viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
+                                },
+                                onItemClick = {
+                                    keyboardController?.hide()
+                                    onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
+                                }
+                            )
+                        }
+                    }
                 }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
         }
         if(state.isLoading) {

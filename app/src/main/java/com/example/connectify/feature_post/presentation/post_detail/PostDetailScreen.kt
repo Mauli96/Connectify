@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +33,7 @@ import coil.ImageLoader
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.Comment
 import com.example.connectify.core.presentation.components.CommentFilterDropdown
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.SendTextField
@@ -60,6 +63,7 @@ fun PostDetailScreen(
     val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
     val commentState by viewModel.commentState.collectAsStateWithLifecycle()
     val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -85,168 +89,179 @@ fun PostDetailScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        StandardToolbar(
-            onNavigateUp = onNavigateUp,
-            title = {
-                Text(
-                    text = stringResource(id = R.string.post),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            showBackArrow = true,
-        )
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .background(MaterialTheme.colorScheme.background),
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background)
-                ) {
-                    Spacer(modifier = Modifier.height(SpaceSmall))
-                    Box(
+            StandardToolbar(
+                onNavigateUp = onNavigateUp,
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.post),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                showBackArrow = true,
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.background),
+            ) {
+                item {
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
                     ) {
-                        Column(
+                        Spacer(modifier = Modifier.height(SpaceSmall))
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(MaterialTheme.shapes.medium)
-                                .shadow(5.dp)
-                                .background(DarkGray)
+                                .fillMaxSize()
                         ) {
-                            state.post?.let { post ->
-                                Post(
-                                    post = post,
-                                    imageLoader = imageLoader,
-                                    onUsernameClick = {
-                                        onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .shadow(5.dp)
+                                    .background(DarkGray)
+                            ) {
+                                state.post?.let { post ->
+                                    Post(
+                                        post = post,
+                                        imageLoader = imageLoader,
+                                        onUsernameClick = {
+                                            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                                        },
+                                        onLikeClick = {
+                                            viewModel.onEvent(PostDetailEvent.LikePost)
+                                        },
+                                        onCommentClick = {
+                                            context.showKeyboard()
+                                            focusRequester.requestFocus()
+                                        },
+                                        onShareClick = {
+                                            context.sendSharePostIntent(post.id)
+                                        },
+                                        onSaveClick = {
+                                            viewModel.onEvent(PostDetailEvent.SavePost(post.id))
+                                        },
+                                        onLikedByClick = {
+                                            onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                                        },
+                                        onMoreItemClick = {
+                                            viewModel.onEvent(PostDetailEvent.SelectPostUsername(post.username, post.isOwnPost))
+                                            viewModel.onEvent(PostDetailEvent.ShowBottomSheet)
+                                        },
+                                        isDescriptionVisible = state.isDescriptionVisible,
+                                        onDescriptionToggle = {
+                                            viewModel.onEvent(PostDetailEvent.OnDescriptionToggle)
+                                        }
+                                    )
+                                }
+                            }
+                            if(state.isBottomSheetVisible) {
+                                StandardBottomSheet(
+                                    title = state.selectedPostUsername.toString(),
+                                    showDownloadOption = true,
+                                    showDeleteOption = state.isOwnPost == true,
+                                    bottomSheetState = bottomSheetState,
+                                    onDismissRequest = {
+                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                                     },
-                                    onLikeClick = {
-                                        viewModel.onEvent(PostDetailEvent.LikePost)
+                                    onDownloadClick = {
+                                        viewModel.onEvent(PostDetailEvent.DownloadPost)
+                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                                     },
-                                    onCommentClick = {
-                                        context.showKeyboard()
-                                        focusRequester.requestFocus()
+                                    onDeleteClick = {
+                                        viewModel.onEvent(PostDetailEvent.DeletePost)
+                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                                     },
-                                    onShareClick = {
-                                        context.sendSharePostIntent(post.id)
-                                    },
-                                    onSaveClick = {
-                                        viewModel.onEvent(PostDetailEvent.SavePost(post.id))
-                                    },
-                                    onLikedByClick = {
-                                        onNavigate(Screen.PersonListScreen.route + "/${post.id}")
-                                    },
-                                    onMoreItemClick = {
-                                        viewModel.onEvent(PostDetailEvent.SelectPostUsername(post.username, post.isOwnPost))
-                                        viewModel.onEvent(PostDetailEvent.ShowBottomSheet)
-                                    },
-                                    isDescriptionVisible = state.isDescriptionVisible,
-                                    onDescriptionToggle = {
-                                        viewModel.onEvent(PostDetailEvent.OnDescriptionToggle)
+                                    onCancelClick = {
+                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
                                     }
                                 )
                             }
                         }
-                        if(state.isBottomSheetVisible) {
-                            StandardBottomSheet(
-                                title = state.selectedPostUsername.toString(),
-                                showDownloadOption = true,
-                                showDeleteOption = state.isOwnPost == true,
-                                bottomSheetState = bottomSheetState,
-                                onDismissRequest = {
-                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                                },
-                                onDownloadClick = {
-                                    viewModel.onEvent(PostDetailEvent.DownloadPost)
-                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                                },
-                                onDeleteClick = {
-                                    viewModel.onEvent(PostDetailEvent.DeletePost)
-                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                                },
-                                onCancelClick = {
-                                    viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
-                                }
-                            )
-                        }
-                        if(state.isLoadingPost) {
-                            CustomCircularProgressIndicator(
-                                modifier = Modifier.align(Center)
-                            )
-                        }
                     }
                 }
-            }
-            if(pagingCommentState.items.isNotEmpty()) {
-                item {
-                    CommentFilterDropdown(
-                        expanded = state.isDropdownExpanded,
-                        onShowDropDownMenu = {
-                            viewModel.onEvent(PostDetailEvent.ShowDropDownMenu)
+                if(pagingCommentState.items.isNotEmpty()) {
+                    item {
+                        CommentFilterDropdown(
+                            expanded = state.isDropdownExpanded,
+                            onShowDropDownMenu = {
+                                viewModel.onEvent(PostDetailEvent.ShowDropDownMenu)
+                            },
+                            onDismissDropdownMenu = {
+                                viewModel.onEvent(PostDetailEvent.DismissDropDownMenu)
+                            },
+                            selectedFilter = commentState.commentFilter,
+                            onFilterSelected = { filterType ->
+                                viewModel.onEvent(PostDetailEvent.ChangeCommentFilter(filterType))
+                            }
+                        )
+                    }
+                }
+                items(
+                    count = pagingCommentState.items.size,
+                    key = { i ->
+                        val comment = pagingCommentState.items[i]
+                        comment.id
+                    }
+                ) { i ->
+                    val comment = pagingCommentState.items[i]
+                    if(i >= pagingCommentState.items.size - 1 && !pagingCommentState.endReached && !pagingCommentState.isLoading) {
+                        viewModel.loadNextComments()
+                    }
+                    Comment(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        comment = comment,
+                        context = context,
+                        imageLoader = imageLoader,
+                        onLikeClick = {
+                            viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
                         },
-                        onDismissDropdownMenu = {
-                            viewModel.onEvent(PostDetailEvent.DismissDropDownMenu)
+                        onLikedByClick = {
+                            onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                         },
-                        selectedFilter = commentState.commentFilter,
-                        onFilterSelected = { filterType ->
-                            viewModel.onEvent(PostDetailEvent.ChangeCommentFilter(filterType))
+                        onLongPress = {
+                            viewModel.onEvent(PostDetailEvent.SelectComment(comment.id))
+                        },
+                        onDeleteClick = {
+                            viewModel.onEvent(PostDetailEvent.DeleteComment)
                         }
                     )
                 }
             }
-            items(
-                count = pagingCommentState.items.size,
-                key = { i ->
-                    val comment = pagingCommentState.items[i]
-                    comment.id
-                }
-            ) { i ->
-                val comment = pagingCommentState.items[i]
-                if(i >= pagingCommentState.items.size - 1 && !pagingCommentState.endReached && !pagingCommentState.isLoading) {
-                    viewModel.loadNextComments()
-                }
-                Comment(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    comment = comment,
-                    context = context,
-                    imageLoader = imageLoader,
-                    onLikeClick = {
-                        viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
-                    },
-                    onLikedByClick = {
-                        onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
-                    },
-                    onLongPress = {
-                        viewModel.onEvent(PostDetailEvent.SelectComment(comment.id))
-                    },
-                    onDeleteClick = {
-                        viewModel.onEvent(PostDetailEvent.DeleteComment)
-                    }
-                )
-            }
+            SendTextField(
+                state = commentTextFieldState,
+                onValueChange = {
+                    viewModel.onEvent(PostDetailEvent.EnteredComment(it))
+                },
+                onSend = {
+                    viewModel.onEvent(PostDetailEvent.Comment)
+                },
+                ownProfilePicture = profilePictureState,
+                hint = stringResource(id = R.string.enter_a_comment),
+                isLoading = commentState.isLoading,
+                focusRequester = focusRequester
+            )
         }
-        SendTextField(
-            state = commentTextFieldState,
-            onValueChange = {
-                viewModel.onEvent(PostDetailEvent.EnteredComment(it))
-            },
-            onSend = {
-                viewModel.onEvent(PostDetailEvent.Comment)
-            },
-            ownProfilePicture = profilePictureState,
-            hint = stringResource(id = R.string.enter_a_comment),
-            isLoading = commentState.isLoading,
-            focusRequester = focusRequester
+        ConnectivityBanner(
+            networkState = networkState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 50.dp)
         )
+        if(state.isLoadingPost) {
+            CustomCircularProgressIndicator(
+                modifier = Modifier.align(Center)
+            )
+        }
     }
 }

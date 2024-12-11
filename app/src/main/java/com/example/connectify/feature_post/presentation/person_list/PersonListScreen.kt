@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.components.UserProfileItem
@@ -40,6 +42,7 @@ fun PersonListScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val ownUserId by viewModel.ownUserId.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
@@ -57,47 +60,57 @@ fun PersonListScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        StandardToolbar(
-            onNavigateUp = onNavigateUp,
-            showBackArrow = true,
-            title = {
-                Text(
-                    text = stringResource(id = R.string.liked_by),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.users) { user ->
-                    UserProfileItem(
-                        user = user,
-                        imageLoader = imageLoader,
-                        modifier = Modifier.fillMaxWidth(),
-                        isFollowing = user.isFollowing,
-                        onItemClick = {
-                            onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
-                        },
-                        onActionItemClick = {
-                            viewModel.onEvent(PersonListEvent.ToggleFollowStateForUser(user.userId))
-                        },
-                        ownUserId = ownUserId
+            StandardToolbar(
+                onNavigateUp = onNavigateUp,
+                showBackArrow = true,
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.liked_by),
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
-            }
-            if(state.isLoading) {
-                CustomCircularProgressIndicator(
-                    modifier = Modifier.align(Center)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(state.users) { user ->
+                        UserProfileItem(
+                            user = user,
+                            imageLoader = imageLoader,
+                            modifier = Modifier.fillMaxWidth(),
+                            isFollowing = user.isFollowing,
+                            onItemClick = {
+                                onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
+                            },
+                            onActionItemClick = {
+                                viewModel.onEvent(PersonListEvent.ToggleFollowStateForUser(user.userId))
+                            },
+                            ownUserId = ownUserId
+                        )
+                    }
+                }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
                 )
             }
+        }
+        if(state.isLoading) {
+            CustomCircularProgressIndicator(
+                modifier = Modifier.align(Center)
+            )
         }
     }
 }

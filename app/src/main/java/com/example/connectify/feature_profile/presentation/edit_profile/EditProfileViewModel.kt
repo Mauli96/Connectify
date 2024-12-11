@@ -1,21 +1,22 @@
 package com.example.connectify.feature_profile.presentation.edit_profile
 
-import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
+import com.example.connectify.core.data.connectivity.ConnectivityObserver
+import com.example.connectify.core.domain.states.NetworkConnectionState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_profile.domain.models.UpdateProfileData
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
-import com.example.connectify.feature_profile.presentation.profile.ProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
+    private val connectivityObserver: ConnectivityObserver,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -52,6 +54,10 @@ class EditProfileViewModel @Inject constructor(
 
     private val _editProfileState = MutableStateFlow(EditProfileState())
     val editProfileState = _editProfileState.asStateFlow()
+
+    val networkState: StateFlow<NetworkConnectionState> =
+        connectivityObserver.networkConnection
+            .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()

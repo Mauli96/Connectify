@@ -3,8 +3,10 @@ package com.example.connectify.feature_post.presentation.main_feed
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
+import com.example.connectify.core.data.connectivity.ConnectivityObserver
 import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.domain.states.NetworkConnectionState
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
@@ -25,6 +27,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
@@ -41,7 +44,8 @@ class MainFeedViewModel @Inject constructor(
     private val commentLiker: CommentLiker,
     private val getOwnProfilePictureUseCase: GetOwnProfilePictureUseCase,
     private val getPostDownloadUrlUseCase: GetPostDownloadUrlUseCase,
-    private val postDownloader: PostDownloader
+    private val postDownloader: PostDownloader,
+    private val connectivityObserver: ConnectivityObserver
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainFeedState())
@@ -57,6 +61,10 @@ class MainFeedViewModel @Inject constructor(
 
     private val _commentTextFieldState = MutableStateFlow(StandardTextFieldState(error = CommentError.FieldEmpty))
     val commentTextFieldState = _commentTextFieldState.asStateFlow()
+
+    val networkState: StateFlow<NetworkConnectionState> =
+        connectivityObserver.networkConnection
+            .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()

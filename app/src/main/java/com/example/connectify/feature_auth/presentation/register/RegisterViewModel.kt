@@ -3,6 +3,8 @@ package com.example.connectify.feature_auth.presentation.register
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.connectify.R
+import com.example.connectify.core.data.connectivity.ConnectivityObserver
+import com.example.connectify.core.domain.states.NetworkConnectionState
 import com.example.connectify.core.domain.states.PasswordTextFieldState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
@@ -14,8 +16,11 @@ import com.example.connectify.feature_auth.domain.use_case.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +29,7 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val loginUseCase: LoginUseCase,
+    private val connectivityObserver: ConnectivityObserver
 ) : ViewModel() {
 
     private val _emailState = MutableStateFlow(StandardTextFieldState())
@@ -37,6 +43,10 @@ class RegisterViewModel @Inject constructor(
 
     private val _registerState = MutableStateFlow(RegisterState())
     val registerState = _registerState.asStateFlow()
+
+    val networkState: StateFlow<NetworkConnectionState> =
+        connectivityObserver.networkConnection
+            .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()

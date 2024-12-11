@@ -52,6 +52,7 @@ import com.example.connectify.core.domain.models.Comment
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.components.Comment
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
@@ -80,6 +81,7 @@ fun MainFeedScreen(
     val pagingPostState by viewModel.pagingPostState.collectAsStateWithLifecycle()
     val pagingCommentState by viewModel.pagingCommentState.collectAsStateWithLifecycle()
     val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val bottomSheetState = rememberModalBottomSheetState(
@@ -278,6 +280,11 @@ fun MainFeedScreen(
                 modifier = Modifier.align(Alignment.TopCenter),
                 backgroundColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+            ConnectivityBanner(
+                networkState = networkState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
             )
         }
     }

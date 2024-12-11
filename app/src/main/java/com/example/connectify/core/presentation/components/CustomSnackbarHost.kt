@@ -48,6 +48,7 @@ fun CustomSnackbarHost(
         val successLoginText = stringResource(R.string.success_login)
         val createPostText = stringResource(R.string.post_created)
         val savePostText = stringResource(R.string.successfully_saved_post)
+        val successDownload = stringResource(R.string.successfully_downloaded_post)
         val unSavePostText = stringResource(R.string.successfully_unsaved_post)
         val deletePostText = stringResource(R.string.successfully_deleted_post)
         val deleteChatText = stringResource(R.string.successfully_deleted_chat)
@@ -62,7 +63,8 @@ fun CustomSnackbarHost(
             message.contains(successRegisterationText, ignoreCase = true) ||
                     message.contains(successLoginText, ignoreCase = true) ||
                     message.contains(createPostText, ignoreCase = true) ||
-                    message.contains(savePostText, ignoreCase = true) -> R.raw.success
+                    message.contains(savePostText, ignoreCase = true) ||
+                    message.contains(successDownload, ignoreCase = true) -> R.raw.success
             message.contains(unSavePostText, ignoreCase = true) ||
                     message.contains(deletePostText, ignoreCase = true) ||
                     message.contains(deleteChatText, ignoreCase = true) ||

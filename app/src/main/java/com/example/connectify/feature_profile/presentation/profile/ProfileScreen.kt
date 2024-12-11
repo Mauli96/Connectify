@@ -66,6 +66,7 @@ import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.components.Comment
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
@@ -73,7 +74,6 @@ import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
-import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
@@ -95,14 +95,15 @@ fun ProfileScreen(
     onNavigateUp: () -> Unit = {},
     onLogout: () -> Unit = {},
     profilePictureSize: Dp = ProfilePictureSizeLarge,
-    viewmodel: ProfileViewModel = hiltViewModel(),
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
 
-    val state by viewmodel.state.collectAsStateWithLifecycle()
-    val toolbarState by viewmodel.toolbarState.collectAsStateWithLifecycle()
-    val pagingPostState by viewmodel.pagingPostState.collectAsStateWithLifecycle()
-    val pagingCommentState by viewmodel.pagingCommentState.collectAsStateWithLifecycle()
-    val commentTextFieldState by  viewmodel.commentTextFieldState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val toolbarState by viewModel.toolbarState.collectAsStateWithLifecycle()
+    val pagingPostState by viewModel.pagingPostState.collectAsStateWithLifecycle()
+    val pagingCommentState by viewModel.pagingCommentState.collectAsStateWithLifecycle()
+    val commentTextFieldState by  viewModel.commentTextFieldState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
 
@@ -142,18 +143,18 @@ fun ProfileScreen(
             ): Offset {
                 val delta = available.y
                 val shouldNotScroll = delta > 0f && lazyListState.firstVisibleItemIndex != 0 ||
-                        viewmodel.pagingPostState.value.items.isEmpty()
+                        viewModel.pagingPostState.value.items.isEmpty()
                 if(shouldNotScroll) {
                     return Offset.Zero
                 }
-                val newOffset = viewmodel.toolbarState.value.toolbarOffsetY + delta
-                viewmodel.setToolbarOffsetY(
+                val newOffset = viewModel.toolbarState.value.toolbarOffsetY + delta
+                viewModel.setToolbarOffsetY(
                     newOffset.coerceIn(
                         minimumValue = -maxOffset.toPx(),
                         maximumValue = 0f
                     )
                 )
-                viewmodel.setExpandedRatio((viewmodel.toolbarState.value.toolbarOffsetY + maxOffset.toPx()) / maxOffset.toPx())
+                viewModel.setExpandedRatio((viewModel.toolbarState.value.toolbarOffsetY + maxOffset.toPx()) / maxOffset.toPx())
                 return Offset.Zero
             }
         }
@@ -166,7 +167,7 @@ fun ProfileScreen(
     )
 
     LaunchedEffect(key1 = true) {
-        viewmodel.eventFlow.collectLatest { event ->
+        viewModel.eventFlow.collectLatest { event ->
             when(event) {
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
@@ -225,7 +226,7 @@ fun ProfileScreen(
                             onNavigate(Screen.FollowerScreen.route + "/${profile.userId}")
                         },
                         onFollowClick = {
-                            viewmodel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
+                            viewModel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
                         },
                         onMessageClick = {
                             val encodedProfilePictureUrl = Base64.encodeToString(profile.profilePictureUrl.encodeToByteArray(), 0)
@@ -272,36 +273,36 @@ fun ProfileScreen(
                 ) { i ->
                     val post = pagingPostState.items[i]
                     if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
-                        viewmodel.loadNextPosts()
+                        viewModel.loadNextPosts()
                     }
                     Post(
                         post = post,
                         imageLoader = imageLoader,
                         onLikeClick = {
-                            viewmodel.onEvent(ProfileEvent.LikedPost(post.id))
+                            viewModel.onEvent(ProfileEvent.LikedPost(post.id))
                         },
                         onCommentClick = {
-                            viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
-                            viewmodel.onEvent(ProfileEvent.ShowBottomSheet)
-                            viewmodel.onEvent(ProfileEvent.LoadComments)
+                            viewModel.onEvent(ProfileEvent.SelectPostId(post.id))
+                            viewModel.onEvent(ProfileEvent.ShowBottomSheet)
+                            viewModel.onEvent(ProfileEvent.LoadComments)
                         },
                         onShareClick = {
                             context.sendSharePostIntent(post.id)
                         },
                         onSaveClick = {
-                            viewmodel.onEvent(ProfileEvent.SavePost(post.id))
+                            viewModel.onEvent(ProfileEvent.SavePost(post.id))
                         },
                         onLikedByClick = {
                             onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                         },
                         onMoreItemClick = {
-                            viewmodel.onEvent(ProfileEvent.SelectPostId(post.id))
-                            viewmodel.onEvent(ProfileEvent.SelectPostUsername(post.username, post.isOwnPost))
-                            viewmodel.onEvent(ProfileEvent.ShowDeleteSheet)
+                            viewModel.onEvent(ProfileEvent.SelectPostId(post.id))
+                            viewModel.onEvent(ProfileEvent.SelectPostUsername(post.username, post.isOwnPost))
+                            viewModel.onEvent(ProfileEvent.ShowDeleteSheet)
                         },
                         isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
                         onDescriptionToggle = {
-                            viewmodel.onEvent(ProfileEvent.OnDescriptionToggle(post.id))
+                            viewModel.onEvent(ProfileEvent.OnDescriptionToggle(post.id))
                         }
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
@@ -347,10 +348,10 @@ fun ProfileScreen(
                     isOwnProfile = profile.isOwnProfile,
                     expanded = state.isDropdownMenuVisible,
                     onShowDropDownMenu = {
-                        viewmodel.onEvent(ProfileEvent.ShowDropDownMenu)
+                        viewModel.onEvent(ProfileEvent.ShowDropDownMenu)
                     },
                     onDismissDropdownMenu = {
-                        viewmodel.onEvent(ProfileEvent.DisMissDropDownMenu)
+                        viewModel.onEvent(ProfileEvent.DisMissDropDownMenu)
                     },
                     onGitHubClick = {
                         context.openUrlInBrowser(profile.gitHubUrl ?: return@BannerSection)
@@ -368,7 +369,7 @@ fun ProfileScreen(
                         onNavigate(Screen.SavedPostScreen.route)
                     },
                     onLogoutClick = {
-                        viewmodel.onEvent(ProfileEvent.ShowLogoutDialog)
+                        viewModel.onEvent(ProfileEvent.ShowLogoutDialog)
                     },
                     onNavigateUp = {
                         onNavigateUp()
@@ -408,7 +409,7 @@ fun ProfileScreen(
             imageLoader = imageLoader,
             onNavigate = onNavigate,
             context = context,
-            viewModel = viewmodel,
+            viewModel = viewModel,
             focusRequester = focusRequester,
             bottomSheetState = bottomSheetState,
             commentTextFieldState = commentTextFieldState,
@@ -421,25 +422,25 @@ fun ProfileScreen(
                 showDownloadOption = true,
                 showDeleteOption = state.isOwnPost == true,
                 onDismissRequest = {
-                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
                 },
                 onDownloadClick = {
-                    viewmodel.onEvent(ProfileEvent.DownloadPost)
-                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.DownloadPost)
+                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
                 },
                 onDeleteClick = {
-                    viewmodel.onEvent(ProfileEvent.DeletePost)
-                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.DeletePost)
+                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
                 },
                 onCancelClick = {
-                    viewmodel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
                 }
             )
         }
         if(state.isLogoutDialogVisible) {
             Dialog(
                 onDismissRequest = {
-                viewmodel.onEvent(ProfileEvent.DismissLogoutDialog)
+                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
             }) {
                 Column(
                     modifier = Modifier
@@ -470,7 +471,7 @@ fun ProfileScreen(
                                 .pointerInput(Unit) {
                                     detectTapGestures(
                                         onTap = {
-                                            viewmodel.onEvent(ProfileEvent.DismissLogoutDialog)
+                                            viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
                                         }
                                     )
                                 }
@@ -483,8 +484,8 @@ fun ProfileScreen(
                                 .pointerInput(Unit) {
                                     detectTapGestures(
                                         onTap = {
-                                            viewmodel.onEvent(ProfileEvent.DismissLogoutDialog)
-                                            viewmodel.onEvent(ProfileEvent.Logout)
+                                            viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
+                                            viewModel.onEvent(ProfileEvent.Logout)
                                             onLogout()
                                         }
                                     )
@@ -494,6 +495,11 @@ fun ProfileScreen(
                 }
             }
         }
+        ConnectivityBanner(
+            networkState = networkState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+        )
         if(state.isLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)

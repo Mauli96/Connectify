@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -65,6 +66,7 @@ fun LoginScreen(
     val emailState by viewModel.emailState.collectAsStateWithLifecycle()
     val passwordState by viewModel.passwordState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
@@ -102,114 +104,124 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(
-                start = SpaceLarge,
-                end = SpaceLarge,
-                top = SpaceLarge,
-                bottom = 50.dp
-            )
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .align(Alignment.Center),
-            verticalArrangement = Arrangement.Center
+                .padding(
+                    start = SpaceLarge,
+                    end = SpaceLarge,
+                    top = SpaceLarge,
+                    bottom = 50.dp
+                )
         ) {
-            Text(
-                text = stringResource(id = R.string.login),
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Spacer(modifier = Modifier.height(SpaceMedium))
-            StandardTextField(
-                text = emailState.text,
-                onValueChange = {
-                    viewModel.onEvent(LoginEvent.EnteredEmail(it))
-                },
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next,
-                onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
-                error = when(emailState.error) {
-                    is AuthError.FieldEmpty -> {
-                        stringResource(id = R.string.this_field_cant_be_empty)
-                    }
-                    else -> ""
-                },
-                leadingIcon = painterResource(id = R.drawable.ic_email),
-                hint = stringResource(id = R.string.login_hint)
-            )
-            Spacer(modifier = Modifier.height(SpaceMedium))
-            StandardTextField(
-                text = passwordState.text,
-                onValueChange = {
-                    viewModel.onEvent(LoginEvent.EnteredPassword(it))
-                },
-                hint = stringResource(id = R.string.password_hint),
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-                onNext = {
-                    focusManager.clearFocus()
-                },
-                error = when(passwordState.error) {
-                    is AuthError.FieldEmpty -> {
-                        stringResource(id = R.string.this_field_cant_be_empty)
-                    }
-                    else -> ""
-                },
-                leadingIcon = painterResource(id = R.drawable.ic_password),
-                showPasswordToggle = passwordState.isPasswordVisible,
-                onPasswordToggleClick = {
-                    viewModel.onEvent(LoginEvent.TogglePasswordVisibility)
-                }
-            )
-            Spacer(modifier = Modifier.height(SpaceMedium))
-            Button(
-                onClick = {
-                    viewModel.onEvent(LoginEvent.Login)
-                },
-                shape = MaterialTheme.shapes.extraSmall,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+                verticalArrangement = Arrangement.Center
             ) {
-                if(state.isLoading) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .align(CenterVertically)
-                    )
-                } else {
-                    Text(
-                        text = stringResource(id = R.string.login),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                Text(
+                    text = stringResource(id = R.string.login),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Spacer(modifier = Modifier.height(SpaceMedium))
+                StandardTextField(
+                    text = emailState.text,
+                    onValueChange = {
+                        viewModel.onEvent(LoginEvent.EnteredEmail(it))
+                    },
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next,
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    },
+                    error = when(emailState.error) {
+                        is AuthError.FieldEmpty -> {
+                            stringResource(id = R.string.this_field_cant_be_empty)
+                        }
+                        else -> ""
+                    },
+                    leadingIcon = painterResource(id = R.drawable.ic_email),
+                    hint = stringResource(id = R.string.login_hint)
+                )
+                Spacer(modifier = Modifier.height(SpaceMedium))
+                StandardTextField(
+                    text = passwordState.text,
+                    onValueChange = {
+                        viewModel.onEvent(LoginEvent.EnteredPassword(it))
+                    },
+                    hint = stringResource(id = R.string.password_hint),
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                    onNext = {
+                        focusManager.clearFocus()
+                    },
+                    error = when(passwordState.error) {
+                        is AuthError.FieldEmpty -> {
+                            stringResource(id = R.string.this_field_cant_be_empty)
+                        }
+                        else -> ""
+                    },
+                    leadingIcon = painterResource(id = R.drawable.ic_password),
+                    showPasswordToggle = passwordState.isPasswordVisible,
+                    onPasswordToggleClick = {
+                        viewModel.onEvent(LoginEvent.TogglePasswordVisibility)
+                    }
+                )
+                Spacer(modifier = Modifier.height(SpaceMedium))
+                Button(
+                    onClick = {
+                        viewModel.onEvent(LoginEvent.Login)
+                    },
+                    shape = MaterialTheme.shapes.extraSmall,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if(state.isLoading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .align(CenterVertically)
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(id = R.string.login),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
             }
+            Text(
+                text = buildAnnotatedString {
+                    append(stringResource(id = R.string.dont_have_an_account_yet))
+                    append(" ")
+                    val signUpText = stringResource(id = R.string.sign_up)
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        append(signUpText)
+                    }
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                onNavigate(Screen.RegisterScreen.route)
+                            }
+                        )
+                    }
+            )
         }
-        Text(
-            text = buildAnnotatedString {
-                append(stringResource(id = R.string.dont_have_an_account_yet))
-                append(" ")
-                val signUpText = stringResource(id = R.string.sign_up)
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    append(signUpText)
-                }
-            },
-            style = MaterialTheme.typography.bodyMedium,
+        ConnectivityBanner(
+            networkState = networkState,
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            onNavigate(Screen.RegisterScreen.route)
-                        }
-                    )
-                }
+                .align(Alignment.TopCenter)
         )
     }
 }

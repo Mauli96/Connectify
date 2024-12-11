@@ -3,6 +3,8 @@ package com.example.connectify.feature_profile.presentation.following
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.connectify.core.data.connectivity.ConnectivityObserver
+import com.example.connectify.core.domain.states.NetworkConnectionState
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.domain.use_case.ToggleFollowStateForUserUseCase
 import com.example.connectify.core.presentation.util.UiEvent
@@ -12,8 +14,11 @@ import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,6 +28,7 @@ class FollowingViewModel @Inject constructor(
     private val profileUseCases: ProfileUseCases,
     private val toggleFollowStateForUserUseCase: ToggleFollowStateForUserUseCase,
     private val getOwnUserId: GetOwnUserIdUseCase,
+    private val connectivityObserver: ConnectivityObserver,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -31,6 +37,10 @@ class FollowingViewModel @Inject constructor(
 
     private val _ownUserId = MutableStateFlow("")
     val ownUserId = _ownUserId.asStateFlow()
+
+    val networkState: StateFlow<NetworkConnectionState> =
+        connectivityObserver.networkConnection
+            .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()

@@ -35,6 +35,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
@@ -57,6 +58,7 @@ fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val bottomSheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
 
@@ -98,54 +100,64 @@ fun ChatScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
             )
-            if(!state.isLoading && state.chats.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceLargeExtra),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(LottieIconSize),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    Text(
-                        text = stringResource(R.string.no_chats_found),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    items(
-                        items = state.chats,
-                        key = { chat ->
-                            chat.chatId
-                        }
-                    ) { chat ->
-                        ChatItem(
-                            item = chat,
-                            imageLoader = imageLoader,
-                            context = context,
-                            modifier = Modifier.fillMaxWidth(),
-                            onItemClick = {
-                                onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}?isOnline=${chat.online}?lastSeen=${chat.lastSeen}")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if(!state.isLoading && state.chats.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLargeExtra),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
                             },
-                            onLongPress = {
-                                viewModel.onEvent(ChatEvent.SelectChat(chat.chatId, chat.remoteUsername))
-                                viewModel.onEvent(ChatEvent.ShowBottomSheet)
-                            }
                         )
-                        Spacer(modifier = Modifier.height(SpaceSmall))
+                        Text(
+                            text = stringResource(R.string.no_chats_found),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        items(
+                            items = state.chats,
+                            key = { chat ->
+                                chat.chatId
+                            }
+                        ) { chat ->
+                            ChatItem(
+                                item = chat,
+                                imageLoader = imageLoader,
+                                context = context,
+                                modifier = Modifier.fillMaxWidth(),
+                                onItemClick = {
+                                    onNavigate(Screen.MessageScreen.route + "/${chat.remoteUserId}/${chat.remoteUsername}/${Base64.encodeToString(chat.remoteUserProfilePictureUrl.encodeToByteArray(), 0)}?chatId=${chat.chatId}?isOnline=${chat.online}?lastSeen=${chat.lastSeen}")
+                                },
+                                onLongPress = {
+                                    viewModel.onEvent(ChatEvent.SelectChat(chat.chatId, chat.remoteUsername))
+                                    viewModel.onEvent(ChatEvent.ShowBottomSheet)
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(SpaceSmall))
+                        }
                     }
                 }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
         }
         if(state.isBottomSheetVisible) {

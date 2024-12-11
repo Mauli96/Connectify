@@ -136,4 +136,6 @@
     <string name="no_followings">You\'re not following anyone yet. Discover and connect with others!</string>
     <string name="no_activity">No recent activity. Start exploring and connecting with others!</string>
     <string name="no_posts_for_profile">No posts yet. Start sharing your moments!</string>
+    <string name="no_internet_connection">No Internet Connection!</string>
+    <string name="back_online">Back Online!</string>
 </resources>

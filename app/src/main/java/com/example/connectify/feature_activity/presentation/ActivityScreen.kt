@@ -34,6 +34,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.HintGray
@@ -53,6 +54,7 @@ fun ActivityScreen(
     viewModel: ActivityViewModel = hiltViewModel()
 ) {
     val state by viewModel.pagingState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_activity))
@@ -93,65 +95,75 @@ fun ActivityScreen(
                 modifier = Modifier.fillMaxWidth(),
                 showBackArrow = false,
             )
-            if(!state.isLoading && state.items.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceLargeExtra),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(LottieIconSize),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    Text(
-                        text = stringResource(R.string.no_activity),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn {
-                    items(
-                        count = state.items.size,
-                        key = { i ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if(!state.isLoading && state.items.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLargeExtra),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
+                            },
+                        )
+                        Text(
+                            text = stringResource(R.string.no_activity),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn {
+                        items(
+                            count = state.items.size,
+                            key = { i ->
+                                val activity = state.items[i]
+                                activity.id
+                            }
+                        ) { i ->
                             val activity = state.items[i]
-                            activity.id
+                            if(i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
+                                viewModel.loadNextActivities()
+                            }
+                            ActivityItem(
+                                activity = Activity(
+                                    id = activity.id,
+                                    userId = activity.userId,
+                                    activityType = activity.activityType,
+                                    formattedTime = activity.formattedTime,
+                                    parentId = activity.parentId,
+                                    username = activity.username,
+                                    profilePictureUrl = activity.profilePictureUrl
+                                ),
+                                onNavigate = onNavigate,
+                                imageLoader = imageLoader,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .height(0.5.dp),
+                                thickness = 1.dp,
+                                color = HintGray
+                            )
                         }
-                    ) { i ->
-                        val activity = state.items[i]
-                        if(i >= state.items.size - 1 && !state.endReached && !state.isLoading) {
-                            viewModel.loadNextActivities()
+                        item {
+                            Spacer(modifier = Modifier.height(90.dp))
                         }
-                        ActivityItem(
-                            activity = Activity(
-                                id = activity.id,
-                                userId = activity.userId,
-                                activityType = activity.activityType,
-                                formattedTime = activity.formattedTime,
-                                parentId = activity.parentId,
-                                username = activity.username,
-                                profilePictureUrl = activity.profilePictureUrl
-                            ),
-                            onNavigate = onNavigate,
-                            imageLoader = imageLoader,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .height(0.5.dp),
-                            thickness = 1.dp,
-                            color = HintGray
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(90.dp))
                     }
                 }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
         }
         if(state.isLoading) {

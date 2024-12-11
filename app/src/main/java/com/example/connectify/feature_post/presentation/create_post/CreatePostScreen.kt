@@ -44,6 +44,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
@@ -74,6 +75,7 @@ fun CreatePostScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val descriptionState by viewModel.descriptionState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val cropActivityLauncher = rememberLauncherForActivityResult(
@@ -128,102 +130,112 @@ fun CreatePostScreen(
                 )
             }
         )
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(SpaceLarge)
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .aspectRatio(4f / 5f)
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.medium)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .clickable {
-                        galleryLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    .fillMaxSize()
+                    .padding(SpaceLarge)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(4f / 5f)
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.medium)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            shape = MaterialTheme.shapes.medium
                         )
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                LottieAnimation(
-                    modifier = Modifier.size(150.dp),
-                    composition = composition,
-                    progress = {
-                        progress
-                    },
-                )
-                state.imageUri?.let { uri ->
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = uri,
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = stringResource(id = R.string.post_image),
-                        modifier = Modifier.matchParentSize()
+                        .clickable {
+                            galleryLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    LottieAnimation(
+                        modifier = Modifier.size(150.dp),
+                        composition = composition,
+                        progress = {
+                            progress
+                        },
                     )
-                }
-            }
-            Spacer(modifier = Modifier.height(SpaceMedium))
-            Text(
-                text = stringResource(id = R.string.description),
-                style = MaterialTheme.typography.labelSmall
-            )
-            StandardOutlinedTextField(
-                text = descriptionState.text,
-                onValueChange = {
-                    viewModel.onEvent(CreatePostEvent.EnterDescription(it))
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = false,
-                maxLines = 5,
-                minLines = 3,
-                error = when(descriptionState.error) {
-                    is PostDescriptionError.FieldEmpty -> {
-                        stringResource(id = R.string.this_field_cant_be_empty)
+                    state.imageUri?.let { uri ->
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = uri,
+                                imageLoader = imageLoader
+                            ),
+                            contentDescription = stringResource(id = R.string.post_image),
+                            modifier = Modifier.matchParentSize()
+                        )
                     }
-                    else -> ""
                 }
-            )
-            Spacer(modifier = Modifier.height(SpaceLarge))
-            Button(
-                onClick = {
-                    viewModel.onEvent(CreatePostEvent.PostImage)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = GreenAccent
-                ),
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .height(40.dp)
-                    .width(100.dp)
-            ) {
-                if(state.isLoading) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(3.dp)
-                            .align(CenterVertically),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        trackColor = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    Text(
-                        text = stringResource(id = R.string.post),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.width(SpaceSmall))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_post_send),
-                        contentDescription = null,
-                        modifier = Modifier.size(IconSizeSmall)
-                    )
+                Spacer(modifier = Modifier.height(SpaceMedium))
+                Text(
+                    text = stringResource(id = R.string.description),
+                    style = MaterialTheme.typography.labelSmall
+                )
+                StandardOutlinedTextField(
+                    text = descriptionState.text,
+                    onValueChange = {
+                        viewModel.onEvent(CreatePostEvent.EnterDescription(it))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    maxLines = 5,
+                    minLines = 3,
+                    error = when(descriptionState.error) {
+                        is PostDescriptionError.FieldEmpty -> {
+                            stringResource(id = R.string.this_field_cant_be_empty)
+                        }
+                        else -> ""
+                    }
+                )
+                Spacer(modifier = Modifier.height(SpaceLarge))
+                Button(
+                    onClick = {
+                        viewModel.onEvent(CreatePostEvent.PostImage)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = GreenAccent
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .height(40.dp)
+                        .width(100.dp)
+                ) {
+                    if(state.isLoading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp)
+                                .align(CenterVertically),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            trackColor = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(id = R.string.post),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Spacer(modifier = Modifier.width(SpaceSmall))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_post_send),
+                            contentDescription = null,
+                            modifier = Modifier.size(IconSizeSmall)
+                        )
+                    }
                 }
             }
+            ConnectivityBanner(
+                networkState = networkState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+            )
         }
     }
 }

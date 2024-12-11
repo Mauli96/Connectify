@@ -46,6 +46,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.SendTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
@@ -55,6 +56,7 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediu
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
@@ -83,6 +85,7 @@ fun MessageScreen(
     val messageTextFieldState by viewModel.messageTextFieldState.collectAsStateWithLifecycle()
     val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
     val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
 
@@ -174,7 +177,8 @@ fun MessageScreen(
                 }
             )
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
             ) {
                 if(!pagingState.isLoading && pagingState.items.isEmpty()) {
                     Column(
@@ -290,6 +294,12 @@ fun MessageScreen(
                 hint = stringResource(id = R.string.enter_a_message)
             )
         }
+        ConnectivityBanner(
+            networkState = networkState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 50.dp)
+        )
         if(pagingState.isLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)

@@ -40,6 +40,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
+import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
@@ -59,6 +60,7 @@ fun SavedPostScreen(
     viewModel: SavedPostViewModel = hiltViewModel()
 ) {
     val pagingPostState by viewModel.pagingPostState.collectAsStateWithLifecycle()
+    val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_activity))
@@ -101,54 +103,64 @@ fun SavedPostScreen(
                 modifier = Modifier.fillMaxWidth(),
                 showBackArrow = true,
             )
-            if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceLargeExtra),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(LottieIconSize),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    Text(
-                        text = stringResource(R.string.no_saved_post),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    items(
-                        count = pagingPostState.items.size,
-                        key = { i ->
-                            val post = pagingPostState.items[i]
-                            post.id
-                        }
-                    ) { i ->
-                        val post = pagingPostState.items[i]
-                        if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
-                            viewModel.loadNextPosts()
-                        }
-                        PostImageItem(
-                            imageLoader = imageLoader,
-                            post = post,
-                            onPostImageClick = {
-                                onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
-                            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if(pagingPostState.items.isEmpty() && !pagingPostState.isLoading) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = SpaceLargeExtra),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(LottieIconSize),
+                            composition = composition,
+                            progress = {
+                                progress
+                            },
+                        )
+                        Text(
+                            text = stringResource(R.string.no_saved_post),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
                         )
                     }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(
+                            count = pagingPostState.items.size,
+                            key = { i ->
+                                val post = pagingPostState.items[i]
+                                post.id
+                            }
+                        ) { i ->
+                            val post = pagingPostState.items[i]
+                            if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isLoading) {
+                                viewModel.loadNextPosts()
+                            }
+                            PostImageItem(
+                                imageLoader = imageLoader,
+                                post = post,
+                                onPostImageClick = {
+                                    onNavigate(Screen.PostDetailScreen.route + "/${post.id}")
+                                }
+                            )
+                        }
+                    }
                 }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
         }
         if(pagingPostState.isLoading) {

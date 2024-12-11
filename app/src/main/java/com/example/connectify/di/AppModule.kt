@@ -1,10 +1,13 @@
 package com.example.connectify.di
 
 import android.app.Application
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import com.example.connectify.core.data.connectivity.AndroidConnectivityObserver
+import com.example.connectify.core.data.connectivity.ConnectivityObserver
 import com.example.connectify.core.domain.repository.ProfileRepository
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
@@ -21,6 +24,7 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -67,6 +71,12 @@ object AppModule {
                 add(SvgDecoder.Factory(true))
             }
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver {
+        return AndroidConnectivityObserver(context)
     }
 
     @Provides
