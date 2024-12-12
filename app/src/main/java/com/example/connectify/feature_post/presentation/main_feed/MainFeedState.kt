@@ -9,6 +9,7 @@ data class MainFeedState(
     val isOwnPost: Boolean? = false,
     val selectedCommentId: String? = null,
     val isUploading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val isBottomSheetVisible: Boolean = false,
     val isCommentBottomSheetVisible: Boolean = false,
     val isDropdownMenuVisible: Boolean = false,

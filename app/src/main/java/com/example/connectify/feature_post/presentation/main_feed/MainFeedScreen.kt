@@ -30,7 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
@@ -56,6 +56,7 @@ import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
+import com.example.connectify.core.presentation.components.ShimmerListPostItem
 import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
@@ -100,9 +101,9 @@ fun MainFeedScreen(
     )
 
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = pagingPostState.isFirstLoading,
+        refreshing = state.isRefreshing,
         onRefresh = {
-            viewModel.loadInitialPosts()
+            viewModel.onRefreshPosts()
         }
     )
 
@@ -191,66 +192,77 @@ fun MainFeedScreen(
                     )
                 }
             } else {
-                LazyColumn(
+                ShimmerListPostItem(
+                    isLoadingPost = pagingPostState.isFirstLoading,
                     modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    items(
-                        count = pagingPostState.items.size,
-                        key = { i ->
-                            val post = pagingPostState.items[i]
-                            post.id
-                        }
-                    ) { i ->
-                        val post = pagingPostState.items[i]
-                        if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached
-                            && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
-                            viewModel.loadNextPosts()
-                        }
-                        Post(
-                            post = post,
-                            imageLoader = imageLoader,
-                            onUsernameClick = {
-                                onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
-                            },
-                            onLikeClick = {
-                                viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
-                            },
-                            onCommentClick = {
-                                viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
-                                viewModel.onEvent(MainFeedEvent.ShowCommentBottomSheet)
-                                viewModel.onEvent(MainFeedEvent.LoadComments)
-                            },
-                            onShareClick = {
-                                context.sendSharePostIntent(post.id)
-                            },
-                            onSaveClick = {
-                                viewModel.onEvent(MainFeedEvent.SavePost(post.id))
-                            },
-                            onLikedByClick = {
-                                onNavigate(Screen.PersonListScreen.route + "/${post.id}")
-                            },
-                            onMoreItemClick = {
-                                viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
-                                viewModel.onEvent(MainFeedEvent.SelectPostUsername(post.username, post.isOwnPost))
-                                viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
-                            },
-                            isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
-                            onDescriptionToggle = {
-                                viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
-                            }
+                        .fillMaxWidth()
+                        .padding(
+                            top = SpaceSmall,
+                            start = SpaceSmall,
+                            end = SpaceSmall
                         )
-                        Spacer(modifier = Modifier.height(SpaceSmall))
-                    }
-                    if(pagingPostState.isNextLoading) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = SpaceMedium),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CustomCircularProgressIndicator()
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        items(
+                            count = pagingPostState.items.size,
+                            key = { i ->
+                                val post = pagingPostState.items[i]
+                                post.id
+                            }
+                        ) { i ->
+                            val post = pagingPostState.items[i]
+                            if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached
+                                && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
+                                viewModel.loadNextPosts()
+                            }
+                            Post(
+                                post = post,
+                                imageLoader = imageLoader,
+                                onUsernameClick = {
+                                    onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                                },
+                                onLikeClick = {
+                                    viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
+                                },
+                                onCommentClick = {
+                                    viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
+                                    viewModel.onEvent(MainFeedEvent.ShowCommentBottomSheet)
+                                    viewModel.onEvent(MainFeedEvent.LoadComments)
+                                },
+                                onShareClick = {
+                                    context.sendSharePostIntent(post.id)
+                                },
+                                onSaveClick = {
+                                    viewModel.onEvent(MainFeedEvent.SavePost(post.id))
+                                },
+                                onLikedByClick = {
+                                    onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+                                },
+                                onMoreItemClick = {
+                                    viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
+                                    viewModel.onEvent(MainFeedEvent.SelectPostUsername(post.username, post.isOwnPost))
+                                    viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
+                                },
+                                isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
+                                onDescriptionToggle = {
+                                    viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(SpaceSmall))
+                        }
+                        if(pagingPostState.isNextLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = SpaceMedium),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomCircularProgressIndicator()
+                                }
                             }
                         }
                     }
@@ -286,7 +298,7 @@ fun MainFeedScreen(
                 )
             }
             PullRefreshIndicator(
-                refreshing = pagingPostState.isFirstLoading,
+                refreshing = state.isRefreshing,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
                 backgroundColor = MaterialTheme.colorScheme.primary,

@@ -291,16 +291,26 @@ class MainFeedViewModel @Inject constructor(
         }
     }
 
-    fun loadInitialPosts() {
+    fun onRefreshPosts() {
         viewModelScope.launch {
-            println("loadInitialPosts called")
+            _state.update {
+                it.copy(isRefreshing = true)
+            }
+            loadInitialPosts()
+            _state.update {
+                it.copy(isRefreshing = false)
+            }
+        }
+    }
+
+    private fun loadInitialPosts() {
+        viewModelScope.launch {
             postPaginator.loadFirstItems()
         }
     }
 
     fun loadNextPosts() {
         viewModelScope.launch {
-            println("loadNextPosts called")
             postPaginator.loadNextItems()
         }
     }
