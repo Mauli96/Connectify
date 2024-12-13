@@ -60,6 +60,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.util.Constants
 import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.presentation.message.components.OwnMessage
 import com.example.connectify.feature_chat.presentation.message.components.RemoteMessage
@@ -232,8 +233,8 @@ fun MessageScreen(
                             }
                         ) { i ->
                             val message = pagingState.items[i]
-                            if(i >= pagingState.items.size - 1 && !pagingState.endReached
-                                && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
+                            if(i >= pagingState.items.size - 1 && pagingState.items.size >= Constants.DEFAULT_PAGE_SIZE
+                                && !pagingState.endReached && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextMessages()
                             }
                             if(message.fromId == remoteUserId) {

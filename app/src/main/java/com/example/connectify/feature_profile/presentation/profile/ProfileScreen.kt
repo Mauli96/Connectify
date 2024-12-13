@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHostState
@@ -47,6 +49,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -72,6 +75,7 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.PaginatedBottomSheet
 import com.example.connectify.core.presentation.components.Post
 import com.example.connectify.core.presentation.components.StandardBottomSheet
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
@@ -79,6 +83,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.openUrlInBrowser
 import com.example.connectify.core.util.sendSharePostIntent
@@ -273,8 +278,8 @@ fun ProfileScreen(
                     }
                 ) { i ->
                     val post = pagingPostState.items[i]
-                    if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached
-                        && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
+                    if(i >= pagingPostState.items.size - 1 && pagingPostState.items.size >= Constants.DEFAULT_PAGE_SIZE
+                        && !pagingPostState.endReached && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                         viewModel.loadNextPosts()
                     }
                     Post(

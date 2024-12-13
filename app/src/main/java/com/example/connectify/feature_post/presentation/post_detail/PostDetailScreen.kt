@@ -45,6 +45,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.presentation.util.showKeyboard
+import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
 import kotlinx.coroutines.flow.collectLatest
@@ -215,7 +216,8 @@ fun PostDetailScreen(
                     }
                 ) { i ->
                     val comment = pagingCommentState.items[i]
-                    if(i >= pagingCommentState.items.size - 1 && !pagingCommentState.endReached && !pagingCommentState.isFirstLoading) {
+                    if(i >= pagingCommentState.items.size - 1 && pagingCommentState.items.size >= Constants.DEFAULT_PAGE_SIZE
+                        && !pagingCommentState.endReached && !pagingCommentState.isFirstLoading && !pagingCommentState.isNextLoading) {
                         viewModel.loadNextComments()
                     }
                     Comment(

@@ -1,10 +1,5 @@
 package com.example.connectify.feature_profile.presentation.profile.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -77,7 +72,7 @@ fun BannerSection(
     onLogoutClick: () -> Unit = {},
     onGitHubClick: () -> Unit = {},
     onInstagramClick: () -> Unit = {},
-    onLinkedInClick: () -> Unit = {}
+    onLinkedInClick: () -> Unit = {},
 ) {
 
     BoxWithConstraints(
@@ -99,101 +94,95 @@ fun BannerSection(
                 .wrapContentSize(Alignment.TopEnd)
                 .padding(end = SpaceSmall)
         ) {
-            AnimatedVisibility(
-                visible = expanded,
-                enter = slideInVertically() + fadeIn(),
-                exit = slideOutVertically() + fadeOut()
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    onDismissDropdownMenu()
+                },
+                modifier = Modifier
+                    .shadow(20.dp)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {
-                        onDismissDropdownMenu()
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_edit),
+                                contentDescription = stringResource(id = R.string.edit_profile),
+                                modifier = Modifier.size(IconSizeSmall)
+                            )
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Text(
+                                text = stringResource(id = R.string.edit_profile),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(modifier = Modifier.width(SpaceLarge))
+                        }
                     },
-                    modifier = Modifier
-                        .shadow(20.dp)
-                        .background(MaterialTheme.colorScheme.background)
-                ) {
-                    DropdownMenuItem(
-                        text = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_edit),
-                                    contentDescription = stringResource(id = R.string.edit_profile),
-                                    modifier = Modifier.size(IconSizeSmall)
-                                )
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Text(
-                                    text = stringResource(id = R.string.edit_profile),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Spacer(modifier = Modifier.width(SpaceLarge))
-                            }
-                        },
-                        onClick = {
-                            onDismissDropdownMenu()
-                            onEditClick()
+                    onClick = {
+                        onDismissDropdownMenu()
+                        onEditClick()
+                    }
+                )
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_unsave),
+                                contentDescription = stringResource(id = R.string.saved),
+                                modifier = Modifier.size(IconSizeSmall)
+                            )
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Text(
+                                text = stringResource(id = R.string.saved),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(modifier = Modifier.width(SpaceLarge))
                         }
-                    )
-                    DropdownMenuItem(
-                        text = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_unsave),
-                                    contentDescription = stringResource(id = R.string.saved),
-                                    modifier = Modifier.size(IconSizeSmall)
+                    },
+                    onClick = {
+                        onDismissDropdownMenu()
+                        onSavedClick()
+                    }
+                )
+                HorizontalDivider(
+                    thickness = 0.5.dp,
+                    color = HintGray,
+                    modifier = Modifier.padding(start = SpaceMediumLarge)
+                )
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_logout),
+                                contentDescription = stringResource(id = R.string.log_out),
+                                modifier = Modifier.size(IconSizeSmall),
+                                tint = Color.Red
+                            )
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Text(
+                                text = stringResource(id = R.string.log_out),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = Color.Red
                                 )
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Text(
-                                    text = stringResource(id = R.string.saved),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Spacer(modifier = Modifier.width(SpaceLarge))
-                            }
-                        },
-                        onClick = {
-                            onDismissDropdownMenu()
-                            onSavedClick()
+                            )
+                            Spacer(modifier = Modifier.width(SpaceLarge))
                         }
-                    )
-                    HorizontalDivider(
-                        thickness = 0.5.dp,
-                        color = HintGray,
-                        modifier = Modifier.padding(start = SpaceMediumLarge)
-                    )
-                    DropdownMenuItem(
-                        text = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_logout),
-                                    contentDescription = stringResource(id = R.string.log_out),
-                                    modifier = Modifier.size(IconSizeSmall),
-                                    tint = Color.Red
-                                )
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Text(
-                                    text = stringResource(id = R.string.log_out),
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = Color.Red
-                                    )
-                                )
-                                Spacer(modifier = Modifier.width(SpaceLarge))
-                            }
-                        },
-                        onClick = {
-                            onDismissDropdownMenu()
-                            onLogoutClick()
-                        }
-                    )
-                }
+                    },
+                    onClick = {
+                        onDismissDropdownMenu()
+                        onLogoutClick()
+                    }
+                )
             }
         }
         TopAppBar(
@@ -206,9 +195,9 @@ fun BannerSection(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.navigate_back),
-                            tint = Color.White
+                            painter = painterResource(R.drawable.ic_arrow_back),
+                            contentDescription = stringResource(id = R.string.back),
+                            modifier = Modifier.size(IconSizeSmall)
                         )
                     }
                 }

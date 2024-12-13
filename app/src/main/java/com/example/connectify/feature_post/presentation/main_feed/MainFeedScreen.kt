@@ -66,6 +66,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
 import kotlinx.coroutines.flow.collectLatest
@@ -191,7 +192,7 @@ fun MainFeedScreen(
                         textAlign = TextAlign.Center
                     )
                 }
-            } else {
+            }else {
                 ShimmerListPostItem(
                     isLoadingPost = pagingPostState.isFirstLoading,
                     modifier = Modifier
@@ -214,8 +215,8 @@ fun MainFeedScreen(
                             }
                         ) { i ->
                             val post = pagingPostState.items[i]
-                            if(i >= pagingPostState.items.size - 1 && !pagingPostState.endReached
-                                && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
+                            if(i >= pagingPostState.items.size - 1 && pagingPostState.items.size >= Constants.DEFAULT_PAGE_SIZE
+                                && !pagingPostState.endReached && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                                 viewModel.loadNextPosts()
                             }
                             Post(

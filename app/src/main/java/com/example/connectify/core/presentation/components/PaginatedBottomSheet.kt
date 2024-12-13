@@ -45,6 +45,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.util.Constants
 import com.example.connectify.feature_post.presentation.util.CommentFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -178,8 +179,8 @@ fun <T> PaginatedBottomSheet(
                                 }
                             ) { index ->
                                 val item = items[index]
-                                if(index >= items.size - 1 && !endReached
-                                    && !isFirstLoading && !isNextLoading) {
+                                if(index >= items.size - 1 && items.size >= Constants.DEFAULT_PAGE_SIZE
+                                    && !endReached && !isFirstLoading && !isNextLoading) {
                                     loadNextPage()
                                 }
                                 itemContent(index, item)

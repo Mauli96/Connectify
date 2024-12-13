@@ -44,6 +44,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.util.Constants
 import com.example.connectify.feature_activity.presentation.components.ActivityItem
 import kotlinx.coroutines.flow.collectLatest
 
@@ -132,8 +133,8 @@ fun ActivityScreen(
                             }
                         ) { i ->
                             val activity = pagingState.items[i]
-                            if(i >= pagingState.items.size - 1 && !pagingState.endReached
-                                && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
+                            if(i >= pagingState.items.size - 1 && pagingState.items.size >= Constants.DEFAULT_PAGE_SIZE
+                                && !pagingState.endReached && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextActivities()
                             }
                             ActivityItem(

@@ -46,6 +46,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
+import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import kotlinx.coroutines.flow.collectLatest
 
@@ -105,7 +106,7 @@ fun SavedPostScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && pagingPostState.isNextLoading) {
+                if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -141,7 +142,8 @@ fun SavedPostScreen(
                             }
                         ) { i ->
                             val post = pagingPostState.items[i]
-                            if (i >= pagingPostState.items.size - 1 && !pagingPostState.endReached && !pagingPostState.isFirstLoading) {
+                            if (i >= pagingPostState.items.size - 1 && pagingPostState.items.size >= Constants.DEFAULT_PAGE_SIZE
+                                && !pagingPostState.endReached && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                                 viewModel.loadNextPosts()
                             }
                             PostImageItem(
