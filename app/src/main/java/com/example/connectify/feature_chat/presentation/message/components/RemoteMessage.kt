@@ -3,6 +3,7 @@ package com.example.connectify.feature_chat.presentation.message.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,58 +27,64 @@ fun RemoteMessage(
     message: Message,
     formattedTime: String,
     color: Color = HintGray,
+    modifier: Modifier = Modifier,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
     triangleHeight: Dp = 30.dp,
     tailOffset: Dp = 8.dp,
 ) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = color,
-                shape = MaterialTheme.shapes.large
-            )
-            .drawBehind {
-                val triangleHeightPx = triangleHeight.toPx()
-                val triangleWidthPx = triangleWidth.toPx()
-                val tailOffsetPx = tailOffset.toPx()
 
-                val path = Path().apply {
-                    moveTo(
-                        0f + triangleWidthPx - tailOffsetPx,
-                        0f
-                    )
-                    lineTo(
-                        0f - tailOffsetPx,
-                        0f
-                    )
-                    lineTo(
-                        0f + triangleWidthPx - tailOffsetPx,
-                        triangleHeightPx
-                    )
-                    close()
-                }
-                drawPath(
-                    path = path,
-                    color = color
-                )
-            }
-            .padding(SpaceSmall)
+    Row(
+        modifier = modifier
     ) {
-        Column {
-            Text(
-                text = message.text,
-                color = textColor
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.End)
-            ) {
-                Text(
-                    text = formattedTime,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 12.sp
+        Box(
+            modifier = Modifier
+                .background(
+                    color = color,
+                    shape = MaterialTheme.shapes.large
                 )
+                .drawBehind {
+                    val triangleHeightPx = triangleHeight.toPx()
+                    val triangleWidthPx = triangleWidth.toPx()
+                    val tailOffsetPx = tailOffset.toPx()
+
+                    val path = Path().apply {
+                        moveTo(
+                            0f + triangleWidthPx - tailOffsetPx,
+                            0f
+                        )
+                        lineTo(
+                            0f - tailOffsetPx,
+                            0f
+                        )
+                        lineTo(
+                            0f + triangleWidthPx - tailOffsetPx,
+                            triangleHeightPx
+                        )
+                        close()
+                    }
+                    drawPath(
+                        path = path,
+                        color = color
+                    )
+                }
+                .padding(SpaceSmall)
+        ) {
+            Column {
+                Text(
+                    text = message.text,
+                    color = textColor
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                ) {
+                    Text(
+                        text = formattedTime,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 10.sp
+                    )
+                }
             }
         }
     }

@@ -3,7 +3,6 @@ package com.example.connectify.feature_activity.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +38,7 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
+import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.UiEvent
@@ -124,7 +123,10 @@ fun ActivityScreen(
                         )
                     }
                 } else {
-                    LazyColumn {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
                         items(
                             count = pagingState.items.size,
                             key = { i ->
@@ -153,7 +155,10 @@ fun ActivityScreen(
                             )
                             HorizontalDivider(
                                 modifier = Modifier
-                                    .height(0.5.dp),
+                                    .height(0.5.dp)
+                                    .padding(
+                                        start = ProfilePictureSizeMedium
+                                    ),
                                 thickness = 1.dp,
                                 color = HintGray
                             )

@@ -36,6 +36,7 @@ fun OwnMessage(
     message: Message,
     formattedTime: String,
     color: Color = DarkerGreen,
+    modifier: Modifier = Modifier,
     scope: CoroutineScope = rememberCoroutineScope(),
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
@@ -45,7 +46,7 @@ fun OwnMessage(
 ) {
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.End
     ) {
         Box(
@@ -102,7 +103,7 @@ fun OwnMessage(
                     Text(
                         text = formattedTime,
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 12.sp,
+                        fontSize = 10.sp,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                     )

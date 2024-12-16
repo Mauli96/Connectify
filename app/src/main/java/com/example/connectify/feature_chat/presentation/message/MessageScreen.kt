@@ -1,6 +1,8 @@
 package com.example.connectify.feature_chat.presentation.message
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -118,12 +123,11 @@ fun MessageScreen(
     LaunchedEffect(key1 = pagingState) {
         viewModel.messageReceived.collect { event ->
             when(event) {
-                is MessageViewModel.MessageUpdateEvent.SingleMessageUpdate,
-                is MessageViewModel.MessageUpdateEvent.MessagePageLoaded -> {
+                is MessageViewModel.MessageUpdateEvent.SingleMessageUpdate -> {
                     if(pagingState.items.isEmpty()) {
                         return@collect
                     }
-                    lazyListState.scrollToItem(pagingState.items.size - 1)
+                    lazyListState.scrollToItem(0)
                 }
             }
         }
@@ -132,6 +136,7 @@ fun MessageScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
     ) {
         Column(
             modifier = Modifier
@@ -141,42 +146,45 @@ fun MessageScreen(
                 onNavigateUp = onNavigateUp,
                 showBackArrow = true,
                 title = {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = decodedRemoteUserProfilePictureUrl,
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(ProfilePictureSizeMediumSmall)
-                            .clip(CircleShape)
-                    )
-                    Spacer(modifier = Modifier.width(SpaceMedium))
-                    Column {
-                        Text(
-                            text = remoteUsername,
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                    Row {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = decodedRemoteUserProfilePictureUrl,
+                                imageLoader = imageLoader
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(ProfilePictureSizeMediumSmall)
+                                .clip(CircleShape)
                         )
-                        if(isOnline) {
+                        Spacer(modifier = Modifier.width(SpaceMedium))
+                        Column {
                             Text(
-                                text = stringResource(id = R.string.online),
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = GreenAccent
+                                text = remoteUsername,
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
-                        } else {
-                            Text(
-                                text = DateFormatUtil.timestampToFormattedString(lastSeen, "hh:mm a, dd MMM"),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+                            if(isOnline) {
+                                Text(
+                                    text = stringResource(id = R.string.online),
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = GreenAccent
+                                    )
+                                )
+                            } else {
+                                Text(
+                                    text = DateFormatUtil.timestampToFormattedString(lastSeen, "hh:mm a, dd MMM"),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
 
+                        }
                     }
                 }
             )
+
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -209,22 +217,11 @@ fun MessageScreen(
                             .weight(1f)
                             .padding(
                                 start = SpaceMedium,
-                                end = SpaceMedium
-                            )
-                            .imePadding()
+                                end = SpaceMedium,
+                                bottom = SpaceSmall
+                            ),
+                        reverseLayout = true
                     ) {
-                        if(pagingState.isNextLoading) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = SpaceMedium),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CustomCircularProgressIndicator()
-                                }
-                            }
-                        }
                         items(
                             count = pagingState.items.size,
                             key = { i ->
@@ -240,7 +237,8 @@ fun MessageScreen(
                             if(message.fromId == remoteUserId) {
                                 RemoteMessage(
                                     message = message,
-                                    formattedTime = message.formattedTime
+                                    formattedTime = message.formattedTime,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             } else {
                                 OwnMessage(
@@ -249,10 +247,24 @@ fun MessageScreen(
                                     onLongPress = { id ->
                                         viewModel.onEvent(MessageEvent.SelectMessage(id))
                                         viewModel.onEvent(MessageEvent.ShowDialog)
-                                    }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                             Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        if(pagingState.isNextLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = SpaceMedium)
+                                        .background(Color.Transparent),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomCircularProgressIndicator()
+                                }
+                            }
                         }
                     }
                 }

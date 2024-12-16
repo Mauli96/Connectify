@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -78,6 +79,7 @@ fun EditProfileScreen(
     val bioState by viewModel.bioState.collectAsStateWithLifecycle()
     val skills by viewModel.skills.collectAsStateWithLifecycle()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     val cropBannerImageLauncher = rememberLauncherForActivityResult(
@@ -125,10 +127,13 @@ fun EditProfileScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             StandardToolbar(
                 onNavigateUp = onNavigateUp,
@@ -158,7 +163,7 @@ fun EditProfileScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(scrollState)
                 ) {
                     BannerEditSection(
                         bannerImage = rememberAsyncImagePainter(

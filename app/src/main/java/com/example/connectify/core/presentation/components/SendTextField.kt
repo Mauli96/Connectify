@@ -35,6 +35,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 
 @Composable
 fun SendTextField(
+    modifier: Modifier = Modifier,
     state: StandardTextFieldState,
     onValueChange: (String) -> Unit,
     ownProfilePicture: String = "",
@@ -48,8 +49,7 @@ fun SendTextField(
 ) {
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         contentAlignment = Alignment.BottomCenter
     ) {
         BasicTextField(

@@ -53,8 +53,6 @@ class MessageViewModel @Inject constructor(
     val pagingState = _pagingState
         .onStart {
             loadInitialMessages()
-            observeChatEvents()
-            observeChatMessages()
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
@@ -70,6 +68,8 @@ class MessageViewModel @Inject constructor(
 
     init {
         chatUseCases.initializeRepository()
+        observeChatEvents()
+        observeChatMessages()
     }
 
     private val paginator = DefaultPaginator(
@@ -103,9 +103,6 @@ class MessageViewModel @Inject constructor(
                     items = if(firstPage) messages else pagingState.value.items + messages,
                     endReached = messages.isEmpty()
                 )
-            }
-            viewModelScope.launch {
-                _messageUpdatedEvent.emit(MessageUpdateEvent.MessagePageLoaded)
             }
         }
     )
@@ -160,7 +157,7 @@ class MessageViewModel @Inject constructor(
                 .collect { message ->
                     _pagingState.update {
                         it.copy(
-                            items = pagingState.value.items + message
+                            items = listOf(message) + pagingState.value.items
                         )
                     }
                     _messageUpdatedEvent.emit(MessageUpdateEvent.SingleMessageUpdate)
@@ -265,6 +262,5 @@ class MessageViewModel @Inject constructor(
 
     sealed class MessageUpdateEvent {
         object SingleMessageUpdate: MessageUpdateEvent()
-        object MessagePageLoaded: MessageUpdateEvent()
     }
 }

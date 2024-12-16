@@ -63,8 +63,6 @@ dependencies {
     implementation(libs.accompanist.flowlayout)
     implementation(libs.androidx.foundation)
     implementation(libs.accompanist.pager.indicators)
-    implementation(libs.androidx.paging.compose)
-    implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.core.splashscreen)
 

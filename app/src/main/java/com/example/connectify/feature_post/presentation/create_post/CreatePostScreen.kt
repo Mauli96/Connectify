@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -48,9 +51,7 @@ import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
-import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
-import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -76,6 +77,7 @@ fun CreatePostScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val descriptionState by viewModel.descriptionState.collectAsStateWithLifecycle()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     val cropActivityLauncher = rememberLauncherForActivityResult(
@@ -117,125 +119,133 @@ fun CreatePostScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
     ) {
-        StandardToolbar(
-            onNavigateUp = onNavigateUp,
-            showBackArrow = true,
-            title = {
-                Text(
-                    text = stringResource(id = R.string.create_a_new_post),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-        )
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column(
+            StandardToolbar(
+                onNavigateUp = onNavigateUp,
+                showBackArrow = true,
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.create_a_new_post),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            )
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(SpaceLarge)
             ) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .aspectRatio(4f / 5f)
-                        .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.medium)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .clickable {
-                            galleryLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(SpaceLarge)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .aspectRatio(4f / 5f)
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.medium)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                shape = MaterialTheme.shapes.medium
                             )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(150.dp),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    state.imageUri?.let { uri ->
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = uri,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = stringResource(id = R.string.post_image),
-                            modifier = Modifier.matchParentSize()
+                            .clickable {
+                                galleryLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LottieAnimation(
+                            modifier = Modifier.size(150.dp),
+                            composition = composition,
+                            progress = {
+                                progress
+                            },
                         )
-                    }
-                }
-                Spacer(modifier = Modifier.height(SpaceMedium))
-                Text(
-                    text = stringResource(id = R.string.description),
-                    style = MaterialTheme.typography.labelSmall
-                )
-                StandardOutlinedTextField(
-                    text = descriptionState.text,
-                    onValueChange = {
-                        viewModel.onEvent(CreatePostEvent.EnterDescription(it))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = false,
-                    maxLines = 5,
-                    minLines = 3,
-                    error = when(descriptionState.error) {
-                        is PostDescriptionError.FieldEmpty -> {
-                            stringResource(id = R.string.this_field_cant_be_empty)
+                        state.imageUri?.let { uri ->
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = uri,
+                                    imageLoader = imageLoader
+                                ),
+                                contentDescription = stringResource(id = R.string.post_image),
+                                modifier = Modifier.matchParentSize()
+                            )
                         }
-                        else -> ""
                     }
-                )
-                Spacer(modifier = Modifier.height(SpaceLarge))
-                Button(
-                    onClick = {
-                        viewModel.onEvent(CreatePostEvent.PostImage)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = GreenAccent
-                    ),
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .height(40.dp)
-                        .width(100.dp)
-                ) {
-                    if(state.isLoading) {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(3.dp)
-                                .align(CenterVertically),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            trackColor = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(id = R.string.post),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.width(SpaceSmall))
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_post_send),
-                            contentDescription = null,
-                            modifier = Modifier.size(IconSizeSmall)
-                        )
+                    Spacer(modifier = Modifier.height(SpaceMedium))
+                    Text(
+                        text = stringResource(id = R.string.description),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    StandardOutlinedTextField(
+                        text = descriptionState.text,
+                        onValueChange = {
+                            viewModel.onEvent(CreatePostEvent.EnterDescription(it))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = false,
+                        maxLines = 5,
+                        minLines = 3,
+                        error = when(descriptionState.error) {
+                            is PostDescriptionError.FieldEmpty -> {
+                                stringResource(id = R.string.this_field_cant_be_empty)
+                            }
+                            else -> ""
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(SpaceLarge))
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(CreatePostEvent.PostImage)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = GreenAccent
+                        ),
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .height(40.dp)
+                            .width(100.dp)
+                    ) {
+                        if(state.isLoading) {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(3.dp)
+                                    .align(CenterVertically),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                trackColor = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(id = R.string.post),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            Spacer(modifier = Modifier.width(SpaceSmall))
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_post_send),
+                                contentDescription = null,
+                                modifier = Modifier.size(IconSizeSmall)
+                            )
+                        }
                     }
                 }
+                ConnectivityBanner(
+                    networkState = networkState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
             }
-            ConnectivityBanner(
-                networkState = networkState,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-            )
         }
     }
 }
