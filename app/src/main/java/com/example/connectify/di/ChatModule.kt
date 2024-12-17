@@ -1,21 +1,27 @@
-package com.example.connectify.feature_chat.di
+package com.example.connectify.di
 
+import android.content.SharedPreferences
 import com.example.connectify.feature_chat.data.remote.ChatApi
 import com.example.connectify.feature_chat.data.repository.ChatRepositoryImpl
+import com.example.connectify.feature_chat.data.repository.KtorRealtimeMessagingClient
 import com.example.connectify.feature_chat.domain.respository.ChatRepository
+import com.example.connectify.feature_chat.domain.respository.RealtimeMessagingClient
 import com.example.connectify.feature_chat.domain.use_case.ChatUseCases
+import com.example.connectify.feature_chat.domain.use_case.CloseWsConnection
 import com.example.connectify.feature_chat.domain.use_case.DeleteChat
 import com.example.connectify.feature_chat.domain.use_case.DeleteMessage
 import com.example.connectify.feature_chat.domain.use_case.GetChatsForUser
 import com.example.connectify.feature_chat.domain.use_case.GetMessagesForChat
-import com.example.connectify.feature_chat.domain.use_case.InitializeRepository
-import com.example.connectify.feature_chat.domain.use_case.ObserveChatEvents
 import com.example.connectify.feature_chat.domain.use_case.ObserveMessages
 import com.example.connectify.feature_chat.domain.use_case.SendMessage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -28,15 +34,33 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ChatModule {
 
+    @Singleton
     @Provides
+    fun provideHttpClient(): HttpClient {
+        return HttpClient(CIO) {
+            install(Logging)
+            install(WebSockets)
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideKtorMessagingClient(
+        httpClient: HttpClient,
+        sharedPreferences: SharedPreferences
+    ): RealtimeMessagingClient {
+        return KtorRealtimeMessagingClient(httpClient, sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
     fun provideChatUseCases(repository: ChatRepository): ChatUseCases {
         return ChatUseCases(
             sendMessage = SendMessage(repository),
-            observeChatEvents = ObserveChatEvents(repository),
             observeMessages = ObserveMessages(repository),
             getChatsForUser = GetChatsForUser(repository),
             getMessagesForChat = GetMessagesForChat(repository),
-            initializeRepository = InitializeRepository(repository),
+            closeWsConnection = CloseWsConnection(repository),
             deleteChat = DeleteChat(repository),
             deleteMessage = DeleteMessage(repository)
         )
@@ -54,7 +78,11 @@ object ChatModule {
     }
 
     @Provides
-    fun provideChatRepository(client: OkHttpClient, chatApi: ChatApi): ChatRepository {
+    @Singleton
+    fun provideChatRepository(
+        chatApi: ChatApi,
+        client: RealtimeMessagingClient
+    ): ChatRepository {
         return ChatRepositoryImpl(chatApi, client)
     }
 }

@@ -1,6 +1,5 @@
 package com.example.connectify.feature_chat.presentation.message
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -217,8 +213,7 @@ fun MessageScreen(
                             .weight(1f)
                             .padding(
                                 start = SpaceMedium,
-                                end = SpaceMedium,
-                                bottom = SpaceSmall
+                                end = SpaceMedium
                             ),
                         reverseLayout = true
                     ) {
@@ -226,6 +221,7 @@ fun MessageScreen(
                             count = pagingState.items.size,
                             key = { i ->
                                 val message = pagingState.items[i]
+                                println("The message pagination : ${i}_${message.id} with this ${message.text}")
                                 message.id
                             }
                         ) { i ->
@@ -234,6 +230,7 @@ fun MessageScreen(
                                 && !pagingState.endReached && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextMessages()
                             }
+                            Spacer(modifier = Modifier.height(5.dp))
                             if(message.fromId == remoteUserId) {
                                 RemoteMessage(
                                     message = message,
@@ -251,7 +248,6 @@ fun MessageScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                            Spacer(modifier = Modifier.height(5.dp))
                         }
                         if(pagingState.isNextLoading) {
                             item {

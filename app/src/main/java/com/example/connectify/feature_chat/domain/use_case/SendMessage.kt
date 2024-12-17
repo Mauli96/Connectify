@@ -6,7 +6,11 @@ class SendMessage(
     private val repository: ChatRepository
 ) {
 
-    operator fun invoke(toId: String, text: String, chatId: String?) {
+    suspend operator fun invoke(
+        toId: String,
+        text: String,
+        chatId: String?
+    ) {
         if(text.isBlank()) {
             return
         }

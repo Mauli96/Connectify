@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -80,6 +81,7 @@ dependencies {
     // Asynchronous Programming (Coroutines)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
 
     // Coroutine Lifecycle Scopes
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -98,12 +100,11 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
 
-    // WebSocket Communication (Scarlet)
-    implementation(libs.scarlet)
-    implementation(libs.websocket.okhttp)
-    implementation(libs.lifecycle.android)
-    implementation(libs.message.adapter.gson)
-    implementation(libs.stream.adapter.coroutines)
+    // WebSocket Communication (Ktor)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.client.logging)
 
     // Logging (Timber)
     implementation(libs.timber)

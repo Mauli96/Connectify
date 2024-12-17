@@ -2,9 +2,9 @@ package com.example.connectify.feature_chat.data.remote.wsMessage
 
 import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.domain.model.Message
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class WsServerMessage(
     val fromId: String,
     val toId: String,

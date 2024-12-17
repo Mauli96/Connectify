@@ -4,12 +4,9 @@ import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.feature_chat.domain.model.Chat
 import com.example.connectify.feature_chat.domain.model.Message
-import com.tinder.scarlet.WebSocket
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-
-    fun initialize()
 
     suspend fun getChatsForUser(): Resource<List<Chat>>
 
@@ -19,15 +16,16 @@ interface ChatRepository {
         pageSize: Int
     ): Resource<List<Message>>
 
-    fun observeChatEvents(): Flow<WebSocket.Event>
 
     fun observeMessages(): Flow<Message>
 
-    fun sendMessage(
+    suspend fun sendMessage(
         toId: String,
         text: String,
         chatId: String?
     )
+
+    suspend fun close()
 
     suspend fun deleteChat(chatId: String): SimpleResource
 

@@ -2,8 +2,6 @@ package com.example.connectify.feature_chat.data.remote.response
 
 import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.domain.model.Message
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 data class MessageDto(
     val fromId: String,

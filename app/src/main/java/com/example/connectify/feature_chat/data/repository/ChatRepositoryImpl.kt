@@ -5,31 +5,20 @@ import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_chat.data.remote.ChatApi
-import com.example.connectify.feature_chat.data.remote.ChatService
 import com.example.connectify.feature_chat.data.remote.wsMessage.WsClientMessage
-import com.example.connectify.feature_chat.di.ScarletInstance
 import com.example.connectify.feature_chat.domain.model.Chat
 import com.example.connectify.feature_chat.domain.model.Message
 import com.example.connectify.feature_chat.domain.respository.ChatRepository
-import com.tinder.scarlet.WebSocket
+import com.example.connectify.feature_chat.domain.respository.RealtimeMessagingClient
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
-import okhttp3.OkHttpClient
 import retrofit2.HttpException
 import java.io.IOException
 
 class ChatRepositoryImpl(
     private val chatApi: ChatApi,
-    private val okHttpClient: OkHttpClient
+    private val client: RealtimeMessagingClient
 ): ChatRepository {
-
-    private var chatService: ChatService? = null
-
-    override fun initialize() {
-        chatService = ScarletInstance.getNewInstance(okHttpClient)
-    }
 
     override suspend fun getChatsForUser(): Resource<List<Chat>> {
         return try {
@@ -69,30 +58,28 @@ class ChatRepositoryImpl(
         }
     }
 
-    override fun observeChatEvents(): Flow<WebSocket.Event> {
-        return chatService?.observeEvents()
-            ?.receiveAsFlow() ?: flow {  }
-    }
-
     override fun observeMessages(): Flow<Message> {
-        return chatService
-            ?.observeMessages()
-            ?.receiveAsFlow()
-            ?.map { it.toMessage() } ?: flow {  }
+        return client.observeMessages().map {
+            it.toMessage()
+        }
     }
 
-    override fun sendMessage(
+    override suspend fun sendMessage(
         toId: String,
         text: String,
         chatId: String?
     ) {
-        chatService?.sendMessage(
+        client.sendMessage(
             WsClientMessage(
                 toId = toId,
                 text = text,
                 chatId = chatId
             )
         )
+    }
+
+    override suspend fun close() {
+        client.close()
     }
 
     override suspend fun deleteChat(chatId: String): SimpleResource {

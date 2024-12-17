@@ -14,7 +14,6 @@ import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_chat.domain.model.Message
 import com.example.connectify.feature_chat.domain.use_case.ChatUseCases
-import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +21,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -53,6 +50,7 @@ class MessageViewModel @Inject constructor(
     val pagingState = _pagingState
         .onStart {
             loadInitialMessages()
+            observeChatMessages()
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, PagingState())
 
@@ -66,11 +64,6 @@ class MessageViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    init {
-        chatUseCases.initializeRepository()
-        observeChatEvents()
-        observeChatMessages()
-    }
 
     private val paginator = DefaultPaginator(
         onFirstLoadUpdated = { isFirstLoading ->
@@ -100,7 +93,12 @@ class MessageViewModel @Inject constructor(
         onSuccess = { messages, firstPage ->
             _pagingState.update {
                 it.copy(
-                    items = if(firstPage) messages else pagingState.value.items + messages,
+                    items = if(firstPage) {
+                        messages
+                    } else {
+                        val newMessages = pagingState.value.items + messages
+                        newMessages.distinctBy { it.id }
+                    },
                     endReached = messages.isEmpty()
                 )
             }
@@ -165,23 +163,6 @@ class MessageViewModel @Inject constructor(
         }
     }
 
-    private fun observeChatEvents() {
-        chatUseCases.observeChatEvents()
-            .onEach { event ->
-                when(event) {
-                    is WebSocket.Event.OnConnectionOpened<*> -> {
-                        println("Connection was opened")
-                    }
-                    is WebSocket.Event.OnConnectionFailed -> {
-                        println("Connection failed: ${event.throwable}")
-                    }
-                    else -> {
-                        null
-                    }
-                }
-            }.launchIn(viewModelScope)
-    }
-
     private fun loadInitialMessages() {
         viewModelScope.launch {
             paginator.loadFirstItems()
@@ -195,21 +176,23 @@ class MessageViewModel @Inject constructor(
     }
 
     private fun sendMessage() {
-        val toId = savedStateHandle.get<String>("remoteUserId") ?: return
-        if(messageTextFieldState.value.text.isBlank()) {
-            return
-        }
-        val chatId = savedStateHandle.get<String>("chatId")
-        chatUseCases.sendMessage(
-            toId = toId,
-            text = messageTextFieldState.value.text,
-            chatId = chatId
-        )
-        _messageTextFieldState.value = StandardTextFieldState()
-        _state.update {
-            it.copy(
-                canSendMessage = false
+        viewModelScope.launch {
+            val toId = savedStateHandle.get<String>("remoteUserId") ?: return@launch
+            if(messageTextFieldState.value.text.isBlank()) {
+                return@launch
+            }
+            val chatId = savedStateHandle.get<String>("chatId")
+            chatUseCases.sendMessage(
+                toId = toId,
+                text = messageTextFieldState.value.text,
+                chatId = chatId
             )
+            _messageTextFieldState.value = StandardTextFieldState()
+            _state.update {
+                it.copy(
+                    canSendMessage = false
+                )
+            }
         }
     }
 
