@@ -15,6 +15,9 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_chat.domain.model.Message
 import com.example.connectify.feature_chat.domain.use_case.ChatUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,6 +28,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,6 +68,8 @@ class MessageViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val viewModelJob = SupervisorJob()
+    private val viewModelCoroutine = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     private val paginator = DefaultPaginator(
         onFirstLoadUpdated = { isFirstLoading ->
@@ -239,6 +245,17 @@ class MessageViewModel @Inject constructor(
                         )
                     )
                 }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelCoroutine.launch {
+            try {
+                chatUseCases.closeWsConnection()
+            } finally {
+                viewModelJob.cancel()
             }
         }
     }

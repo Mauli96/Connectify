@@ -31,6 +31,10 @@ class KtorRealtimeMessagingClient(
 
     override fun observeMessages(): Flow<WsServerMessage> {
         val token = sharedPreferences.getString(Constants.KEY_JWT_TOKEN, "")
+        if (token.isNullOrEmpty()) {
+            println("Token is missing, cannot connect to WebSocket")
+            return flow { /* Optionally emit an error or take alternative action */ }
+        }
         return flow {
             session = client.webSocketSession {
                 url("ws://192.168.0.104:8001/api/chat/websocket")
