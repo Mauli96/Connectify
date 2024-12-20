@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -128,7 +127,8 @@ class MessageViewModel @Inject constructor(
             is MessageEvent.SelectMessage -> {
                 _state.update {
                     it.copy(
-                        selectedMessageId = event.messageId
+                        selectedMessageId = event.messageId,
+                        selectedMessage = event.message
                     )
                 }
             }
@@ -137,17 +137,17 @@ class MessageViewModel @Inject constructor(
                     deleteMessage(messageId)
                 }
             }
-            is MessageEvent.ShowDialog -> {
+            is MessageEvent.ShowBottomSheet -> {
                 _state.update {
                     it.copy(
-                        isDialogVisible = true
+                        isBottomSheetVisible = true
                     )
                 }
             }
-            is MessageEvent.DismissDialog -> {
+            is MessageEvent.DismissBottomSheet -> {
                 _state.update {
                     it.copy(
-                        isDialogVisible = false
+                        isBottomSheetVisible = false
                     )
                 }
             }

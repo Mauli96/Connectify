@@ -1,5 +1,9 @@
 package com.example.connectify.feature_chat.presentation.message
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
@@ -51,14 +54,14 @@ import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.SendTextField
+import com.example.connectify.core.presentation.components.StandardBottomSheet
+import com.example.connectify.core.presentation.components.StandardMessageSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediumSmall
-import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
-import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -69,6 +72,7 @@ import kotlinx.coroutines.flow.collectLatest
 import okio.ByteString.Companion.decodeBase64
 import java.nio.charset.Charset
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageScreen(
     remoteUserId: String,
@@ -88,6 +92,7 @@ fun MessageScreen(
     val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
     val pagingState by viewModel.pagingState.collectAsStateWithLifecycle()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val bottomSheetState = rememberModalBottomSheetState()
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
 
@@ -225,7 +230,6 @@ fun MessageScreen(
                             }
                         ) { i ->
                             val message = pagingState.items[i]
-                            println("The message pagination : ${i}_${message.id} with this ${message.text}")
                             if(i >= pagingState.items.size - 1 && pagingState.items.size >= Constants.DEFAULT_PAGE_SIZE
                                 && !pagingState.endReached && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextMessages()
@@ -241,9 +245,9 @@ fun MessageScreen(
                                 OwnMessage(
                                     message = message,
                                     formattedTime = message.formattedTime,
-                                    onLongPress = { id ->
-                                        viewModel.onEvent(MessageEvent.SelectMessage(id))
-                                        viewModel.onEvent(MessageEvent.ShowDialog)
+                                    onLongPress = {
+                                        viewModel.onEvent(MessageEvent.SelectMessage(message.id, message.text))
+                                        viewModel.onEvent(MessageEvent.ShowBottomSheet)
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 )
@@ -261,44 +265,6 @@ fun MessageScreen(
                                     CustomCircularProgressIndicator()
                                 }
                             }
-                        }
-                    }
-                }
-                if(state.isDialogVisible) {
-                    Dialog(
-                        onDismissRequest = {
-                            viewModel.onEvent(MessageEvent.DismissDialog)
-                        }
-                    ) {
-                        Column {
-                            Text(
-                                text = stringResource(id = R.string.delete_message),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(SpaceSmall))
-                            Text(
-                                text = stringResource(id = R.string.this_action_cannot_be_undone),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(modifier = Modifier.height(SpaceMedium))
-                            Row {
-                                Button(onClick = {
-                                    viewModel.onEvent(MessageEvent.DismissDialog)
-                                }) {
-                                    Text(text = stringResource(id = R.string.cancel))
-                                }
-                                Spacer(modifier = Modifier.width(SpaceLarge))
-                                Button(
-                                    onClick = {
-                                        viewModel.onEvent(MessageEvent.DeleteMessage)
-                                        viewModel.onEvent(MessageEvent.DismissDialog)
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                                ) {
-                                    Text(text = stringResource(id = R.string.delete))
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(SpaceSmall))
                         }
                     }
                 }
@@ -320,12 +286,46 @@ fun MessageScreen(
             networkState = networkState,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 50.dp)
+                .padding(top = 55.dp)
         )
+        if(state.isBottomSheetVisible) {
+            StandardMessageSheet(
+                bottomSheetState = bottomSheetState,
+                showDeleteOption = true,
+                showCopyOption = true,
+                onDismissRequest = {
+                    viewModel.onEvent(MessageEvent.DismissBottomSheet)
+                },
+                onCopiedClick = {
+                    copyToClipboard(
+                        context = context,
+                        text = state.selectedMessage.toString()
+                    )
+                    viewModel.onEvent(MessageEvent.DismissBottomSheet)
+                },
+                onDeleteClick = {
+                    viewModel.onEvent(MessageEvent.DeleteMessage)
+                    viewModel.onEvent(MessageEvent.DismissBottomSheet)
+                },
+                onCancelClick = {
+                    viewModel.onEvent(MessageEvent.DismissBottomSheet)
+                }
+            )
+        }
         if(pagingState.isFirstLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier.align(Center)
             )
         }
     }
+}
+
+fun copyToClipboard(
+    context: Context,
+    text: String
+) {
+    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Copied Message", text)
+    clipboardManager.setPrimaryClip(clip)
+    Toast.makeText(context, "Message copied!", Toast.LENGTH_SHORT).show()
 }

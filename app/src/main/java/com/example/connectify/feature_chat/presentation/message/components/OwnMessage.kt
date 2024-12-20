@@ -42,7 +42,7 @@ fun OwnMessage(
     triangleWidth: Dp = 30.dp,
     triangleHeight: Dp = 30.dp,
     tailOffset: Dp = 8.dp,
-    onLongPress: (String) -> Unit = {}
+    onLongPress: () -> Unit = {}
 ) {
 
     Row(
@@ -59,7 +59,7 @@ fun OwnMessage(
                     detectTapGestures(
                         onLongPress = {
                             scope.launch {
-                                onLongPress(message.id)
+                                onLongPress()
                             }
                         }
                     )
