@@ -221,11 +221,11 @@ fun MessageScreen(
                             count = pagingState.items.size,
                             key = { i ->
                                 val message = pagingState.items[i]
-                                println("The message pagination : ${i}_${message.id} with this ${message.text}")
                                 message.id
                             }
                         ) { i ->
                             val message = pagingState.items[i]
+                            println("The message pagination : ${i}_${message.id} with this ${message.text}")
                             if(i >= pagingState.items.size - 1 && pagingState.items.size >= Constants.DEFAULT_PAGE_SIZE
                                 && !pagingState.endReached && !pagingState.isFirstLoading && !pagingState.isNextLoading) {
                                 viewModel.loadNextMessages()

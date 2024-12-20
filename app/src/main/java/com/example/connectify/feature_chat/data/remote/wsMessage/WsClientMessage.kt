@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class WsClientMessage(
     val toId: String,
     val text: String,
-    val chatId: String?,
+    val chatId: String?
 )

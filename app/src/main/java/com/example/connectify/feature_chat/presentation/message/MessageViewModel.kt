@@ -102,8 +102,7 @@ class MessageViewModel @Inject constructor(
                     items = if(firstPage) {
                         messages
                     } else {
-                        val newMessages = pagingState.value.items + messages
-                        newMessages.distinctBy { it.id }
+                        pagingState.value.items + messages
                     },
                     endReached = messages.isEmpty()
                 )
@@ -161,7 +160,7 @@ class MessageViewModel @Inject constructor(
                 .collect { message ->
                     _pagingState.update {
                         it.copy(
-                            items = listOf(message) + pagingState.value.items
+                            items = listOf(message) + pagingState.value.items.dropLast(1)
                         )
                     }
                     _messageUpdatedEvent.emit(MessageUpdateEvent.SingleMessageUpdate)
