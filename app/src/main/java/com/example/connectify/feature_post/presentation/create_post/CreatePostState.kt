@@ -4,5 +4,5 @@ import android.net.Uri
 
 data class CreatePostState(
     val imageUri: Uri? = null,
-    val isLoading: Boolean = false
+    val isPosting: Boolean = false
 )

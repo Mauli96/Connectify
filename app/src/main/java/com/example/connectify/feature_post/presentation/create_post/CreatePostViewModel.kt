@@ -36,6 +36,9 @@ class CreatePostViewModel @Inject constructor(
     private val _state = MutableStateFlow(CreatePostState())
     val state = _state.asStateFlow()
 
+    private val _navigationState = MutableStateFlow(false)
+    val navigationState = _navigationState.asStateFlow()
+
     private val _descriptionState = MutableStateFlow(StandardTextFieldState())
     val descriptionState = _descriptionState.asStateFlow()
 
@@ -69,6 +72,12 @@ class CreatePostViewModel @Inject constructor(
                     )
                 }
             }
+            is CreatePostEvent.OnNavigatingToCrop -> {
+                _navigationState.value = true
+            }
+            is CreatePostEvent.OnNavigatingToBackFromCrop -> {
+                _navigationState.value = false
+            }
             is CreatePostEvent.PostImage -> {
                 postImage()
             }
@@ -79,7 +88,7 @@ class CreatePostViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    isLoading = true
+                    isPosting = true
                 )
             }
             val result = postUseCases.createPost(
@@ -104,7 +113,7 @@ class CreatePostViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             imageUri = null,
-                            isLoading = false
+                            isPosting = false
                         )
                     }
                 }
@@ -114,7 +123,7 @@ class CreatePostViewModel @Inject constructor(
                     ))
                     _state.update {
                         it.copy(
-                            isLoading = false
+                            isPosting = false
                         )
                     }
                 }

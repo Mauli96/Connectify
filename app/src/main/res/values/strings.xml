@@ -139,4 +139,11 @@
     <string name="no_internet_connection">No Internet Connection!</string>
     <string name="back_online">Back Online!</string>
     <string name="copy">Copy</string>
+    <string name="move_and_scale">Move and scale</string>
+    <string name="close">Close</string>
+    <string name="apply">Apply</string>
+    <string name="full_crop">Full Crop</string>
+    <string name="post_crop">Post Crop</string>
+    <string name="profile_crop">Profile Crop</string>
+    <string name="reset_crop">Reset Crop</string>
 </resources>

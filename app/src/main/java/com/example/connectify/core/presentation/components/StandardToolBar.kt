@@ -24,6 +24,7 @@ fun StandardToolbar(
     modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit = {},
     showBackArrow: Boolean = false,
+    showClose: Boolean = false,
     title: @Composable () -> Unit = {},
     navActions: @Composable RowScope.() -> Unit = {},
 ) {
@@ -43,7 +44,21 @@ fun StandardToolbar(
                         modifier = Modifier.size(IconSizeSmall)
                     )
                 }
-            } else null
+            } else if(showClose) {
+                IconButton(
+                    onClick = {
+                        onNavigateUp()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_cancel),
+                        contentDescription = stringResource(id = R.string.close),
+                        modifier = Modifier.size(IconSizeSmall)
+                    )
+                }
+            } else {
+                null
+            }
         },
         actions = navActions,
         colors = TopAppBarColors(

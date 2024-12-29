@@ -160,7 +160,11 @@ class MessageViewModel @Inject constructor(
                 .collect { message ->
                     _pagingState.update {
                         it.copy(
-                            items = listOf(message) + pagingState.value.items.dropLast(1)
+                            items = if(pagingState.value.items.size > 14) {
+                                listOf(message) + pagingState.value.items.dropLast(1)
+                            } else {
+                                listOf(message) + pagingState.value.items
+                            }
                         )
                     }
                     _messageUpdatedEvent.emit(MessageUpdateEvent.SingleMessageUpdate)

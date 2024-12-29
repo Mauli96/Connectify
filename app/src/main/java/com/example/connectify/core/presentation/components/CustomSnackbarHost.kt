@@ -43,6 +43,7 @@ fun CustomSnackbarHost(
     snackbarHostState: SnackbarHostState,
     onNavigate: (String) -> Unit = {},
     lottieIconProvider: @Composable (String) -> Int = { message ->
+
         // Define string resources
         val successRegisterationText = stringResource(R.string.success_registeration)
         val successLoginText = stringResource(R.string.success_login)
@@ -52,11 +53,10 @@ fun CustomSnackbarHost(
         val unSavePostText = stringResource(R.string.successfully_unsaved_post)
         val deletePostText = stringResource(R.string.successfully_deleted_post)
         val deleteChatText = stringResource(R.string.successfully_deleted_chat)
-        val deleteCommentText = stringResource(R.string.successfully_deleted_chat)
+        val deleteCommentText = stringResource(R.string.successfully_deleted_comment)
         val errorUnknownText = stringResource(R.string.error_unknown)
         val errorServerText = stringResource(R.string.error_couldnt_reach_server)
         val errorWentWrongText = stringResource(R.string.oops_something_went_wrong)
-
 
         // Return the appropriate icon based on the message
         when {

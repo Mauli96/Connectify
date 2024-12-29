@@ -54,7 +54,6 @@ import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.SendTextField
-import com.example.connectify.core.presentation.components.StandardBottomSheet
 import com.example.connectify.core.presentation.components.StandardMessageSheet
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.GreenAccent

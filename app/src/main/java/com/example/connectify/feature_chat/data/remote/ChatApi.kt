@@ -29,6 +29,6 @@ interface ChatApi {
     )
 
     companion object {
-        const val BASE_URL = "http://192.168.0.104:8001/"
+        const val BASE_URL = "http://192.168.0.101:8001/"
     }
 }

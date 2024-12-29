@@ -14,6 +14,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import coil.ImageLoader
+import com.example.connectify.core.presentation.crop_image.CropScreen
 import com.example.connectify.feature_activity.presentation.ActivityScreen
 import com.example.connectify.feature_auth.presentation.login.LoginScreen
 import com.example.connectify.feature_auth.presentation.register.RegisterScreen
@@ -293,6 +294,7 @@ fun Navigation(
                 CreatePostScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
+                    navController = navController,
                     snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
@@ -554,6 +556,52 @@ fun Navigation(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
                     snackbarHostState = snackbarHostState,
+                )
+            }
+            composable(
+                route = Screen.CropScreen.route + "/{imageUri}/{cropType}",
+                arguments = listOf(
+                    navArgument("imageUri") {
+                        type = NavType.StringType
+                    },
+                    navArgument("cropType") {
+                        type = NavType.StringType
+                    }
+                ),
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
+            ) {
+                CropScreen(
+                    onClose = navController::navigateUp,
+                    onNavigateUp = { imageUri ->
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "imageUri",
+                            imageUri
+                        )
+                        navController.navigateUp()
+                    }
                 )
             }
         }
