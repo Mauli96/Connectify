@@ -1,6 +1,6 @@
 # Connectify
 
-Connectify is a modern social media application inspired by Instagram. It offers a seamless user experience for connecting, sharing, and discovering content. Built using cutting-edge technologies like Kotlin, Jetpack Compose, Ktor for the backend, and MongoDB as the database, Connectify is designed for performance, scalability, and user engagement.
+Connectify is a modern social network application. It offers a seamless user experience for connecting, sharing, and discovering content. Built using cutting-edge technologies like Kotlin, Jetpack Compose, Ktor for the backend, and MongoDB as the database, Connectify is designed for performance, scalability, and user engagement.
 
 ## Features
 
