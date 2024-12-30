@@ -36,6 +36,7 @@ import com.example.connectify.core.presentation.crop_image.cropview.CropType
 import com.example.connectify.core.presentation.crop_image.cropview.EdgeType
 import com.example.connectify.core.presentation.crop_image.cropview.ImageCrop
 import com.example.connectify.core.presentation.ui.theme.DarkerGreen
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -74,7 +75,7 @@ fun CropScreen(
                         CustomCircularProgressIndicator(
                             modifier = Modifier
                                 .padding(end = SpaceSmall)
-                                .size(20.dp)
+                                .size(IconSizeSmall)
                         )
                     } else {
                         Text(

@@ -576,18 +576,6 @@ fun Navigation(
                 },
                 exitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(animationDuration)
-                    )
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(animationDuration)
-                    )
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
                         AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(animationDuration)
                     )

@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.min
 import kotlin.math.abs
 
 // Scale given bitmap to given canvas size and draw the scaled bitmap on canvas draw scope
-public fun DrawScope.drawBitmap(bitmap: Bitmap, canvasSize: CanvasSize) {
+fun DrawScope.drawBitmap(bitmap: Bitmap, canvasSize: CanvasSize) {
     val mBitmap = Bitmap.createScaledBitmap(
         bitmap,
         canvasSize.canvasWidth.toInt(),
@@ -23,7 +23,7 @@ public fun DrawScope.drawBitmap(bitmap: Bitmap, canvasSize: CanvasSize) {
 }
 
 // Draw the bordered rectangle view
-public fun DrawScope.drawCropRectangleView(
+fun DrawScope.drawCropRectangleView(
     guideLineColor: Color,
     guideLineWidth: Dp = 2.dp,
     iRect: IRect
@@ -37,7 +37,7 @@ public fun DrawScope.drawCropRectangleView(
 }
 
 // Draw Vertical and Horizontal lines
-public fun DrawScope.drawGuideLines(
+fun DrawScope.drawGuideLines(
     noOfGuideLines: Int = 2,
     guideLineColor: Color,
     guideLineWidth: Dp = 2.dp,
@@ -68,7 +68,7 @@ public fun DrawScope.drawGuideLines(
 }
 
 // Draw circular edge on crop view rect
-public fun DrawScope.drawCircularEdges(
+fun DrawScope.drawCircularEdges(
     edgeCircleSize: Dp = 8.dp,
     guideLineColor: Color,
     iRect: IRect
@@ -103,7 +103,7 @@ public fun DrawScope.drawCircularEdges(
     )
 }
 
-public fun DrawScope.drawSquareBrackets(
+fun DrawScope.drawSquareBrackets(
     guideLineColor: Color,
     guideLineWidthGiven: Dp = 2.dp,
     iRect: IRect

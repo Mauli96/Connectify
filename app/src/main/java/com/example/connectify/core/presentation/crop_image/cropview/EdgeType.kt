@@ -1,6 +1,6 @@
 package com.example.connectify.core.presentation.crop_image.cropview
 
-public enum class EdgeType {
+enum class EdgeType {
     CIRCULAR,
     SQUARE
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,13 +18,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -33,10 +30,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -48,16 +45,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.crop_image.cropview.CropType
-import com.example.connectify.core.presentation.ui.theme.GreenAccent
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -87,6 +81,7 @@ fun CreatePostScreen(
     val navigatorState by viewModel.navigationState.collectAsState()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
+    val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -103,12 +98,6 @@ fun CreatePostScreen(
             }
         }
     }
-
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.add_images))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = 1
-    )
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = navController) {
@@ -166,12 +155,36 @@ fun CreatePostScreen(
             ) {
                 StandardToolbar(
                     onNavigateUp = onNavigateUp,
-                    showBackArrow = true,
+                    showClose = true,
                     title = {
                         Text(
                             text = stringResource(id = R.string.create_a_new_post),
                             style = MaterialTheme.typography.titleLarge
                         )
+                    },
+                    navActions = {
+                        Button(
+                            onClick = {
+                                keyboardController?.hide()
+                                viewModel.onEvent(CreatePostEvent.PostImage)
+                            },
+                            modifier = Modifier
+                                .padding(end = SpaceMedium)
+                                .height(30.dp),
+                            contentPadding = PaddingValues(horizontal = SpaceSmall, vertical = 0.dp)
+                        ) {
+                            if(state.isPosting) {
+                                CustomCircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(IconSizeSmall)
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(id = R.string.post),
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
                     }
                 )
                 Box(
@@ -201,12 +214,10 @@ fun CreatePostScreen(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            LottieAnimation(
-                                modifier = Modifier.size(150.dp),
-                                composition = composition,
-                                progress = {
-                                    progress
-                                },
+                            Image(
+                                painter = painterResource(R.drawable.ic_add),
+                                contentDescription = stringResource(R.string.create_post),
+                                modifier = Modifier.size(IconSizeMedium)
                             )
                             state.imageUri?.let { uri ->
                                 Image(
@@ -219,7 +230,7 @@ fun CreatePostScreen(
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.height(SpaceMedium))
+                        Spacer(modifier = Modifier.height(SpaceLarge))
                         Text(
                             text = stringResource(id = R.string.description),
                             style = MaterialTheme.typography.labelSmall
@@ -240,41 +251,6 @@ fun CreatePostScreen(
                                 else -> ""
                             }
                         )
-                        Spacer(modifier = Modifier.height(SpaceLarge))
-                        Button(
-                            onClick = {
-                                viewModel.onEvent(CreatePostEvent.PostImage)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = GreenAccent
-                            ),
-                            modifier = Modifier
-                                .align(Alignment.End)
-                                .height(40.dp)
-                                .width(100.dp)
-                        ) {
-                            if(state.isPosting) {
-                                LinearProgressIndicator(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(3.dp)
-                                        .align(CenterVertically),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    trackColor = MaterialTheme.colorScheme.primary
-                                )
-                            } else {
-                                Text(
-                                    text = stringResource(id = R.string.post),
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                                Spacer(modifier = Modifier.width(SpaceSmall))
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_post_send),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(IconSizeSmall)
-                                )
-                            }
-                        }
                     }
                     ConnectivityBanner(
                         networkState = networkState,
