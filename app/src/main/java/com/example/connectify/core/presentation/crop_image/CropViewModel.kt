@@ -65,16 +65,6 @@ class CropViewModel @Inject constructor(
         }
     }
 
-    private fun updateCropType(cropType: CropType) {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    cropType = cropType
-                )
-            }
-        }
-    }
-
     fun saveMediaToStorage(
         bitmap: Bitmap,
         onComplete: (Uri?) -> Unit

@@ -32,6 +32,9 @@ class EditProfileViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val _editProfileState = MutableStateFlow(EditProfileState())
+    val editProfileState = _editProfileState.asStateFlow()
+
     private val _usernameState = MutableStateFlow(StandardTextFieldState())
     val usernameState = _usernameState.asStateFlow()
 
@@ -52,8 +55,8 @@ class EditProfileViewModel @Inject constructor(
         .onStart { getSkills() }
         .stateIn(viewModelScope, SharingStarted.Lazily, SkillsState())
 
-    private val _editProfileState = MutableStateFlow(EditProfileState())
-    val editProfileState = _editProfileState.asStateFlow()
+    private val _cropState = MutableStateFlow(CropImageState())
+    val cropState = _cropState.asStateFlow()
 
     val networkState: StateFlow<NetworkConnectionState> =
         connectivityObserver.networkConnection
@@ -144,6 +147,21 @@ class EditProfileViewModel @Inject constructor(
                             ))
                         }
                     }
+                }
+            }
+            is EditProfileEvent.OnNavigatingToCrop -> {
+                _cropState.update {
+                    it.copy(
+                        isNavigatedToCrop = true,
+                        cropType = event.type
+                    )
+                }
+            }
+            is EditProfileEvent.OnNavigatingToBackFromCrop -> {
+                _cropState.update {
+                    it.copy(
+                        isNavigatedToCrop = false
+                    )
                 }
             }
             is EditProfileEvent.UpdateProfile -> {

@@ -146,4 +146,5 @@
     <string name="post_crop">Post Crop</string>
     <string name="profile_crop">Profile Crop</string>
     <string name="reset_crop">Reset Crop</string>
+    <string name="save">Save</string>
 </resources>

@@ -369,6 +369,7 @@ fun Navigation(
                 EditProfileScreen(
                     onNavigate = navController::navigate,
                     onNavigateUp = navController::navigateUp,
+                    navController = navController,
                     snackbarHostState = snackbarHostState,
                     imageLoader = imageLoader
                 )
@@ -559,13 +560,14 @@ fun Navigation(
                 )
             }
             composable(
-                route = Screen.CropScreen.route + "/{imageUri}/{cropType}",
+                route = Screen.CropScreen.route + "/{imageUri}?cropType={cropType}",
                 arguments = listOf(
                     navArgument("imageUri") {
                         type = NavType.StringType
                     },
                     navArgument("cropType") {
                         type = NavType.StringType
+                        nullable = true
                     }
                 ),
                 enterTransition = {

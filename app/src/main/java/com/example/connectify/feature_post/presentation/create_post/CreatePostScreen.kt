@@ -90,7 +90,7 @@ fun CreatePostScreen(
         uri?.let {
             viewModel.onEvent(CreatePostEvent.OnNavigatingToCrop)
             val encodedUri = Uri.encode(uri.toString())
-            navController.navigate("${Screen.CropScreen.route}/$encodedUri/${CropType.POST_PICTURE.name}") {
+            navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.POST_PICTURE.name}") {
                 launchSingleTop = true
                 popUpTo(Screen.CreatePostScreen.route) {
                     saveState = true
