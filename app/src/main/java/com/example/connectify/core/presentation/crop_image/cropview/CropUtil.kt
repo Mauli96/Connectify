@@ -72,6 +72,25 @@ class CropUtil(
                 irectTopleft = getSquarePosition(canWidth, canHeight, squareSize.width)
                 iRect = IRect(topLeft = irectTopleft, size = squareSize)
             }
+            CropType.BANNER_PICTURE -> {
+                // Calculate 5:2 aspect ratio dimensions
+                val aspectRatio = 5f / 2f  // Width to height ratio
+                val width = if (canWidth < canHeight * aspectRatio) {
+                    canWidth - 100f
+                } else {
+                    (canHeight - 100f) * aspectRatio
+                }
+                val height = width / aspectRatio
+
+                irectTopleft = Offset(
+                    x = (canWidth - width) / 2,
+                    y = (canHeight - height) / 2
+                )
+                iRect = IRect(
+                    topLeft = irectTopleft,
+                    size = Size(width, height)
+                )
+            }
             else -> {
                 // Free style Rect positioning
                 irectTopleft = Offset(x = 0.0F, y = 0.0F)
@@ -215,6 +234,15 @@ class CropUtil(
                 val size = min(newWidth, newHeight)
                 Size(size, size)
             }
+            CropType.BANNER_PICTURE -> {
+                // Maintain 5:2 aspect ratio
+                val targetRatio = 2.5F // 5:2 ratio
+                if (newWidth / newHeight > targetRatio) {
+                    Size(newHeight * targetRatio, newHeight)
+                } else {
+                    Size(newWidth, newWidth / targetRatio)
+                }
+            }
             else -> Size(newWidth, newHeight)
         }
     }
@@ -260,6 +288,23 @@ class CropUtil(
                     }
 
                     Size(width = sqSide, height = sqSide)
+                }
+                CropType.BANNER_PICTURE -> {
+                    val maintainedSize = maintainAspectRatio(newWidth, newHeight)
+                    val totalHeight = (maintainedSize.height + irectTopleft.y)
+                    val diff = canvasHeight - totalHeight
+                    if (diff < 0) {
+                        irectTopleft = irectTopleft.copy(y = (irectTopleft.y + diff))
+                    }
+                    // Ensure the width doesn't exceed canvas width
+                    if (maintainedSize.width > canvasWidth) {
+                        val aspectRatio = 5f / 2f
+                        val adjustedWidth = canvasWidth
+                        val adjustedHeight = adjustedWidth / aspectRatio
+                        Size(adjustedWidth, adjustedHeight)
+                    } else {
+                        maintainedSize
+                    }
                 }
                 else -> {
                     Size(
@@ -353,7 +398,35 @@ class CropUtil(
                     }
                     Size(width = sqSide, height = sqSide)
                 }
+                CropType.BANNER_PICTURE -> {
+                    val aspectRatio = 5f / 2f  // Move constant to class level
 
+                    // First, ensure width is within bounds
+                    val constrainedWidth = minOf(newWidth, canvasWidth)
+                    val expectedHeight = constrainedWidth / aspectRatio
+
+                    // Calculate maintained size with constrained width
+                    val maintainedSize = maintainAspectRatio(constrainedWidth, expectedHeight)
+
+                    // Check if the maintained size fits within canvas height
+                    val totalHeight = maintainedSize.height + irectTopleft.y
+                    val heightDiff = canvasHeight - totalHeight
+
+                    if (heightDiff < 0) {
+                        // Adjust y position to fit within canvas
+                        irectTopleft = irectTopleft.copy(y = irectTopleft.y + heightDiff)
+                    }
+
+                    // Final size check to ensure we maintain aspect ratio
+                    // while fitting within canvas boundaries
+                    if (maintainedSize.width > canvasWidth) {
+                        val finalWidth = canvasWidth
+                        val finalHeight = finalWidth / aspectRatio
+                        Size(finalWidth, finalHeight)
+                    } else {
+                        maintainedSize
+                    }
+                }
                 else -> { // Free style
                     Size(width = maxOf(minLimit, width), height = maxOf(minLimit, height))
                 }
@@ -424,7 +497,37 @@ class CropUtil(
 
                     Size(width = sqSide, height = sqSide)
                 }
+                CropType.BANNER_PICTURE -> {
+                    val aspectRatio = 5f / 2f
 
+                    // First ensure width is within bounds and maintains minimum size
+                    val constrainedWidth = maxOf(minLimit,
+                        minOf(width, canvasSize.canvasWidth))
+
+                    // Calculate height based on aspect ratio
+                    val expectedHeight = constrainedWidth / aspectRatio
+
+                    // Maintain aspect ratio with constrained dimensions
+                    val maintainedSize = maintainAspectRatio(constrainedWidth, expectedHeight)
+
+                    // Check if the total height fits within canvas
+                    val totalHeight = maintainedSize.height + irectTopleft.y
+                    val heightDiff = canvasHeight - totalHeight
+
+                    // Adjust y-position if needed
+                    if (heightDiff < 0) {
+                        irectTopleft = irectTopleft.copy(y = irectTopleft.y + heightDiff)
+                    }
+
+                    // Final size check against canvas width (not height)
+                    if (maintainedSize.width > canvasSize.canvasWidth) {
+                        val finalWidth = canvasSize.canvasWidth
+                        val finalHeight = finalWidth / aspectRatio
+                        Size(finalWidth, finalHeight)
+                    } else {
+                        maintainedSize
+                    }
+                }
                 else -> {
                     Size(width = maxOf(minLimit, width), height = maxOf(minLimit, height))
                 }
@@ -473,7 +576,39 @@ class CropUtil(
                     }
                     Size(width = sqSide, height = sqSide)
                 }
+                CropType.BANNER_PICTURE -> {
+                    val aspectRatio = 5f / 2f
 
+                    // First, ensure width is within canvas bounds and minimum limit
+                    val constrainedWidth = newWidth
+                        .coerceAtLeast(minLimit)
+                        .coerceAtMost(canvasSize.canvasWidth - iRect.topLeft.x)
+
+                    // Calculate expected height based on aspect ratio
+                    val expectedHeight = constrainedWidth / aspectRatio
+                        .coerceAtMost(canvasSize.canvasHeight - iRect.topLeft.y)
+
+                    // Maintain aspect ratio with constrained dimensions
+                    val maintainedSize = maintainAspectRatio(constrainedWidth, expectedHeight)
+
+                    // Verify total height fits within canvas
+                    val totalHeight = maintainedSize.height + irectTopleft.y
+                    val heightDiff = canvasHeight - totalHeight
+
+                    // Adjust y-position if needed
+                    if (heightDiff < 0) {
+                        irectTopleft = irectTopleft.copy(y = irectTopleft.y + heightDiff)
+                    }
+
+                    // Final check against canvas width
+                    if (maintainedSize.width > canvasSize.canvasWidth - iRect.topLeft.x) {
+                        val finalWidth = canvasSize.canvasWidth - iRect.topLeft.x
+                        val finalHeight = finalWidth / aspectRatio
+                        Size(finalWidth, finalHeight)
+                    } else {
+                        maintainedSize
+                    }
+                }
                 else -> { // Free style
                     Size(
                         width = newWidth.coerceAtLeast(minLimit),
@@ -653,6 +788,30 @@ class CropUtil(
                     cropBitmap,
                     targetSize,
                     targetSize,
+                    true
+                )
+            }
+            CropType.BANNER_PICTURE -> {
+                val aspectRatio = 5f / 2f
+                val maxWidth = 1500 // Standard banner width
+                val maxHeight = (maxWidth / aspectRatio).toInt()
+
+                val currentRatio = imgWidth.toFloat() / imgHeight.toFloat()
+                val (targetWidth, targetHeight) = if (currentRatio > aspectRatio) {
+                    val width = (imgHeight * aspectRatio).toInt()
+                    Pair(width, imgHeight)
+                } else {
+                    val height = (imgWidth / aspectRatio).toInt()
+                    Pair(imgWidth, height)
+                }
+
+                val finalWidth = minOf(maxWidth, targetWidth)
+                val finalHeight = (finalWidth / aspectRatio).toInt()
+
+                Bitmap.createScaledBitmap(
+                    cropBitmap,
+                    maxOf(1, finalWidth),
+                    maxOf(1, finalHeight),
                     true
                 )
             }

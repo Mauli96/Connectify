@@ -33,7 +33,9 @@ class EditProfileViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _editProfileState = MutableStateFlow(EditProfileState())
-    val editProfileState = _editProfileState.asStateFlow()
+    val editProfileState = _editProfileState
+        .onStart { getSkills() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, EditProfileState())
 
     private val _usernameState = MutableStateFlow(StandardTextFieldState())
     val usernameState = _usernameState.asStateFlow()
@@ -50,12 +52,7 @@ class EditProfileViewModel @Inject constructor(
     private val _bioState = MutableStateFlow(StandardTextFieldState())
     val bioState = _bioState.asStateFlow()
 
-    private val _skills = MutableStateFlow(SkillsState())
-    val skills = _skills
-        .onStart { getSkills() }
-        .stateIn(viewModelScope, SharingStarted.Lazily, SkillsState())
-
-    private val _cropState = MutableStateFlow(CropImageState())
+    private val _cropState = MutableStateFlow(CropPictureState())
     val cropState = _cropState.asStateFlow()
 
     val networkState: StateFlow<NetworkConnectionState> =
@@ -124,13 +121,13 @@ class EditProfileViewModel @Inject constructor(
             }
             is EditProfileEvent.SetSkillSelected -> {
                 val result = profileUseCases.setSkillUseCase(
-                    selectedSkill = skills.value.selectedSkills,
+                    selectedSkill = editProfileState.value.selectedSkills,
                     skillToToggle = event.skill
                 )
                 viewModelScope.launch {
                     when(result) {
                         is Resource.Success -> {
-                            _skills.update {
+                            _editProfileState.update {
                                 it.copy(
                                     selectedSkills = result.data ?: kotlin.run {
                                         _eventFlow.emit(UiEvent.ShowSnackbar(
@@ -175,7 +172,7 @@ class EditProfileViewModel @Inject constructor(
             val result = profileUseCases.getSkills()
             when(result) {
                 is Resource.Success -> {
-                    _skills.update {
+                    _editProfileState.update {
                         it.copy(
                             skills = result.data ?: kotlin.run {
                                 _eventFlow.emit(
@@ -239,7 +236,7 @@ class EditProfileViewModel @Inject constructor(
                             text = profile.bio
                         )
                     }
-                    _skills.update {
+                    _editProfileState.update {
                         it.copy(
                             selectedSkills = profile.topSkills
                         )
@@ -252,6 +249,11 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
+                    _editProfileState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                     _eventFlow.emit(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
@@ -263,6 +265,11 @@ class EditProfileViewModel @Inject constructor(
 
     private fun updateProfile() {
         viewModelScope.launch {
+            _editProfileState.update {
+                it.copy(
+                    isUpdating = true
+                )
+            }
             val result = profileUseCases.updateProfile(
                 bannerImageUri = editProfileState.value.bannerUri,
                 profilePictureUri = editProfileState.value.profileUri,
@@ -272,7 +279,7 @@ class EditProfileViewModel @Inject constructor(
                     linkedInUrl = linkedInTextFieldState.value.text,
                     instagramUrl = instagramTextFieldState.value.text,
                     bio = bioState.value.text,
-                    skills = skills.value.selectedSkills
+                    skills = editProfileState.value.selectedSkills
                 )
             )
             when(result) {
@@ -287,6 +294,11 @@ class EditProfileViewModel @Inject constructor(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                 }
+            }
+            _editProfileState.update {
+                it.copy(
+                    isUpdating = false
+                )
             }
         }
     }

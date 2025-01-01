@@ -9,6 +9,6 @@ data class CropState(
     val cropImageUri: Uri? = null,
     val imageBitmap: Bitmap? = null,
     val cropImageBitmap: Bitmap? = null,
-    val isSavingMediaToStore: Boolean = false,
+    val isSavingMedia: Boolean = false,
     val cropType: CropType = CropType.FULL_PICTURE
 )

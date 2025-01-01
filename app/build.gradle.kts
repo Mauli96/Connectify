@@ -109,9 +109,6 @@ dependencies {
     // Logging (Timber)
     implementation(libs.timber)
 
-    // Image Cropping (uCrop)
-    implementation(libs.ucrop)
-
     // Testing
     // Unit Testing
     implementation(libs.androidx.core)

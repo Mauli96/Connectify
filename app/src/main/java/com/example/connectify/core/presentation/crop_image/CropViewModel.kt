@@ -72,7 +72,7 @@ class CropViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    isSavingMediaToStore = true
+                    isSavingMedia = true
                 )
             }
 
@@ -90,11 +90,12 @@ class CropViewModel @Inject constructor(
                 e.printStackTrace()
             } finally {
                 onComplete(fileUri)
-                _state.update {
-                    it.copy(
-                        isSavingMediaToStore = false
-                    )
-                }
+            }
+
+            _state.update {
+                it.copy(
+                    isSavingMedia = false
+                )
             }
         }
     }

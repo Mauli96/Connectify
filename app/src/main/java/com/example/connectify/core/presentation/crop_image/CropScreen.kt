@@ -36,6 +36,7 @@ import com.example.connectify.core.presentation.crop_image.cropview.CropType
 import com.example.connectify.core.presentation.crop_image.cropview.EdgeType
 import com.example.connectify.core.presentation.crop_image.cropview.ImageCrop
 import com.example.connectify.core.presentation.ui.theme.DarkerGreen
+import com.example.connectify.core.presentation.ui.theme.GreenAccent
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
@@ -71,7 +72,7 @@ fun CropScreen(
                     )
                 },
                 navActions = {
-                    if(state.isSavingMediaToStore) {
+                    if(state.isSavingMedia) {
                         CustomCircularProgressIndicator(
                             modifier = Modifier
                                 .padding(end = SpaceSmall)
@@ -80,7 +81,9 @@ fun CropScreen(
                     } else {
                         Text(
                             text = stringResource(R.string.apply),
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                color = GreenAccent
+                            ),
                             modifier = Modifier
                                 .padding(end = SpaceSmall)
                                 .pointerInput(Unit) {

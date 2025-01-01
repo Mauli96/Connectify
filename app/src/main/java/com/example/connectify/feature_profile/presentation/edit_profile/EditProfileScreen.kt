@@ -56,6 +56,8 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.crop_image.cropview.CropType
+import com.example.connectify.core.presentation.ui.theme.GreenAccent
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
@@ -86,7 +88,6 @@ fun EditProfileScreen(
     val instagramTextFieldState by viewModel.instagramTextFieldState.collectAsStateWithLifecycle()
     val linkedInTextFieldState by viewModel.linkedInTextFieldState.collectAsStateWithLifecycle()
     val bioState by viewModel.bioState.collectAsStateWithLifecycle()
-    val skills by viewModel.skills.collectAsStateWithLifecycle()
     val cropState by viewModel.cropState.collectAsState()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
@@ -98,7 +99,7 @@ fun EditProfileScreen(
         uri?.let {
             viewModel.onEvent(EditProfileEvent.OnNavigatingToCrop(CropType.FULL_PICTURE))
             val encodedUri = Uri.encode(uri.toString())
-            navController.navigate("${Screen.CropScreen.route}/$encodedUri") {
+            navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.BANNER_PICTURE.name}") {
                 launchSingleTop = true
                 popUpTo(Screen.EditProfileScreen.route) {
                     saveState = true
@@ -191,19 +192,29 @@ fun EditProfileScreen(
                         )
                     },
                     navActions = {
-                        Text(
-                            text = stringResource(R.string.save),
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier
-                                .padding(end = SpaceSmall)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            viewModel.onEvent(EditProfileEvent.UpdateProfile)
-                                        }
-                                    )
-                                }
-                        )
+                        if(editProfileState.isUpdating) {
+                            CustomCircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(end = SpaceSmall)
+                                    .size(IconSizeSmall)
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.save),
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    color = GreenAccent
+                                ),
+                                modifier = Modifier
+                                    .padding(end = SpaceSmall)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                viewModel.onEvent(EditProfileEvent.UpdateProfile)
+                                            }
+                                        )
+                                    }
+                            )
+                        }
                     }
                 )
 
@@ -366,10 +377,10 @@ fun EditProfileScreen(
                                 mainAxisSpacing = SpaceMedium,
                                 crossAxisSpacing = SpaceMedium
                             ) {
-                                skills.skills.forEach { skill ->
+                                editProfileState.skills.forEach { skill ->
                                     Chip(
                                         text = skill.name,
-                                        selected = skill in viewModel.skills.value.selectedSkills,
+                                        selected = skill in viewModel.editProfileState.value.selectedSkills,
                                         onChipClick = {
                                             viewModel.onEvent(EditProfileEvent.SetSkillSelected(skill))
                                         }

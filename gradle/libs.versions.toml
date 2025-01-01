@@ -40,7 +40,6 @@ retrofit = "2.11.0"
 robolectric = "4.12.2"
 timber = "5.0.1"
 truth = "1.4.2"
-ucrop = "2.2.8"
 credentials = "1.5.0-beta01"
 airbnbLottieCompose = "6.6.1"
 
@@ -100,7 +99,6 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
-ucrop = { group = "com.github.yalantis", name = "ucrop", version.ref = "ucrop" }
 androidx-credentials-core = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-compat = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 

@@ -50,12 +50,6 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-
-        <!-- Activity for handling image cropping (UCrop library) -->
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
     <!-- Allow the app to query activities that handle sharing -->
