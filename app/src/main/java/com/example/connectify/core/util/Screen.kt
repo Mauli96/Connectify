@@ -2,6 +2,7 @@ package com.example.connectify.core.util
 
 sealed class Screen(val route: String) {
     object AuthScreen : Screen("auth_screen")
+    object OnBoardingScreen : Screen("on_boarding_screen")
     object LoginScreen : Screen("login_screen")
     object RegisterScreen : Screen("register_screen")
     object MainFeedScreen : Screen("main_feed_screen")

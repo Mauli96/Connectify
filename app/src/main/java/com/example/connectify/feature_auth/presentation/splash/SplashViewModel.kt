@@ -2,62 +2,63 @@ package com.example.connectify.feature_auth.presentation.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.example.connectify.feature_auth.domain.use_case.ReadOnBoardingStateUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class SplashViewModel @Inject constructor(
+    private val readOnBoardingState: ReadOnBoardingStateUseCase,
     private val authenticateUseCase: AuthenticateUseCase
 ) : ViewModel() {
 
     private val _splashState = MutableStateFlow(SplashState())
     val splashState = _splashState.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
-
     init {
-        authenticateUser()
+        initializeSplashState()
     }
 
-    private fun authenticateUser() {
+    private fun initializeSplashState() {
         viewModelScope.launch {
-            val result = authenticateUseCase()
-            when(result) {
-                is Resource.Success -> {
-                    _splashState.update {
-                        it.copy(
-                            isUserAuthenticated = true
-                        )
-                    }
-                    _eventFlow.emit(
-                        UiEvent.Navigate(Screen.MainFeedScreen.route)
-                    )
-                }
-                is Resource.Error -> {
-                    _splashState.update {
-                        it.copy(
-                            isUserAuthenticated = false
-                        )
-                    }
-                    _eventFlow.emit(
-                        UiEvent.Navigate(Screen.AuthScreen.route)
-                    )
-                }
-            }
             _splashState.update {
                 it.copy(
-                    keepSplashScreenOn = false
+                    keepSplashScreenOn = true
                 )
             }
+
+            val hasCompletedOnboarding = readOnBoardingState().first()
+            if(!hasCompletedOnboarding) {
+                navigateToScreen(Screen.OnBoardingScreen.route)
+            } else {
+                authenticateUser()
+            }
+        }
+    }
+
+    private suspend fun authenticateUser() {
+        val result = authenticateUseCase()
+        when(result) {
+            is Resource.Success -> {
+                navigateToScreen(Screen.MainFeedScreen.route)
+            }
+            is Resource.Error -> {
+                navigateToScreen(Screen.AuthScreen.route)
+            }
+        }
+    }
+
+    private fun navigateToScreen(destination: String) {
+        _splashState.update {
+            it.copy(
+                startDestination = destination,
+                keepSplashScreenOn = false
+            )
         }
     }
 }

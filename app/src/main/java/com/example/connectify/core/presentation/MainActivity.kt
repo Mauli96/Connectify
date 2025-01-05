@@ -4,11 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -21,20 +22,15 @@ import coil.ImageLoader
 import com.example.connectify.core.presentation.components.CustomSnackbarHost
 import com.example.connectify.core.presentation.components.StandardScaffold
 import com.example.connectify.core.presentation.ui.theme.ConnectifyTheme
-import com.example.connectify.core.presentation.util.UiEvent
-import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Navigation
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_auth.presentation.splash.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var splashViewModel: SplashViewModel
+    private val splashViewModel by viewModels<SplashViewModel>()
     @Inject
     lateinit var imageLoader: ImageLoader
 
@@ -52,46 +48,47 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    val navController = rememberNavController()
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val snackbarHostState = remember { SnackbarHostState() }
                     val splashState by splashViewModel.splashState.collectAsStateWithLifecycle()
-                    val splashDuration = if(splashState.isUserAuthenticated == true) 100L else Constants.SPLASH_SCREEN_DURATION
 
-                    LaunchedEffect(splashState.isUserAuthenticated) {
-                        splashViewModel.eventFlow.collectLatest { event ->
-                            when(event) {
-                                is UiEvent.Navigate -> {
-                                    delay(splashDuration)
-                                    navController.navigate(event.route) {
-                                        popUpTo(0)
-                                    }
-                                }
-                                else -> Unit
-                            }
-                        }
-                    }
-
-                    StandardScaffold(
-                        navController = navController,
-                        showBottomBar = shouldShowBottomBar(navBackStackEntry),
-                        snackbarHost = {
-                            CustomSnackbarHost(
-                                snackbarHostState = snackbarHostState,
-                                onNavigate = navController::navigate
-                            )
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Navigation(
-                            navController = navController,
-                            snackbarHostState = snackbarHostState,
-                            imageLoader = imageLoader,
-                            isUserAuthenticated = splashState.isUserAuthenticated
+                    if(!splashState.keepSplashScreenOn && splashState.startDestination.isNotEmpty()) {
+                        MainContent(
+                            startDestination = splashState.startDestination,
+                            imageLoader = imageLoader
                         )
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun MainContent(
+        startDestination: String,
+        imageLoader: ImageLoader
+    ) {
+        val navController = rememberNavController()
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val snackbarHostState = remember {
+            SnackbarHostState()
+        }
+
+        StandardScaffold(
+            navController = navController,
+            showBottomBar = shouldShowBottomBar(navBackStackEntry),
+            snackbarHost = {
+                CustomSnackbarHost(
+                    snackbarHostState = snackbarHostState,
+                    onNavigate = navController::navigate
+                )
+            },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Navigation(
+                navController = navController,
+                snackbarHostState = snackbarHostState,
+                imageLoader = imageLoader,
+                startDestination = startDestination
+            )
         }
     }
 

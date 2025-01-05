@@ -61,9 +61,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.accompanist.flowlayout)
     implementation(libs.androidx.foundation)
-    implementation(libs.accompanist.pager.indicators)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.core.splashscreen)
 
@@ -87,6 +85,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // Pager and Indicators - Accompanist
+    implementation(libs.accompanist.flowlayout)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
+
+    // DataStore Preferences
+    implementation(libs.androidx.datastore.preferences)
 
     // Dependency Injection (Dagger-Hilt)
     implementation(libs.hilt.android)
