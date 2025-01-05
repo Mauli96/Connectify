@@ -39,6 +39,7 @@ fun Navigation(
     imageLoader: ImageLoader,
     isUserAuthenticated: Boolean?
 ) {
+
     val startDestination = when(isUserAuthenticated) {
         true -> Screen.MainFeedScreen.route
         false -> Screen.AuthScreen.route

@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -15,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -35,13 +33,15 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val splashViewModel by viewModels<SplashViewModel>()
+    @Inject
+    lateinit var splashViewModel: SplashViewModel
     @Inject
     lateinit var imageLoader: ImageLoader
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                splashViewModel.keepSplashScreenOn.value
+                splashViewModel.splashState.value.keepSplashScreenOn
             }
         }
         super.onCreate(savedInstanceState)
@@ -55,10 +55,10 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val snackbarHostState = remember { SnackbarHostState() }
-                    val isUserAuthenticated by splashViewModel.isUserAuthenticated.collectAsStateWithLifecycle()
-                    val splashDuration = if(isUserAuthenticated == true) 100L else Constants.SPLASH_SCREEN_DURATION
+                    val splashState by splashViewModel.splashState.collectAsStateWithLifecycle()
+                    val splashDuration = if(splashState.isUserAuthenticated == true) 100L else Constants.SPLASH_SCREEN_DURATION
 
-                    LaunchedEffect(isUserAuthenticated) {
+                    LaunchedEffect(splashState.isUserAuthenticated) {
                         splashViewModel.eventFlow.collectLatest { event ->
                             when(event) {
                                 is UiEvent.Navigate -> {
@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             snackbarHostState = snackbarHostState,
                             imageLoader = imageLoader,
-                            isUserAuthenticated = isUserAuthenticated
+                            isUserAuthenticated = splashState.isUserAuthenticated
                         )
                     }
                 }
