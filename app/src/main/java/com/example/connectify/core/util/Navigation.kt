@@ -21,6 +21,8 @@ import com.example.connectify.feature_activity.presentation.ActivityScreen
 import com.example.connectify.feature_auth.presentation.login.LoginScreen
 import com.example.connectify.feature_auth.presentation.register.RegisterScreen
 import com.example.connectify.feature_auth.presentation.on_boarding.OnBoardingScreen
+import com.example.connectify.feature_auth.presentation.otp.OtpScreen
+import com.example.connectify.feature_auth.presentation.password.PasswordScreen
 import com.example.connectify.feature_chat.presentation.chat.ChatScreen
 import com.example.connectify.feature_chat.presentation.message.MessageScreen
 import com.example.connectify.feature_post.presentation.create_post.CreatePostScreen
@@ -77,25 +79,25 @@ fun Navigation(
                 route = Screen.LoginScreen.route,
                 enterTransition = {
                     slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        AnimatedContentTransitionScope.SlideDirection.Left,
                         animationSpec = tween(animationDuration)
                     )
                 },
                 exitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        AnimatedContentTransitionScope.SlideDirection.Left,
                         animationSpec = tween(animationDuration)
                     )
                 },
                 popEnterTransition = {
                     slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(animationDuration)
                     )
                 },
                 popExitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(animationDuration)
                     )
                 }
@@ -117,25 +119,25 @@ fun Navigation(
                 route = Screen.RegisterScreen.route,
                 enterTransition = {
                     slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        AnimatedContentTransitionScope.SlideDirection.Left,
                         animationSpec = tween(animationDuration)
                     )
                 },
                 exitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        AnimatedContentTransitionScope.SlideDirection.Left,
                         animationSpec = tween(animationDuration)
                     )
                 },
                 popEnterTransition = {
                     slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(animationDuration)
                     )
                 },
                 popExitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(animationDuration)
                     )
                 }
@@ -152,6 +154,40 @@ fun Navigation(
                     },
                     snackbarHostState = snackbarHostState
                 )
+            }
+            composable(
+                route = Screen.OtpScreen.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
+            ) {
+                OtpScreen()
+            }
+            composable(
+                route = Screen.PasswordScreen.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(animationDuration)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(animationDuration)
+                    )
+                }
+            ) {
+                PasswordScreen()
             }
         }
         composable(

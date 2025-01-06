@@ -43,6 +43,7 @@ import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -143,7 +144,7 @@ fun LoginScreen(
                         else -> ""
                     },
                     leadingIcon = painterResource(id = R.drawable.ic_email),
-                    hint = stringResource(id = R.string.login_hint)
+                    hint = stringResource(id = R.string.email_hint)
                 )
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 StandardTextField(
@@ -169,7 +170,21 @@ fun LoginScreen(
                         viewModel.onEvent(LoginEvent.TogglePasswordVisibility)
                     }
                 )
-                Spacer(modifier = Modifier.height(SpaceMedium))
+                Spacer(modifier = Modifier.height(SpaceSmall))
+                Text(
+                    text = stringResource(id = R.string.forgot_password),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    onNavigate(Screen.PasswordScreen.route)
+                                }
+                            )
+                        }
+                )
+                Spacer(modifier = Modifier.height(SpaceSmall))
                 Button(
                     onClick = {
                         viewModel.onEvent(LoginEvent.Login)
