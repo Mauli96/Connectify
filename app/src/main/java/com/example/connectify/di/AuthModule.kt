@@ -8,10 +8,12 @@ import com.example.connectify.feature_auth.data.repository.DataStoreRepositoryIm
 import com.example.connectify.feature_auth.domain.repository.AuthRepository
 import com.example.connectify.feature_auth.domain.repository.DataStoreRepository
 import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
+import com.example.connectify.feature_auth.domain.use_case.GenerateOtpUseCase
 import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import com.example.connectify.feature_auth.domain.use_case.ReadOnBoardingStateUseCase
 import com.example.connectify.feature_auth.domain.use_case.RegisterUseCase
 import com.example.connectify.feature_auth.domain.use_case.SaveOnBoardingStateUseCase
+import com.example.connectify.feature_auth.domain.use_case.VerifyOtpUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -76,6 +78,18 @@ object AuthModule {
     @Singleton
     fun provideReadOnBoardingStateUseCase(repository: DataStoreRepository): ReadOnBoardingStateUseCase {
         return ReadOnBoardingStateUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGenerateOtpUseCase(repository: AuthRepository): GenerateOtpUseCase {
+        return GenerateOtpUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVerifyOtpUseCase(repository: AuthRepository): VerifyOtpUseCase {
+        return VerifyOtpUseCase(repository)
     }
 
     @Provides

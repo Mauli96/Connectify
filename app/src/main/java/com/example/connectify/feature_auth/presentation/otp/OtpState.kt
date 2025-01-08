@@ -5,5 +5,6 @@ data class OtpState(
     val focusedIndex: Int? = null,
     val showEmailInput: Boolean = true,
     val isValid: Boolean? = null,
-    val isLoading: Boolean = false
+    val isOtpGenerating: Boolean = false,
+    val isOtpVerifying: Boolean = false
 )

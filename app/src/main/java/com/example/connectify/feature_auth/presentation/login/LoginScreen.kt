@@ -40,7 +40,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardTextField
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -66,8 +68,8 @@ fun LoginScreen(
     val state by viewModel.loginState.collectAsStateWithLifecycle()
     val emailState by viewModel.emailState.collectAsStateWithLifecycle()
     val passwordState by viewModel.passwordState.collectAsStateWithLifecycle()
-    val keyboardController = LocalSoftwareKeyboardController.current
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
@@ -75,10 +77,10 @@ fun LoginScreen(
         AccountManager(context as ComponentActivity)
     }
 
-    LaunchedEffect(key1 = true) {
-        val result = accountManager.signIn()
-        viewModel.onEvent(LoginEvent.OnSignIn(result))
-    }
+//    LaunchedEffect(key1 = true) {
+//        val result = accountManager.signIn()
+//        viewModel.onEvent(LoginEvent.OnSignIn(result))
+//    }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -152,7 +154,7 @@ fun LoginScreen(
                     onValueChange = {
                         viewModel.onEvent(LoginEvent.EnteredPassword(it))
                     },
-                    hint = stringResource(id = R.string.password_hint),
+                    hint = stringResource(id = R.string.password),
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
                     onNext = {
@@ -179,7 +181,7 @@ fun LoginScreen(
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onTap = {
-                                    onNavigate(Screen.PasswordScreen.route)
+                                    onNavigate(Screen.OtpScreen.route)
                                 }
                             )
                         }
@@ -193,12 +195,9 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if(state.isLoading) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp,
+                        CustomCircularProgressIndicator(
                             modifier = Modifier
-                                .size(20.dp)
-                                .align(CenterVertically)
+                                .size(IconSizeSmall)
                         )
                     } else {
                         Text(

@@ -77,7 +77,7 @@ fun OtpInputField(
             },
             cursorBrush = SolidColor(GreenAccent),
             singleLine = true,
-            textStyle = MaterialTheme.typography.headlineSmall.copy(
+            textStyle = MaterialTheme.typography.titleMedium.copy(
                 textAlign = TextAlign.Center
             ),
             keyboardOptions = KeyboardOptions(

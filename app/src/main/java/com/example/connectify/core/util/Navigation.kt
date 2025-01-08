@@ -170,7 +170,18 @@ fun Navigation(
                     )
                 }
             ) {
-                OtpScreen()
+                OtpScreen(
+                    snackbarHostState = snackbarHostState,
+                    onNavigate = { route ->
+                        navController.navigate(route) {
+                            popUpTo(Screen.OtpScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onNavigateUp = navController::navigateUp
+                )
             }
             composable(
                 route = Screen.PasswordScreen.route,

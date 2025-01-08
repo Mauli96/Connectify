@@ -8,7 +8,9 @@ import com.example.connectify.core.util.SimpleResource
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.data.remote.AuthApi
 import com.example.connectify.feature_auth.data.remote.request.CreateAccountRequest
+import com.example.connectify.feature_auth.data.remote.request.EmailRequest
 import com.example.connectify.feature_auth.data.remote.request.LoginRequest
+import com.example.connectify.feature_auth.data.remote.request.OtpVerificationRequest
 import com.example.connectify.feature_auth.domain.repository.AuthRepository
 import okio.IOException
 import retrofit2.HttpException
@@ -58,6 +60,56 @@ class AuthRepositoryImpl(
                         .putString(Constants.KEY_USER_ID, authResponse.userId)
                         .apply()
                 }
+                Resource.Success(Unit)
+            } else {
+                response.message?.let { msg ->
+                    Resource.Error(UiText.DynamicString(msg))
+                } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
+            }
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun generateOtp(email: String): SimpleResource {
+        val request = EmailRequest(email)
+        return try {
+            val response = api.generateOtp(request)
+            if(response.successful) {
+                Resource.Success(Unit)
+            } else {
+                response.message?.let { msg ->
+                    Resource.Error(UiText.DynamicString(msg))
+                } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
+            }
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun verifyOtp(
+        email: String,
+        code: String
+    ): SimpleResource {
+        val request = OtpVerificationRequest(
+            email = email,
+            code = code
+        )
+        return try {
+            val response = api.verifyOtp(request)
+            if(response.successful) {
                 Resource.Success(Unit)
             } else {
                 response.message?.let { msg ->

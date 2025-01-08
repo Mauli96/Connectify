@@ -5,5 +5,5 @@ sealed interface OtpEvent {
     data class OnEnterNumber(val number: Int?, val index: Int): OtpEvent
     data class OnChangeFieldFocused(val index: Int): OtpEvent
     data object OnKeyboardBack: OtpEvent
-    data object OnVerifyEmail: OtpEvent
+    data object OnSendOtp: OtpEvent
 }

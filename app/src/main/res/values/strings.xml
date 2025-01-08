@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Connectify</string>
     <string name="login">Login</string>
-    <string name="password_hint">Password</string>
+    <string name="password">Password</string>
     <string name="email_hint">E-Mail</string>
     <string name="password_visible_content_description">Hide password</string>
     <string name="password_hidden_content_description">Show password</string>
@@ -150,5 +150,11 @@
     <string name="lets_connect">Let\'s connect</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="verify_email">Verify E-Mail</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="confirm_password">Confirm password</string>
     <string name="change_password">Change Password</string>
+    <string name="otp_generated">OTP generated. Check your email to proceed.</string>
+    <string name="otp_verifying">Verifying OTP, please wait...</string>
+    <string name="otp_valid">OTP is valid!</string>
+    <string name="otp_invalid">OTP is invalid!</string>
 </resources>

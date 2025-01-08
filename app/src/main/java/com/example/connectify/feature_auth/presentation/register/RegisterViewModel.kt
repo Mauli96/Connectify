@@ -141,7 +141,9 @@ class RegisterViewModel @Inject constructor(
                     )
                     _eventFlow.emit(UiEvent.OnRegister)
                     _registerState.update {
-                        it.copy(isLoading = false)
+                        it.copy(
+                            isLoading = false
+                        )
                     }
                     _usernameState.value = StandardTextFieldState()
                     _emailState.value = StandardTextFieldState()

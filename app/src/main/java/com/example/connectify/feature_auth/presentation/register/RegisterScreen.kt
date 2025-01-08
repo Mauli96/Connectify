@@ -40,7 +40,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
+import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardTextField
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.util.UiEvent
@@ -183,7 +185,7 @@ fun RegisterScreen(
                     onNext = {
                         focusManager.clearFocus()
                     },
-                    hint = stringResource(id = R.string.password_hint),
+                    hint = stringResource(id = R.string.password),
                     error = when(passwordState.error) {
                         is AuthError.FieldEmpty -> {
                             stringResource(id = R.string.this_field_cant_be_empty)
@@ -211,12 +213,9 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if(registerState.isLoading) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp,
+                        CustomCircularProgressIndicator(
                             modifier = Modifier
-                                .size(20.dp)
-                                .align(CenterVertically)
+                                .size(IconSizeSmall)
                         )
                     } else {
                         Text(

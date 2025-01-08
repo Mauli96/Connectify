@@ -15,5 +15,14 @@ interface AuthRepository {
         password: String
     ): SimpleResource
 
+    suspend fun generateOtp(
+        email: String
+    ): SimpleResource
+
+    suspend fun verifyOtp(
+        email: String,
+        code: String
+    ): SimpleResource
+
     suspend fun authenticate(): SimpleResource
 }

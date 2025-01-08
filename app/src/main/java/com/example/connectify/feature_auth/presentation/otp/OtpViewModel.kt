@@ -1,18 +1,29 @@
 package com.example.connectify.feature_auth.presentation.otp
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.util.UiEvent
+import com.example.connectify.core.util.Resource
+import com.example.connectify.core.util.Screen
+import com.example.connectify.core.util.UiText
+import com.example.connectify.feature_auth.domain.use_case.GenerateOtpUseCase
+import com.example.connectify.feature_auth.domain.use_case.VerifyOtpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-private const val VALID_OTP_CODE = "1414"
 
 @HiltViewModel
 class OtpViewModel @Inject constructor(
-
+    private val generateOtp: GenerateOtpUseCase,
+    private val verifyOtp: VerifyOtpUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OtpState())
@@ -20,6 +31,9 @@ class OtpViewModel @Inject constructor(
 
     private val _emailState = MutableStateFlow(StandardTextFieldState())
     val emailState = _emailState.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
 
     fun onEvent(event: OtpEvent) {
         when(event) {
@@ -55,11 +69,66 @@ class OtpViewModel @Inject constructor(
                     )
                 }
             }
-            is OtpEvent.OnVerifyEmail -> {
-                _state.update {
+            is OtpEvent.OnSendOtp -> {
+                sendOtp()
+            }
+        }
+    }
+
+    private fun sendOtp() {
+        viewModelScope.launch {
+            _emailState.update {
+                it.copy(
+                    error = null
+                )
+            }
+            _state.update {
+                it.copy(
+                    isOtpGenerating = true
+                )
+            }
+            val otpResult = generateOtp(email = emailState.value.text)
+
+            if(otpResult.emailError != null) {
+                _emailState.update {
                     it.copy(
-                        showEmailInput = false
+                        error = otpResult.emailError
                     )
+                }
+            }
+
+            when(otpResult.result) {
+                is Resource.Success -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            UiText.StringResource(R.string.otp_generated)
+                        )
+                    )
+                    _state.update {
+                        it.copy(
+                            showEmailInput = false,
+                            isOtpGenerating = false
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = otpResult.result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                    _state.update {
+                        it.copy(
+                            isOtpGenerating = false
+                        )
+                    }
+                }
+                null -> {
+                    _state.update {
+                        it.copy(
+                            isOtpGenerating = false
+                        )
+                    }
                 }
             }
         }
@@ -67,28 +136,74 @@ class OtpViewModel @Inject constructor(
 
     private fun enterNumber(number: Int?, index: Int) {
         val newCode = state.value.code.mapIndexed { currentIndex, currentNumber ->
-            if(currentIndex == index) {
-                number
-            } else {
-                currentNumber
-            }
+            if (currentIndex == index) number else currentNumber
         }
         val wasNumberRemoved = number == null
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    code = newCode,
+                    focusedIndex = if (wasNumberRemoved || it.code.getOrNull(index) != null) {
+                        it.focusedIndex
+                    } else {
+                        getNextFocusedTextFieldIndex(
+                            currentCode = it.code,
+                            currentFocusedIndex = it.focusedIndex
+                        )
+                    },
+                    isValid = null
+                )
+            }
+
+            val isValid = if (newCode.none { it == null }) {
+                verifyCode(
+                    email = emailState.value.text,
+                    code = newCode.joinToString("")
+                )
+            } else null
+
+            _state.update {
+                it.copy(
+                    isValid = isValid
+                )
+            }
+
+            if(isValid == true) {
+                delay(1000)
+                _eventFlow.emit(UiEvent.Navigate(Screen.PasswordScreen.route))
+            }
+        }
+    }
+
+    private suspend fun verifyCode(
+        email: String,
+        code: String
+    ): Boolean {
         _state.update {
             it.copy(
-                code = newCode,
-                focusedIndex = if(wasNumberRemoved || it.code.getOrNull(index) != null) {
-                    it.focusedIndex
-                } else {
-                    getNextFocusedTextFieldIndex(
-                        currentCode = it.code,
-                        currentFocusedIndex = it.focusedIndex
-                    )
-                },
-                isValid = if(newCode.none { it == null }) {
-                    newCode.joinToString("") == VALID_OTP_CODE
-                } else null
+                isOtpVerifying = true
             )
+        }
+        val result = verifyOtp(email = email, code = code)
+
+        return when(result) {
+            is Resource.Success -> {
+                _state.update {
+                    it.copy(
+                        isOtpVerifying = false
+                    )
+                }
+                true
+            }
+            is Resource.Error -> {
+                _state.update {
+                    it.copy(
+                        isOtpVerifying = false
+                    )
+                }
+                false
+            }
         }
     }
 
