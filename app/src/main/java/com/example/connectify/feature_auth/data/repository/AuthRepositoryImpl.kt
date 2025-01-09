@@ -9,6 +9,7 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.data.remote.AuthApi
 import com.example.connectify.feature_auth.data.remote.request.CreateAccountRequest
 import com.example.connectify.feature_auth.data.remote.request.EmailRequest
+import com.example.connectify.feature_auth.data.remote.request.ForgotPasswordRequest
 import com.example.connectify.feature_auth.data.remote.request.LoginRequest
 import com.example.connectify.feature_auth.data.remote.request.OtpVerificationRequest
 import com.example.connectify.feature_auth.domain.repository.AuthRepository
@@ -109,6 +110,34 @@ class AuthRepositoryImpl(
         )
         return try {
             val response = api.verifyOtp(request)
+            if(response.successful) {
+                Resource.Success(Unit)
+            } else {
+                response.message?.let { msg ->
+                    Resource.Error(UiText.DynamicString(msg))
+                } ?: Resource.Error(UiText.StringResource(R.string.error_unknown))
+            }
+        } catch(e: IOException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.error_couldnt_reach_server)
+            )
+        } catch(e: HttpException) {
+            Resource.Error(
+                uiText = UiText.StringResource(R.string.oops_something_went_wrong)
+            )
+        }
+    }
+
+    override suspend fun forgotPassword(
+        email: String,
+        newPassword: String
+    ): SimpleResource {
+        val request = ForgotPasswordRequest(
+            email = email,
+            newPassword = newPassword
+        )
+        return try {
+            val response = api.forgotPassword(request)
             if(response.successful) {
                 Resource.Success(Unit)
             } else {

@@ -171,7 +171,7 @@ class OtpViewModel @Inject constructor(
 
             if(isValid == true) {
                 delay(1000)
-                _eventFlow.emit(UiEvent.Navigate(Screen.PasswordScreen.route))
+                _eventFlow.emit(UiEvent.Navigate(Screen.PasswordScreen.route + "/${emailState.value.text}"))
             }
         }
     }

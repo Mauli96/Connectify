@@ -62,6 +62,6 @@ interface ProfileApi {
     suspend fun getOwnProfilePicture(): BasicApiResponse<String>
 
     companion object {
-        const val BASE_URL = "http://192.168.0.102:8001/"
+        const val BASE_URL = "http://192.168.0.100:8001/"
     }
 }

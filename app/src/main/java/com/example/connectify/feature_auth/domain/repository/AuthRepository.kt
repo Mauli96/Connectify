@@ -24,5 +24,10 @@ interface AuthRepository {
         code: String
     ): SimpleResource
 
+    suspend fun forgotPassword(
+        email: String,
+        newPassword: String
+    ): SimpleResource
+
     suspend fun authenticate(): SimpleResource
 }

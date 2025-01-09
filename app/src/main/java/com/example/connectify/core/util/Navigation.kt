@@ -184,7 +184,12 @@ fun Navigation(
                 )
             }
             composable(
-                route = Screen.PasswordScreen.route,
+                route = Screen.PasswordScreen.route + "/{email}",
+                arguments = listOf(
+                    navArgument("email") {
+                        type = NavType.StringType
+                    }
+                ),
                 enterTransition = {
                     slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.Left,
@@ -198,7 +203,11 @@ fun Navigation(
                     )
                 }
             ) {
-                PasswordScreen()
+                PasswordScreen(
+                    snackbarHostState = snackbarHostState,
+                    onNavigate = navController::navigate,
+                    onNavigateUp = navController::navigateUp
+                )
             }
         }
         composable(

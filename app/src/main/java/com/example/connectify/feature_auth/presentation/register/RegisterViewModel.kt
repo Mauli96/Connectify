@@ -9,7 +9,6 @@ import com.example.connectify.core.domain.states.PasswordTextFieldState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.Resource
-import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import com.example.connectify.feature_auth.domain.use_case.RegisterUseCase
@@ -134,12 +133,12 @@ class RegisterViewModel @Inject constructor(
                         email = emailState.value.text,
                         password = passwordState.value.text
                     )
+                    _eventFlow.emit(UiEvent.OnRegister)
                     _eventFlow.emit(
                         UiEvent.ShowSnackbar(
                             UiText.StringResource(R.string.success_registeration)
                         )
                     )
-                    _eventFlow.emit(UiEvent.OnRegister)
                     _registerState.update {
                         it.copy(
                             isLoading = false

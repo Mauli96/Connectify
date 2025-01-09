@@ -5,4 +5,5 @@ sealed interface PasswordEvent {
     data class EnteredPassword2(val password: String): PasswordEvent
     data object TogglePasswordVisibility1: PasswordEvent
     data object TogglePasswordVisibility2: PasswordEvent
+    data object OnPasswordChanged: PasswordEvent
 }

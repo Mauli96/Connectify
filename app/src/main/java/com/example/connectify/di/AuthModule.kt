@@ -8,6 +8,7 @@ import com.example.connectify.feature_auth.data.repository.DataStoreRepositoryIm
 import com.example.connectify.feature_auth.domain.repository.AuthRepository
 import com.example.connectify.feature_auth.domain.repository.DataStoreRepository
 import com.example.connectify.feature_auth.domain.use_case.AuthenticateUseCase
+import com.example.connectify.feature_auth.domain.use_case.ForgotPasswordUseCase
 import com.example.connectify.feature_auth.domain.use_case.GenerateOtpUseCase
 import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import com.example.connectify.feature_auth.domain.use_case.ReadOnBoardingStateUseCase
@@ -90,6 +91,12 @@ object AuthModule {
     @Singleton
     fun provideVerifyOtpUseCase(repository: AuthRepository): VerifyOtpUseCase {
         return VerifyOtpUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideForgotPasswordUseCase(repository: AuthRepository): ForgotPasswordUseCase {
+        return ForgotPasswordUseCase(repository)
     }
 
     @Provides

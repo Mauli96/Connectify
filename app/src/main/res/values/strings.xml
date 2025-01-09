@@ -92,6 +92,7 @@
     <string name="successfully_deleted_post">Successfully deleted post</string>
     <string name="message_screen">Messages</string>
     <string name="success_login">Successfully logged in</string>
+    <string name="password_changed_successfully">Your password has been changed successfully.</string>
     <string name="delete">Delete</string>
     <string name="connectify">Connectify</string>
     <string name="message">Message</string>
@@ -154,7 +155,12 @@
     <string name="confirm_password">Confirm password</string>
     <string name="change_password">Change Password</string>
     <string name="otp_generated">OTP generated. Check your email to proceed.</string>
-    <string name="otp_verifying">Verifying OTP, please wait...</string>
+    <string name="otp_verifying">Verifying OTP, please wait…</string>
     <string name="otp_valid">OTP is valid!</string>
     <string name="otp_invalid">OTP is invalid!</string>
+    <string name="login_to_connectify">Login to Connectify</string>
+    <string name="register_screen_message_1">Hi new friend,</string>
+    <string name="register_screen_message_2">welcome to Connectify</string>
+    <string name="verify_your_email">Verify your E-Mail</string>
+    <string name="password_did_not_matched">The passwords you entered don\'t match</string>
 </resources>

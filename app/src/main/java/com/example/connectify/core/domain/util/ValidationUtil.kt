@@ -42,4 +42,17 @@ object ValidationUtil {
         }
         return null
     }
+
+    fun validateConfirmPassword(
+        newPassword: String,
+        confirmPassword: String
+    ): AuthError? {
+        if(confirmPassword.isBlank()) {
+            return AuthError.FieldEmpty
+        }
+        if(newPassword != confirmPassword) {
+            return AuthError.PasswordsDoNotMatch
+        }
+        return null
+    }
 }

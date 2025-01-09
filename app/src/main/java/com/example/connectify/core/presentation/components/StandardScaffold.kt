@@ -58,9 +58,7 @@ fun StandardScaffold(
     Scaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = {
-            snackbarHost()
-        },
+        snackbarHost = snackbarHost,
         bottomBar = {
             if(showBottomBar) {
                 NavigationBar(

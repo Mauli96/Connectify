@@ -1,5 +1,6 @@
 package com.example.connectify.feature_auth.presentation.otp
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -110,6 +111,7 @@ fun OtpScreen(
                     )
                 }
                 is UiEvent.Navigate -> {
+                    keyboardController?.hide()
                     onNavigate(event.route)
                 }
                 else -> {
@@ -129,10 +131,21 @@ fun OtpScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 100.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(top = 120.dp),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(R.drawable.ic_logo),
+                contentDescription = stringResource(R.string.connectify),
+                modifier = Modifier.size(70.dp)
+            )
+            Spacer(modifier = Modifier.height(SpaceMedium))
+            Text(
+                text = stringResource(id = R.string.verify_your_email),
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(SpaceLarge))
             if(state.showEmailInput) {
                 Column(
                     modifier = Modifier
@@ -140,10 +153,6 @@ fun OtpScreen(
                         .padding(horizontal = SpaceLarge),
                     verticalArrangement = Arrangement.spacedBy(SpaceMedium)
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.email),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
                     StandardTextField(
                         text = emailState.text,
                         onValueChange = {
@@ -166,7 +175,6 @@ fun OtpScreen(
                     Button(
                         onClick = {
                             viewModel.onEvent(OtpEvent.OnSendOtp)
-                            keyboardController?.hide()
                         },
                         shape = MaterialTheme.shapes.extraSmall,
                         modifier = Modifier.fillMaxWidth()
