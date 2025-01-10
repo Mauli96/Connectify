@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,8 +49,7 @@ fun ShimmerListPostItem(
                 count = 2
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -63,6 +63,7 @@ fun ShimmerListPostItem(
                         modifier = Modifier
                             .fillMaxWidth(0.7f)
                             .height(IconSizeSmall)
+                            .clip(MaterialTheme.shapes.medium)
                             .shimmerEffect()
                     )
                 }
@@ -71,6 +72,7 @@ fun ShimmerListPostItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(4f / 5f)
+                        .clip(MaterialTheme.shapes.large)
                         .shimmerEffect()
                 )
                 Spacer(modifier = Modifier.height(SpaceMedium))

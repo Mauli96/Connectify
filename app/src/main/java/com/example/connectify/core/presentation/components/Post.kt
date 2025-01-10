@@ -73,20 +73,28 @@ fun Post(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(DarkGray)
+                .padding(
+                    start = SpaceMedium,
+                    end = SpaceMedium
+                )
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                    start = SpaceSmall,
-                    end = SpaceSmall,
-                    bottom = SpaceMedium
-                ),
+                    .padding(bottom = SpaceMedium),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    onUsernameClick()
+                                }
+                            )
+                        }
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -110,15 +118,7 @@ fun Post(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            onUsernameClick()
-                                        }
-                                    )
-                                }
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -146,11 +146,15 @@ fun Post(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4f / 5f)
+                    .clip(MaterialTheme.shapes.large)
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(SpaceMedium)
+                    .padding(
+                        top = SpaceMedium,
+                        bottom = SpaceMedium
+                    )
             ) {
                 ActionRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -159,9 +163,7 @@ fun Post(
                     likeCount = post.likeCount,
                     commentCount = post.commentCount,
                     onLikeClick = onLikeClick,
-                    onCommentClick = {
-                        onCommentClick()
-                    },
+                    onCommentClick = onCommentClick,
                     onShareClick = onShareClick,
                     onSaveClick = onSaveClick,
                     onLikedByClick = onLikedByClick
@@ -284,18 +286,9 @@ fun EngagementButtons(
         )
         if(likeCount != 0) {
             Spacer(modifier = Modifier.width(SpaceSmall))
-            Text(
-                text = likeCount.toString(),
-                fontSize = 17.sp,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = {
-                                onLikedByClick()
-                            }
-                        )
-                    }
+            AnimatedCounter(
+                count = likeCount,
+                onClick = onLikedByClick
             )
         }
         Spacer(modifier = Modifier.width(SpaceMediumLarge))

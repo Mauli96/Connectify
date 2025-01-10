@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.Icon
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,154 +33,139 @@ import com.example.connectify.feature_post.presentation.util.CommentFilter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun CommentFilterDropdown(
     expanded: Boolean,
+    selectedFilter: CommentFilter,
     onShowDropDownMenu: () -> Unit,
     onDismissDropdownMenu: () -> Unit,
-    selectedFilter: CommentFilter,
-    onFilterSelected: (CommentFilter) -> Unit
+    onFilterSelected: (CommentFilter) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
-    val coroutineScope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     Box(
-        modifier = Modifier
-            .padding(
-                horizontal = SpaceSmall,
-                vertical = SpaceSmall
-            )
+        modifier = modifier.padding(SpaceSmall)
     ) {
-        Row(
-            modifier = Modifier
-                .wrapContentSize()
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            onShowDropDownMenu()
-                        }
-                    )
-                },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(
-                    id = when(selectedFilter) {
-                        CommentFilter.MOST_RECENT -> R.string.most_recent_comments
-                        CommentFilter.MOST_OLD -> R.string.most_old_commets
-                        CommentFilter.MOST_POPULAR -> R.string.most_popular_comments
+        FilterHeader(
+            expanded = expanded,
+            selectedFilter = selectedFilter,
+            onClick = onShowDropDownMenu
+        )
+
+        FilterDropdownMenu(
+            expanded = expanded,
+            selectedFilter = selectedFilter,
+            onDismissRequest = onDismissDropdownMenu,
+            onFilterSelected = { filter ->
+                onDismissDropdownMenu()
+                scope.launch {
+                    delay(200) // Animation delay
+                    onFilterSelected(filter)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun FilterHeader(
+    expanded: Boolean,
+    selectedFilter: CommentFilter,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .wrapContentSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        onClick()
                     }
-                ),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.width(SpaceSmall))
-            Icon(
-                painter = if(expanded) {
-                    painterResource(R.drawable.ic_drop_down_up)
-                } else {
-                    painterResource(R.drawable.ic_drop_down)
-                },
-                contentDescription = stringResource(id = R.string.filter_comments),
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(IconSizeSmall)
-            )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.TopStart)
-                .shadow(30.dp, MaterialTheme.shapes.extraLarge)
+                )
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(
+                id = when(selectedFilter) {
+                    CommentFilter.MOST_RECENT -> R.string.most_recent_comments
+                    CommentFilter.MOST_OLD -> R.string.most_old_commets
+                    CommentFilter.MOST_POPULAR -> R.string.most_popular_comments
+                }
+            ),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Spacer(modifier = Modifier.width(SpaceSmall))
+        Icon(
+            painter = painterResource(
+                if(expanded) {
+                    R.drawable.ic_drop_down_up
+                } else R.drawable.ic_drop_down
+            ),
+            contentDescription = stringResource(id = R.string.filter_comments),
+            tint = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.size(IconSizeSmall)
+        )
+    }
+}
+
+@Composable
+private fun FilterDropdownMenu(
+    expanded: Boolean,
+    selectedFilter: CommentFilter,
+    onDismissRequest: () -> Unit,
+    onFilterSelected: (CommentFilter) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.TopStart)
+            .shadow(elevation = 30.dp, shape = MaterialTheme.shapes.extraLarge)
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = onDismissRequest,
+            offset = DpOffset(0.dp, 26.dp)
         ) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    onDismissDropdownMenu()
-                },
-                offset = DpOffset(0.dp, 26.dp)
-            ) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.most_recent_comments),
-                            style = if(selectedFilter == CommentFilter.MOST_RECENT) {
-                                MaterialTheme.typography.labelLarge
-                            } else {
-                                MaterialTheme.typography.bodyLarge
-                            }
-                        )
-                    },
-                    onClick = {
-                        onDismissDropdownMenu()
-                        coroutineScope.launch {
-                            delay(200)
-                            onFilterSelected(CommentFilter.MOST_RECENT)
-                        }
-                    },
-                    modifier = Modifier
-                        .background(
-                            if(selectedFilter == CommentFilter.MOST_RECENT) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                Color.Transparent
-                            }
-                        )
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.most_old_commets),
-                            style = if(selectedFilter == CommentFilter.MOST_OLD) {
-                                MaterialTheme.typography.labelLarge
-                            } else {
-                                MaterialTheme.typography.bodyLarge
-                            }
-                        )
-                    },
-                    onClick = {
-                        onDismissDropdownMenu()
-                        coroutineScope.launch {
-                            delay(200)
-                            onFilterSelected(CommentFilter.MOST_OLD)
-                        }
-                    },
-                    modifier = Modifier
-                        .background(
-                            if(selectedFilter == CommentFilter.MOST_OLD) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                Color.Transparent
-                            }
-                        )
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.most_popular_comments),
-                            style = if(selectedFilter == CommentFilter.MOST_POPULAR) {
-                                MaterialTheme.typography.labelLarge
-                            } else {
-                                MaterialTheme.typography.bodyLarge
-                            }
-                        )
-                    },
-                    onClick = {
-                        onDismissDropdownMenu()
-                        coroutineScope.launch {
-                            delay(200)
-                            onFilterSelected(CommentFilter.MOST_POPULAR)
-                        }
-                    },
-                    modifier = Modifier
-                        .background(
-                            if(selectedFilter == CommentFilter.MOST_POPULAR) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                Color.Transparent
-                            }
-                        )
+            CommentFilter.entries.forEach { filter ->
+                FilterMenuItem(
+                    filter = filter,
+                    isSelected = filter == selectedFilter,
+                    onClick = { onFilterSelected(filter) }
                 )
             }
         }
     }
+}
+
+@Composable
+private fun FilterMenuItem(
+    filter: CommentFilter,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val stringResId = when(filter) {
+        CommentFilter.MOST_RECENT -> R.string.most_recent_comments
+        CommentFilter.MOST_OLD -> R.string.most_old_commets
+        CommentFilter.MOST_POPULAR -> R.string.most_popular_comments
+    }
+
+    DropdownMenuItem(
+        text = {
+            Text(
+                text = stringResource(id = stringResId),
+                style = if(isSelected) {
+                    MaterialTheme.typography.labelLarge
+                } else {
+                    MaterialTheme.typography.bodyLarge
+                }
+            )
+        },
+        onClick = onClick,
+        modifier = Modifier.background(
+            if(isSelected) MaterialTheme.colorScheme.primary
+            else Color.Transparent
+        )
+    )
 }

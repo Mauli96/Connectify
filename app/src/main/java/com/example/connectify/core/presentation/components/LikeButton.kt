@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -15,61 +16,61 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.IconSizeMediumSmall
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun LikeButton(
     isLiked: Boolean = false,
+    size: Dp = IconSizeMediumSmall,
+    likedColor: Color = Color(0xFF08FF04),
+    unLikedColor: Color = Color.White,
     onLikeClick: () -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
-    val heartScale = remember {
-        Animatable(1f)
-    }
-    val heartColor = remember {
-        Animatable(Color(0xFF08FF04))
+    val heartScale = remember { Animatable(1f) }
+    val heartColor = remember { Animatable(if(isLiked) likedColor else unLikedColor) }
+
+    // Handle color animation when isLiked changes
+    LaunchedEffect(isLiked) {
+        heartColor.animateTo(
+            targetValue = if(isLiked) likedColor else unLikedColor,
+            animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f)
+        )
     }
 
     fun animateHeart() {
         scope.launch {
-            if(isLiked) {
-                heartScale.animateTo(
-                    targetValue = 1.3f,
-                    animationSpec = spring(dampingRatio = 1f, stiffness = 3000f)
+            // Bounce animation
+            heartScale.animateTo(
+                targetValue = 1.3f,
+                animationSpec = spring(
+                    dampingRatio = 0.5f,  // More bouncy
+                    stiffness = 1500f     // Faster animation
                 )
-                heartScale.animateTo(1f)
-            } else {
-                heartColor.animateTo(Color(0xFF08FF04))
-                heartScale.animateTo(
-                    targetValue = 1.3f,
-                    animationSpec = spring(dampingRatio = 1f, stiffness = 3000f)
+            )
+            heartScale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = 0.5f,
+                    stiffness = 1500f
                 )
-                heartScale.animateTo(1f)
-            }
+            )
         }
     }
 
     Icon(
         painter = if(isLiked) {
             painterResource(id = R.drawable.ic_like)
-        } else {
-            painterResource(id = R.drawable.ic_unlike)
-        },
-        contentDescription = if(isLiked) {
-            stringResource(id = R.string.unlike)
-        } else {
-            stringResource(id = R.string.like)
-        },
-        tint = if(isLiked) {
-            heartColor.value
-        } else {
-            Color.White
-        },
+        } else painterResource(id = R.drawable.ic_unlike),
+        contentDescription = stringResource(
+            id = if(isLiked) R.string.unlike else R.string.like
+        ),
+        tint = heartColor.value,
         modifier = Modifier
-            .size(IconSizeMediumSmall)
+            .size(size)
             .scale(heartScale.value)
             .pointerInput(Unit) {
                 detectTapGestures(

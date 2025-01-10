@@ -32,6 +32,12 @@ import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 
+private data class BottomSheetAction(
+    val icon: Int,
+    val text: Int,
+    val onClick: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StandardBottomSheet(
@@ -42,124 +48,109 @@ fun StandardBottomSheet(
     onDismissRequest: () -> Unit = {},
     onDownloadClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
-    onCancelClick: () -> Unit = {}
+    onCancelClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     ModalBottomSheet(
-        onDismissRequest = {
-            onDismissRequest()
-        },
+        onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
         shape = MaterialTheme.shapes.large,
-        dragHandle = {},
+        dragHandle = {  BottomSheetHeader(title) },
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_line),
-                contentDescription = null,
-                modifier = Modifier.size(IconSizeMedium),
-                tint = Color.Gray
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(SpaceSmall))
-            HorizontalDivider(
-                modifier = Modifier.height(1.dp),
-                thickness = 0.2.dp,
-                color = HintGray
-            )
-            if(showDownloadOption) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .size(
-                            height = 50.dp,
-                            width = 100.dp
-                        )
-                        .clickable {
-                            onDownloadClick()
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.width(SpaceMedium))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_download),
-                        contentDescription = null,
-                        modifier = Modifier.size(IconSizeSmall),
-                    )
-                    Spacer(modifier = Modifier.width(SpaceSmall))
-                    Text(
-                        text = stringResource(id = R.string.download),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 18.sp
-                        )
-                    )
+            val actions = buildList {
+                if(showDownloadOption) {
+                    add(BottomSheetAction(
+                        icon = R.drawable.ic_download,
+                        text = R.string.download,
+                        onClick = onDownloadClick
+                    ))
                 }
+                if(showDeleteOption) {
+                    add(BottomSheetAction(
+                        icon = R.drawable.ic_delete,
+                        text = R.string.delete,
+                        onClick = onDeleteClick
+                    ))
+                }
+                add(BottomSheetAction(
+                    icon = R.drawable.ic_cancel,
+                    text = R.string.cancel,
+                    onClick = onCancelClick
+                ))
             }
 
-            if(showDeleteOption) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .size(
-                            height = 50.dp,
-                            width = 100.dp
-                        )
-                        .clickable {
-                            onDeleteClick()
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.width(SpaceMedium))
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_delete),
-                        contentDescription = null,
-                        modifier = Modifier.size(IconSizeSmall)
-                    )
-                    Spacer(modifier = Modifier.width(SpaceSmall))
-                    Text(
-                        text = stringResource(id = R.string.delete),
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontSize = 18.sp
-                        )
-                    )
-                }
+            actions.forEach { action ->
+                BottomSheetActionItem(action)
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(
-                        height = 50.dp,
-                        width = 100.dp
-                    )
-                    .clickable {
-                        onCancelClick()
-                    },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(modifier = Modifier.width(SpaceMedium))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_cancel),
-                    contentDescription = null,
-                    modifier = Modifier.size(IconSizeSmall)
-                )
-                Spacer(modifier = Modifier.width(SpaceSmall))
-                Text(
-                    text = stringResource(id = R.string.cancel),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 18.sp
-                    )
-                )
-            }
+
             Spacer(modifier = Modifier.height(30.dp))
         }
+    }
+}
+
+@Composable
+private fun BottomSheetHeader(
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_line),
+            contentDescription = null,
+            modifier = Modifier.size(IconSizeMedium),
+            tint = Color.Gray
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(SpaceSmall))
+        HorizontalDivider(
+            modifier = Modifier.height(1.dp),
+            thickness = 0.2.dp,
+            color = HintGray
+        )
+    }
+}
+
+@Composable
+private fun BottomSheetActionItem(
+    action: BottomSheetAction,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .size(height = 50.dp, width = 100.dp)
+            .clickable(onClick = action.onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(modifier = Modifier.width(SpaceMedium))
+        Image(
+            painter = painterResource(id = action.icon),
+            contentDescription = stringResource(id = action.text),
+            modifier = Modifier.size(IconSizeSmall)
+        )
+        Spacer(modifier = Modifier.width(SpaceSmall))
+        Text(
+            text = stringResource(id = action.text),
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = 18.sp
+            ),
+            color = if(action.text == R.string.delete) {
+                Color.Red
+            } else MaterialTheme.colorScheme.onBackground
+        )
     }
 }

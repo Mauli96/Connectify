@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +28,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
+import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -44,7 +50,7 @@ fun SendTextField(
     onSend: () -> Unit,
     hint: String = "",
     canSendMessage: Boolean = true,
-    isLoading: Boolean = false,
+    isUploading: Boolean = false,
     focusRequester: FocusRequester = FocusRequester(),
 ) {
 
@@ -67,6 +73,16 @@ fun SendTextField(
             maxLines = maxLines,
             textStyle = TextStyle(
                 color = MaterialTheme.colorScheme.onPrimary
+            ),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Send
+            ),
+            keyboardActions = KeyboardActions(
+                onSend = {
+                    if(canSendMessage && !isUploading && state.error == null) {
+                        onSend()
+                    }
+                }
             ),
             decorationBox = { innerTextField ->
                 Row(
@@ -95,24 +111,23 @@ fun SendTextField(
                     }
                     if(state.error == null && canSendMessage) {
                         Spacer(modifier = Modifier.width(SpaceMedium))
-                        if(isLoading) {
+                        if(isUploading) {
                             CircularProgressIndicator(
                                 modifier = Modifier
-                                    .size(24.dp),
+                                    .size(IconSizeMedium)
+                                    .padding(end = 3.dp),
                                 strokeWidth = 2.dp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         } else {
                             IconButton(
                                 onClick = onSend,
-                                modifier = Modifier
-                                    .size(30.dp)
+                                modifier = Modifier.size(30.dp)
                             ) {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_send),
                                     contentDescription = stringResource(id = R.string.send),
-                                    modifier = Modifier
-                                        .size(25.dp)
+                                    modifier = Modifier.size(IconSizeMedium)
                                 )
                             }
                         }
