@@ -143,7 +143,7 @@ fun RegisterScreen(
                 StandardTextField(
                     text = emailState.text,
                     onValueChange = {
-                        viewModel.onEvent(RegisterEvent.EnteredEmail(it))
+                        viewModel.onEvent(RegisterEvent.OnEnteredEmail(it))
                     },
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next,
@@ -166,7 +166,7 @@ fun RegisterScreen(
                 StandardTextField(
                     text = usernameState.text,
                     onValueChange = {
-                        viewModel.onEvent(RegisterEvent.EnteredUsername(it))
+                        viewModel.onEvent(RegisterEvent.OnEnteredUsername(it))
                     },
                     imeAction = ImeAction.Next,
                     onNext = {
@@ -188,7 +188,7 @@ fun RegisterScreen(
                 StandardTextField(
                     text = passwordState.text,
                     onValueChange = {
-                        viewModel.onEvent(RegisterEvent.EnteredPassword(it))
+                        viewModel.onEvent(RegisterEvent.OnEnteredPassword(it))
                     },
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
@@ -211,13 +211,13 @@ fun RegisterScreen(
                     leadingIcon = painterResource(id = R.drawable.ic_password),
                     showPasswordToggle = passwordState.isPasswordVisible,
                     onPasswordToggleClick = {
-                        viewModel.onEvent(RegisterEvent.TogglePasswordVisibility)
+                        viewModel.onEvent(RegisterEvent.OnTogglePasswordVisibility)
                     }
                 )
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 Button(
                     onClick = {
-                        viewModel.onEvent(RegisterEvent.Register)
+                        viewModel.onEvent(RegisterEvent.OnRegister)
                     },
                     shape = MaterialTheme.shapes.extraSmall,
                     modifier = Modifier.fillMaxWidth()

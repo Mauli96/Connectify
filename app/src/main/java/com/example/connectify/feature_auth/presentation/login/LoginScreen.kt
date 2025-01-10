@@ -10,11 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -139,7 +136,7 @@ fun LoginScreen(
                 StandardTextField(
                     text = emailState.text,
                     onValueChange = {
-                        viewModel.onEvent(LoginEvent.EnteredEmail(it))
+                        viewModel.onEvent(LoginEvent.OnEnteredEmail(it))
                     },
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next,
@@ -159,7 +156,7 @@ fun LoginScreen(
                 StandardTextField(
                     text = passwordState.text,
                     onValueChange = {
-                        viewModel.onEvent(LoginEvent.EnteredPassword(it))
+                        viewModel.onEvent(LoginEvent.OnEnteredPassword(it))
                     },
                     hint = stringResource(id = R.string.password),
                     keyboardType = KeyboardType.Password,
@@ -176,7 +173,7 @@ fun LoginScreen(
                     leadingIcon = painterResource(id = R.drawable.ic_password),
                     showPasswordToggle = passwordState.isPasswordVisible,
                     onPasswordToggleClick = {
-                        viewModel.onEvent(LoginEvent.TogglePasswordVisibility)
+                        viewModel.onEvent(LoginEvent.OnTogglePasswordVisibility)
                     }
                 )
                 Spacer(modifier = Modifier.height(SpaceSmall))
@@ -196,7 +193,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 Button(
                     onClick = {
-                        viewModel.onEvent(LoginEvent.Login)
+                        viewModel.onEvent(LoginEvent.OnLogin)
                     },
                     shape = MaterialTheme.shapes.extraSmall,
                     modifier = Modifier.fillMaxWidth()

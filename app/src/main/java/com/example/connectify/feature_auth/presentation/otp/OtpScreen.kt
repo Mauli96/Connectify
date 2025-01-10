@@ -35,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
@@ -156,7 +155,7 @@ fun OtpScreen(
                     StandardTextField(
                         text = emailState.text,
                         onValueChange = {
-                            viewModel.onEvent(OtpEvent.EnteredEmail(it))
+                            viewModel.onEvent(OtpEvent.OnEnteredEmail(it))
                         },
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Done,

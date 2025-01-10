@@ -52,35 +52,35 @@ class RegisterViewModel @Inject constructor(
 
     fun onEvent(event: RegisterEvent) {
         when(event) {
-            is RegisterEvent.EnteredUsername -> {
+            is RegisterEvent.OnEnteredUsername -> {
                 _usernameState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is RegisterEvent.EnteredEmail -> {
+            is RegisterEvent.OnEnteredEmail -> {
                 _emailState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is RegisterEvent.EnteredPassword -> {
+            is RegisterEvent.OnEnteredPassword -> {
                 _passwordState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is RegisterEvent.TogglePasswordVisibility -> {
+            is RegisterEvent.OnTogglePasswordVisibility -> {
                 _passwordState.update {
                     it.copy(
                         isPasswordVisible = !passwordState.value.isPasswordVisible
                     )
                 }
             }
-            is RegisterEvent.Register -> {
+            is RegisterEvent.OnRegister -> {
                 register()
             }
         }

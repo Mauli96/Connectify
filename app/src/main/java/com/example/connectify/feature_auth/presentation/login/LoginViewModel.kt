@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,14 +48,14 @@ class LoginViewModel @Inject constructor(
 
     fun onEvent(event: LoginEvent) {
         when(event) {
-            is LoginEvent.EnteredEmail -> {
+            is LoginEvent.OnEnteredEmail -> {
                 _emailState.update {
                     it.copy(
                         text = event.email
                     )
                 }
             }
-            is LoginEvent.EnteredPassword -> {
+            is LoginEvent.OnEnteredPassword -> {
                 _passwordState.update {
                     it.copy(
                         text = event.password
@@ -107,14 +106,14 @@ class LoginViewModel @Inject constructor(
                     }
                 }
             }
-            is LoginEvent.TogglePasswordVisibility -> {
+            is LoginEvent.OnTogglePasswordVisibility -> {
                 _passwordState.update {
                     it.copy(
                         isPasswordVisible = !passwordState.value.isPasswordVisible
                     )
                 }
             }
-            is LoginEvent.Login -> {
+            is LoginEvent.OnLogin -> {
                 login()
             }
         }

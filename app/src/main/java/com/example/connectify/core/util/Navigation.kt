@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -78,29 +80,30 @@ fun Navigation(
             composable(
                 route = Screen.LoginScreen.route,
                 enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
+                    scaleIn(
+                        initialScale = 0.8f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeIn(animationSpec = tween(animationDuration))
                 },
                 exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
+                    scaleOut(
+                        targetScale = 1.2f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeOut(animationSpec = tween(animationDuration))
                 },
                 popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
+                    scaleIn(
+                        initialScale = 1.2f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeIn(animationSpec = tween(animationDuration))
                 },
                 popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
+                    scaleOut(
+                        targetScale = 0.8f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeOut(animationSpec = tween(animationDuration))
                 }
+
             ) {
                 LoginScreen(
                     onNavigate = navController::navigate,
@@ -118,29 +121,30 @@ fun Navigation(
             composable(
                 route = Screen.RegisterScreen.route,
                 enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
+                    scaleIn(
+                        initialScale = 0.8f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeIn(animationSpec = tween(animationDuration))
                 },
                 exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
+                    scaleOut(
+                        targetScale = 1.2f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeOut(animationSpec = tween(animationDuration))
                 },
                 popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
+                    scaleIn(
+                        initialScale = 1.2f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeIn(animationSpec = tween(animationDuration))
                 },
                 popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
+                    scaleOut(
+                        targetScale = 0.8f,
                         animationSpec = tween(animationDuration)
-                    )
+                    ) + fadeOut(animationSpec = tween(animationDuration))
                 }
+
             ) {
                 RegisterScreen(
                     onNavigate = navController::navigate,

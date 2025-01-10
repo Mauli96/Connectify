@@ -115,7 +115,7 @@ fun PasswordScreen(
             StandardTextField(
                 text = passwordState1.text,
                 onValueChange = {
-                    viewModel.onEvent(PasswordEvent.EnteredPassword1(it))
+                    viewModel.onEvent(PasswordEvent.OnEnteredNewPassword(it))
                 },
                 hint = stringResource(id = R.string.enter_new_password),
                 keyboardType = KeyboardType.Password,
@@ -138,14 +138,14 @@ fun PasswordScreen(
                 leadingIcon = painterResource(id = R.drawable.ic_password),
                 showPasswordToggle = passwordState1.isPasswordVisible,
                 onPasswordToggleClick = {
-                    viewModel.onEvent(PasswordEvent.TogglePasswordVisibility1)
+                    viewModel.onEvent(PasswordEvent.OnToggleNewPasswordVisibility)
                 }
             )
             Spacer(modifier = Modifier.height(SpaceMedium))
             StandardTextField(
                 text = passwordState2.text,
                 onValueChange = {
-                    viewModel.onEvent(PasswordEvent.EnteredPassword2(it))
+                    viewModel.onEvent(PasswordEvent.OnConfirmPassword(it))
                 },
                 hint = stringResource(id = R.string.confirm_password),
                 keyboardType = KeyboardType.Password,
@@ -171,7 +171,7 @@ fun PasswordScreen(
                 leadingIcon = painterResource(id = R.drawable.ic_password),
                 showPasswordToggle = passwordState2.isPasswordVisible,
                 onPasswordToggleClick = {
-                    viewModel.onEvent(PasswordEvent.TogglePasswordVisibility2)
+                    viewModel.onEvent(PasswordEvent.OnToggleConfirmPasswordVisibility)
                 }
             )
             Spacer(modifier = Modifier.height(SpaceMedium))

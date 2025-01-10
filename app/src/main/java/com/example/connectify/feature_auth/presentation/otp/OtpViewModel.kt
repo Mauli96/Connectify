@@ -37,7 +37,7 @@ class OtpViewModel @Inject constructor(
 
     fun onEvent(event: OtpEvent) {
         when(event) {
-            is OtpEvent.EnteredEmail -> {
+            is OtpEvent.OnEnteredEmail -> {
                 _emailState.update {
                     it.copy(
                         text = event.email

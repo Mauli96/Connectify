@@ -48,28 +48,28 @@ class PasswordViewModel @Inject constructor(
 
     fun onEvent(event: PasswordEvent) {
         when(event) {
-            is PasswordEvent.EnteredPassword1 -> {
+            is PasswordEvent.OnEnteredNewPassword -> {
                 _newPasswordState.update {
                     it.copy(
                         text = event.password
                     )
                 }
             }
-            is PasswordEvent.EnteredPassword2 -> {
+            is PasswordEvent.OnConfirmPassword -> {
                 _confirmPasswordState.update {
                     it.copy(
                         text = event.password
                     )
                 }
             }
-            is PasswordEvent.TogglePasswordVisibility1 -> {
+            is PasswordEvent.OnToggleNewPasswordVisibility -> {
                 _newPasswordState.update {
                     it.copy(
                         isPasswordVisible = !newPasswordState.value.isPasswordVisible
                     )
                 }
             }
-            is PasswordEvent.TogglePasswordVisibility2 -> {
+            is PasswordEvent.OnToggleConfirmPasswordVisibility -> {
                 _confirmPasswordState.update {
                     it.copy(
                         isPasswordVisible = !confirmPasswordState.value.isPasswordVisible

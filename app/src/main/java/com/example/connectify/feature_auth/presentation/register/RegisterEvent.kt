@@ -1,9 +1,9 @@
 package com.example.connectify.feature_auth.presentation.register
 
-sealed class RegisterEvent {
-    data class EnteredUsername(val value: String): RegisterEvent()
-    data class EnteredEmail(val value: String): RegisterEvent()
-    data class EnteredPassword(val value: String): RegisterEvent()
-    object TogglePasswordVisibility : RegisterEvent()
-    object Register : RegisterEvent()
+sealed interface RegisterEvent {
+    data class OnEnteredUsername(val value: String): RegisterEvent
+    data class OnEnteredEmail(val value: String): RegisterEvent
+    data class OnEnteredPassword(val value: String): RegisterEvent
+    data object OnTogglePasswordVisibility : RegisterEvent
+    data object OnRegister : RegisterEvent
 }
