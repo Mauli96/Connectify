@@ -43,6 +43,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.presentation.util.showKeyboard
@@ -58,7 +59,7 @@ fun PostDetailScreen(
     imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
     onNavigateUp: () -> Unit = {},
-    viewModel: PostDetailViewModel = hiltViewModel(),
+    viewModel: PostDetailViewModel = hiltViewModel()
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -98,15 +99,14 @@ fun PostDetailScreen(
             .imePadding()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             StandardToolbar(
                 onNavigateUp = onNavigateUp,
                 title = {
                     Text(
                         text = stringResource(id = R.string.post),
-                        style = MaterialTheme.typography.titleLarge
+                        style = Typography.titleLarge
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -115,7 +115,7 @@ fun PostDetailScreen(
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .background(MaterialTheme.colorScheme.background),
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 item {
                     Column(
@@ -224,8 +224,7 @@ fun PostDetailScreen(
                         viewModel.loadNextComments()
                     }
                     Comment(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         comment = comment,
                         context = context,
                         imageLoader = imageLoader,
@@ -266,7 +265,7 @@ fun PostDetailScreen(
                 },
                 ownProfilePicture = profilePictureState,
                 hint = stringResource(id = R.string.enter_a_comment),
-                isLoading = commentState.isLoading,
+                isUploading = commentState.isLoading,
                 focusRequester = focusRequester
             )
         }

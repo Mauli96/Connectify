@@ -33,11 +33,14 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
 
 @Composable
 fun SendTextField(
@@ -51,7 +54,7 @@ fun SendTextField(
     hint: String = "",
     canSendMessage: Boolean = true,
     isUploading: Boolean = false,
-    focusRequester: FocusRequester = FocusRequester(),
+    focusRequester: FocusRequester = FocusRequester()
 ) {
 
     Box(
@@ -71,9 +74,7 @@ fun SendTextField(
                 .background(MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(0.dp))
                 .focusRequester(focusRequester = focusRequester),
             maxLines = maxLines,
-            textStyle = TextStyle(
-                color = MaterialTheme.colorScheme.onPrimary
-            ),
+            textStyle = Typography.labelMedium.withColor(DarkGray),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Send
             ),
@@ -104,7 +105,7 @@ fun SendTextField(
                         if(state.text.isEmpty()) {
                             Text(
                                 text = hint,
-                                style = MaterialTheme.typography.displaySmall
+                                style = Typography.labelMedium.withColor(DarkGray)
                             )
                         }
                         innerTextField()

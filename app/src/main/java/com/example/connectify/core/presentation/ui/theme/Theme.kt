@@ -9,7 +9,7 @@ private val DarkColorPalette = darkColorScheme(
     onPrimary = DarkGray,
     background = DarkGray,
     onBackground = TextWhite,
-    secondary = MediumGray,
+    secondary = MediumGray
 )
 
 @Composable

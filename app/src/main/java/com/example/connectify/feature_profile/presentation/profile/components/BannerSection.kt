@@ -43,6 +43,8 @@ import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.domain.models.Skill
 
@@ -115,7 +117,7 @@ fun BannerSection(
                             Spacer(modifier = Modifier.width(SpaceSmall))
                             Text(
                                 text = stringResource(id = R.string.edit_profile),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = Typography.labelMedium
                             )
                             Spacer(modifier = Modifier.width(SpaceLarge))
                         }
@@ -139,7 +141,7 @@ fun BannerSection(
                             Spacer(modifier = Modifier.width(SpaceSmall))
                             Text(
                                 text = stringResource(id = R.string.saved),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = Typography.labelMedium
                             )
                             Spacer(modifier = Modifier.width(SpaceLarge))
                         }
@@ -169,9 +171,7 @@ fun BannerSection(
                             Spacer(modifier = Modifier.width(SpaceSmall))
                             Text(
                                 text = stringResource(id = R.string.log_out),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = Color.Red
-                                )
+                                style = Typography.labelMedium.withColor(Color.Red)
                             )
                             Spacer(modifier = Modifier.width(SpaceLarge))
                         }

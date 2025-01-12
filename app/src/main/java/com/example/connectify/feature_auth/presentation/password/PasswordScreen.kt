@@ -27,15 +27,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -109,7 +114,7 @@ fun PasswordScreen(
             Spacer(modifier = Modifier.height(SpaceMedium))
             Text(
                 text = stringResource(id = R.string.change_password),
-                style = MaterialTheme.typography.headlineMedium
+                style = Typography.headlineLarge
             )
             Spacer(modifier = Modifier.height(SpaceLarge))
             StandardTextField(
@@ -190,7 +195,9 @@ fun PasswordScreen(
                 } else {
                     Text(
                         text = stringResource(id = R.string.change_password),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        style = Typography.labelMedium
+                            .withSize(15.sp)
+                            .withColor(DarkGray)
                     )
                 }
             }

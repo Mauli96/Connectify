@@ -42,6 +42,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -95,7 +96,7 @@ fun ChatScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.message_screen),
-                        style = MaterialTheme.typography.titleLarge
+                        style = Typography.titleLarge
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -121,7 +122,7 @@ fun ChatScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_chats_found),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = Typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }

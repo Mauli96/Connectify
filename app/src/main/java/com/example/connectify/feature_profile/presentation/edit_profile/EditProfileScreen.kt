@@ -62,6 +62,7 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -188,7 +189,7 @@ fun EditProfileScreen(
                     title = {
                         Text(
                             text = stringResource(id = R.string.edit_your_profile),
-                            style = MaterialTheme.typography.titleLarge
+                            style = Typography.titleLarge
                         )
                     },
                     navActions = {
@@ -201,7 +202,7 @@ fun EditProfileScreen(
                         } else {
                             Text(
                                 text = stringResource(R.string.save),
-                                style = MaterialTheme.typography.titleLarge.copy(
+                                style = Typography.titleLarge.copy(
                                     color = GreenAccent
                                 ),
                                 modifier = Modifier
@@ -219,8 +220,7 @@ fun EditProfileScreen(
                 )
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Column(
                         modifier = Modifier

@@ -26,15 +26,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.GreenAccent
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.util.Screen
 import kotlinx.coroutines.delay
 
@@ -129,7 +134,7 @@ fun CustomSnackbarHost(
                         )
                         Text(
                             text = snackbarData.visuals.message,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = Typography.labelMedium.withSize(14.sp),
                             modifier = Modifier
                                 .padding(start = SpaceSmall)
                                 .weight(1f)
@@ -147,8 +152,9 @@ fun CustomSnackbarHost(
                             ) {
                                 Text(
                                     text = actionLabel.uppercase(),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.primary
+                                    style = Typography.labelMedium
+                                        .withSize(14.sp)
+                                        .withColor(GreenAccent)
                                 )
                             }
                         }

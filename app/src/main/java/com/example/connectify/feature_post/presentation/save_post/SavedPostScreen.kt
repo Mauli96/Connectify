@@ -44,6 +44,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -96,7 +97,7 @@ fun SavedPostScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.saved),
-                        style = MaterialTheme.typography.titleLarge
+                        style = Typography.titleLarge
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -123,7 +124,7 @@ fun SavedPostScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_saved_post),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = Typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }

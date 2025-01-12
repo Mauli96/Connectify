@@ -18,13 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 @Composable
 fun AnimatedCounter(
     count: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    style: TextStyle = MaterialTheme.typography.labelMedium
+    style: TextStyle = Typography.displayMedium.withSize(17.sp)
 ) {
     var oldCount by remember {
         mutableIntStateOf(count)
@@ -55,9 +57,7 @@ fun AnimatedCounter(
             ) { char ->
                 Text(
                     text = char.toString(),
-                    style = style.copy(
-                        fontSize = 17.sp
-                    ),
+                    style = style,
                     softWrap = false,
                     modifier = Modifier
                         .pointerInput(Unit) {

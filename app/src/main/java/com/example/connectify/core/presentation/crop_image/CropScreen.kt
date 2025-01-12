@@ -41,6 +41,7 @@ import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,7 +69,7 @@ fun CropScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.move_and_scale),
-                        style = MaterialTheme.typography.titleLarge
+                        style = Typography.titleLarge
                     )
                 },
                 navActions = {

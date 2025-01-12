@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -76,6 +77,8 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -259,7 +262,7 @@ fun ProfileScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_posts_for_profile),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = Typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -463,12 +466,12 @@ fun ProfileScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.log_out),
-                        style = MaterialTheme.typography.titleMedium
+                        style = Typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(SpaceSmall))
                     Text(
                         text = stringResource(id = R.string.log_out_of_your_account),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = Typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(SpaceLarge))
                     Row(
@@ -477,7 +480,7 @@ fun ProfileScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.cancel),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = Typography.labelMedium,
                             modifier = Modifier
                                 .pointerInput(Unit) {
                                     detectTapGestures(
@@ -490,7 +493,7 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.width(SpaceMedium))
                         Text(
                             text = stringResource(id = R.string.log_out),
-                            style = MaterialTheme.typography.titleSmall,
+                            style = Typography.labelMedium.withColor(Color.Red),
                             modifier = Modifier
                                 .pointerInput(Unit) {
                                     detectTapGestures(

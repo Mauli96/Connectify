@@ -37,6 +37,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.components.UserProfileItem
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -92,7 +93,7 @@ fun FollowingScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.following),
-                        style = MaterialTheme.typography.titleLarge
+                        style = Typography.titleLarge
                     )
                 }
             )
@@ -117,7 +118,7 @@ fun FollowingScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_followings),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = Typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }

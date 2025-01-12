@@ -35,16 +35,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardTextField
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -130,7 +135,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 Text(
                     text = stringResource(id = R.string.login_to_connectify),
-                    style = MaterialTheme.typography.headlineMedium
+                    style = Typography.headlineLarge
                 )
                 Spacer(modifier = Modifier.height(SpaceLarge))
                 StandardTextField(
@@ -179,7 +184,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 Text(
                     text = stringResource(id = R.string.forgot_password),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = Typography.labelMedium.withSize(14.sp),
                     modifier = Modifier
                         .align(Alignment.End)
                         .pointerInput(Unit) {
@@ -206,7 +211,9 @@ fun LoginScreen(
                     } else {
                         Text(
                             text = stringResource(id = R.string.login),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            style = Typography.labelMedium
+                                .withSize(15.sp)
+                                .withColor(DarkGray)
                         )
                     }
                 }
@@ -224,7 +231,7 @@ fun LoginScreen(
                         append(signUpText)
                     }
                 },
-                style = MaterialTheme.typography.bodyMedium,
+                style = Typography.bodyMedium,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .pointerInput(Unit) {

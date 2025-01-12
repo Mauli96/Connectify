@@ -47,6 +47,8 @@ import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.util.Constants
 
 @Composable
@@ -195,7 +197,7 @@ fun Post(
                 }
                 Text(
                     text = descriptionText,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = Typography.labelSmall.withSize(12.sp),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = if(isDescriptionVisible) {
                         Int.MAX_VALUE
@@ -309,8 +311,7 @@ fun EngagementButtons(
             Spacer(modifier = Modifier.width(SpaceSmall))
             Text(
                 text = commentCount.toString(),
-                fontSize = 17.sp,
-                style = MaterialTheme.typography.labelMedium
+                style = Typography.displayMedium.withSize(17.sp)
             )
         }
         Spacer(modifier = Modifier.width(SpaceMediumLarge))

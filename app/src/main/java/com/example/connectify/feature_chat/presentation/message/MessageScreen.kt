@@ -61,6 +61,9 @@ import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediumSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -161,22 +164,19 @@ fun MessageScreen(
                         Column {
                             Text(
                                 text = remoteUsername,
-                                style = MaterialTheme.typography.headlineSmall.copy(
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                style = Typography.labelLarge.withSize(17.sp)
                             )
                             if(isOnline) {
                                 Text(
                                     text = stringResource(id = R.string.online),
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = GreenAccent
-                                    )
+                                    style = Typography.labelSmall
+                                        .withSize(12.sp)
+                                        .withColor(GreenAccent)
                                 )
                             } else {
                                 Text(
                                     text = DateFormatUtil.timestampToFormattedString(lastSeen, "hh:mm a, dd MMM"),
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = Typography.labelSmall.withSize(12.sp)
                                 )
                             }
 
@@ -206,7 +206,7 @@ fun MessageScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_messages_found),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = Typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }

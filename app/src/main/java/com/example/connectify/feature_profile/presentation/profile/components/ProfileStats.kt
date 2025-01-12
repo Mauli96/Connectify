@@ -19,9 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.User
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 @Composable
 fun ProfileStats(
@@ -80,9 +84,9 @@ fun ProfileStats(
                         text = if(isFollowing) {
                             stringResource(id = R.string.unfollow)
                         } else stringResource(id = R.string.follow),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = 12.sp
-                        )
+                        style = Typography.labelMedium
+                            .withSize(12.sp)
+                            .withColor(DarkGray)
                     )
                 }
                 Spacer(modifier = Modifier.width(SpaceSmall))
@@ -98,9 +102,9 @@ fun ProfileStats(
                 ) {
                     Text(
                         text = stringResource(id = R.string.message),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = 12.sp
-                        )
+                        style = Typography.labelMedium
+                            .withSize(12.sp)
+                            .withColor(DarkGray)
                     )
                 }
             }

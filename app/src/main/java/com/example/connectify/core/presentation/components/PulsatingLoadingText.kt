@@ -10,6 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 @Composable
 fun PulsatingLoadingText(
@@ -36,7 +39,7 @@ fun PulsatingLoadingText(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyLarge,
+            style = Typography.labelMedium.withSize(14.sp),
             textAlign = TextAlign.Center,
             modifier = Modifier.graphicsLayer {
                 scaleX = scale

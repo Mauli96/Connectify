@@ -11,6 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import com.example.connectify.core.presentation.ui.theme.DarkGray
+import com.example.connectify.core.presentation.ui.theme.TextWhite
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 @Composable
 fun StandardOutlinedTextField(
@@ -18,9 +24,6 @@ fun StandardOutlinedTextField(
     text: String = "",
     maxLength: Int = 400,
     error: String = "",
-    style: TextStyle = TextStyle(
-        color = MaterialTheme.colorScheme.onBackground
-    ),
     singleLine: Boolean = true,
     maxLines: Int = 1,
     minLines: Int = 1,
@@ -39,7 +42,7 @@ fun StandardOutlinedTextField(
             },
             maxLines = maxLines,
             minLines = minLines,
-            textStyle = style,
+            textStyle = Typography.labelMedium.withColor(TextWhite),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = MaterialTheme.colorScheme.onBackground,
                 unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -60,11 +63,10 @@ fun StandardOutlinedTextField(
         if(error.isNotEmpty()) {
             Text(
                 text = error,
-                style = MaterialTheme.typography.bodySmall,
+                style = Typography.labelSmall.withSize(12.sp),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.End,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

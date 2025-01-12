@@ -13,13 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.HintGray
-import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.feature_chat.domain.model.Message
 
 @Composable
@@ -28,7 +28,6 @@ fun RemoteMessage(
     formattedTime: String,
     color: Color = HintGray,
     modifier: Modifier = Modifier,
-    textColor: Color = MaterialTheme.colorScheme.onBackground,
     triangleWidth: Dp = 30.dp,
     triangleHeight: Dp = 30.dp,
     tailOffset: Dp = 8.dp,
@@ -73,7 +72,7 @@ fun RemoteMessage(
             Column {
                 Text(
                     text = message.text,
-                    color = textColor
+                    style = Typography.labelMedium.withSize(14.sp)
                 )
                 Box(
                     modifier = Modifier
@@ -81,8 +80,7 @@ fun RemoteMessage(
                 ) {
                     Text(
                         text = formattedTime,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 10.sp
+                        style = Typography.labelSmall.withSize(10.sp)
                     )
                 }
             }

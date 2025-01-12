@@ -35,15 +35,20 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardTextField
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -105,8 +110,7 @@ fun RegisterScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Box(
             modifier = Modifier
@@ -133,11 +137,11 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(SpaceMedium))
                 Text(
                     text = stringResource(id = R.string.register_screen_message_1),
-                    style = MaterialTheme.typography.headlineMedium
+                    style = Typography.headlineLarge
                 )
                 Text(
                     text = stringResource(id = R.string.register_screen_message_2),
-                    style = MaterialTheme.typography.headlineMedium
+                    style = Typography.headlineLarge
                 )
                 Spacer(modifier = Modifier.height(SpaceLarge))
                 StandardTextField(
@@ -224,13 +228,14 @@ fun RegisterScreen(
                 ) {
                     if(registerState.isLoading) {
                         CustomCircularProgressIndicator(
-                            modifier = Modifier
-                                .size(IconSizeSmall)
+                            modifier = Modifier.size(IconSizeSmall)
                         )
                     } else {
                         Text(
                             text = stringResource(id = R.string.register),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            style = Typography.labelMedium
+                                .withSize(15.sp)
+                                .withColor(DarkGray)
                         )
                     }
                 }
@@ -248,7 +253,7 @@ fun RegisterScreen(
                         append(signUpText)
                     }
                 },
-                style = MaterialTheme.typography.bodyMedium,
+                style = Typography.bodyMedium,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .pointerInput(Unit) {
@@ -262,8 +267,7 @@ fun RegisterScreen(
         }
         ConnectivityBanner(
             networkState = networkState,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 }

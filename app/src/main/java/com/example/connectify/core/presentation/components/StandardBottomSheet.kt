@@ -31,6 +31,7 @@ import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
 
 private data class BottomSheetAction(
     val icon: Int,
@@ -111,7 +112,7 @@ private fun BottomSheetHeader(
         )
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = Typography.bodyMedium,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )

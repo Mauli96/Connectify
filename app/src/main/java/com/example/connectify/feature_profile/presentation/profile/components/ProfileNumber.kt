@@ -14,6 +14,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 @Composable
 fun ProfileNumber(
@@ -35,15 +37,13 @@ fun ProfileNumber(
     ) {
         Text(
             text = number.toString(),
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 20.sp
-            ),
+            style = Typography.titleMedium,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(SpaceSmall))
         Text(
             text = text,
-            style = MaterialTheme.typography.bodySmall,
+            style = Typography.labelSmall.withSize(12.sp),
             textAlign = TextAlign.Center
         )
     }

@@ -31,6 +31,8 @@ import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,9 +140,7 @@ fun StandardMessageSheet(
                     Spacer(modifier = Modifier.width(SpaceSmall))
                     Text(
                         text = stringResource(id = R.string.delete),
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontSize = 18.sp
-                        )
+                        style = Typography.bodySmall.withColor(Color.Red)
                     )
                 }
             }

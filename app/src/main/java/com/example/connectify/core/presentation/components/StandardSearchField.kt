@@ -14,9 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.connectify.core.presentation.ui.theme.DarkGray
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.feature_profile.domain.util.ProfileConstants
 
 @Composable
@@ -37,10 +38,7 @@ fun StandardSearchField(
                 onQueryChanged(it)
             }
         },
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onPrimary
-        ),
+        textStyle = Typography.labelMedium.withColor(DarkGray),
         singleLine = true,
         modifier = modifier
             .height(40.dp)
@@ -63,7 +61,7 @@ fun StandardSearchField(
                     if(query.isEmpty()) {
                         Text(
                             text = placeholderText,
-                            style = MaterialTheme.typography.labelLarge
+                            style = Typography.labelMedium.withColor(DarkGray)
                         )
                     }
                     innerTextField()

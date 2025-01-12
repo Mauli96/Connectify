@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
@@ -42,11 +43,15 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.PulsatingLoadingText
 import com.example.connectify.core.presentation.components.StandardTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.feature_auth.presentation.otp.component.OtpInputField
@@ -142,7 +147,7 @@ fun OtpScreen(
             Spacer(modifier = Modifier.height(SpaceMedium))
             Text(
                 text = stringResource(id = R.string.verify_your_email),
-                style = MaterialTheme.typography.headlineMedium
+                style = Typography.headlineLarge
             )
             Spacer(modifier = Modifier.height(SpaceLarge))
             if(state.showEmailInput) {
@@ -186,7 +191,9 @@ fun OtpScreen(
                         } else {
                             Text(
                                 text = stringResource(id = R.string.verify_email),
-                                color = MaterialTheme.colorScheme.onPrimary
+                                style = Typography.labelMedium
+                                    .withSize(15.sp)
+                                    .withColor(DarkGray)
                             )
                         }
                     }

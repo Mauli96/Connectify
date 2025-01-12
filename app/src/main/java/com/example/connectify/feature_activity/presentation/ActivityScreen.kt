@@ -41,6 +41,7 @@ import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -91,7 +92,7 @@ fun ActivityScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.activity),
-                        style = MaterialTheme.typography.titleLarge
+                        style = Typography.titleLarge
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -118,7 +119,7 @@ fun ActivityScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_activity),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = Typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -179,8 +180,7 @@ fun ActivityScreen(
                 }
                 ConnectivityBanner(
                     networkState = networkState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
+                    modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
         }

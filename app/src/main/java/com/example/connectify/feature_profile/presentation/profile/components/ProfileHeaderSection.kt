@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.sp
 import com.example.connectify.core.domain.models.User
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 @Composable
 fun ProfileHeaderSection(
@@ -37,9 +39,7 @@ fun ProfileHeaderSection(
         ) {
             Text(
                 text = user.username,
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontSize = 24.sp
-                ),
+                style = Typography.displayMedium,
                 textAlign = TextAlign.Center,
             )
         }
@@ -47,7 +47,7 @@ fun ProfileHeaderSection(
         if(user.description.isNotBlank()) {
             Text(
                 text = user.description,
-                style = MaterialTheme.typography.bodySmall,
+                style = Typography.labelSmall.withSize(12.sp),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(SpaceLarge))

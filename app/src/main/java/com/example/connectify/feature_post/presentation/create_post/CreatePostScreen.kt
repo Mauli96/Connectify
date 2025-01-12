@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -51,11 +52,15 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.crop_image.cropview.CropType
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -150,8 +155,7 @@ fun CreatePostScreen(
                 .imePadding()
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 StandardToolbar(
                     onNavigateUp = onNavigateUp,
@@ -159,7 +163,7 @@ fun CreatePostScreen(
                     title = {
                         Text(
                             text = stringResource(id = R.string.create_a_new_post),
-                            style = MaterialTheme.typography.titleLarge
+                            style = Typography.titleLarge
                         )
                     },
                     navActions = {
@@ -181,7 +185,9 @@ fun CreatePostScreen(
                             } else {
                                 Text(
                                     text = stringResource(id = R.string.post),
-                                    color = MaterialTheme.colorScheme.onPrimary
+                                    style = Typography.labelMedium
+                                        .withSize(15.sp)
+                                        .withColor(DarkGray)
                                 )
                             }
                         }

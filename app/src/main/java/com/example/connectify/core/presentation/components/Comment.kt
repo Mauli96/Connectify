@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
@@ -152,13 +153,12 @@ private fun CommentHeader(
             Text(
                 text = comment.username,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground
+                style = Typography.labelSmall.withSize(12.sp)
             )
         }
         Text(
             text = comment.formattedTime,
-            style = MaterialTheme.typography.bodySmall
+            style = Typography.labelSmall.withSize(12.sp)
         )
     }
 }
@@ -175,8 +175,7 @@ private fun CommentBody(
         Spacer(modifier = Modifier.width(SpaceSmall))
         Text(
             text = comment.comment,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onBackground,
+            style = Typography.labelSmall.withSize(12.sp),
             modifier = Modifier.weight(9f)
         )
         CommentActions(
@@ -208,8 +207,7 @@ private fun CommentActions(
         if(comment.likeCount != 0) {
             Text(
                 text = comment.likeCount.toString(),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground,
+                style = Typography.labelSmall.withSize(12.sp),
                 modifier = Modifier.pointerInput(Unit) {
                     detectTapGestures(onTap = { onLikedByClick() })
                 }
@@ -240,8 +238,7 @@ private fun CommentContextMenu(
                 text = {
                     MenuItemContent(
                         iconId = R.drawable.ic_delete,
-                        textId = R.string.delete,
-                        color = Color.Red
+                        textId = R.string.delete
                     )
                 },
                 onClick = onDeleteClick
@@ -262,8 +259,7 @@ private fun CommentContextMenu(
 @Composable
 private fun MenuItemContent(
     iconId: Int,
-    textId: Int,
-    color: Color = MaterialTheme.colorScheme.onBackground
+    textId: Int
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -277,9 +273,7 @@ private fun MenuItemContent(
         Spacer(modifier = Modifier.width(SpaceSmall))
         Text(
             text = stringResource(id = textId),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = color
-            )
+            style = Typography.labelSmall
         )
         Spacer(modifier = Modifier.width(SpaceLarge))
     }

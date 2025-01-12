@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -30,7 +31,11 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.feature_auth.presentation.on_boarding.component.OnBoardingPage
 import com.google.accompanist.pager.HorizontalPagerIndicator
 
@@ -112,13 +117,13 @@ fun PagerScreen(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = onBoardingPage.title,
-                style = MaterialTheme.typography.titleLarge,
+                style = Typography.titleLarge,
                 textAlign = TextAlign.Center
             )
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = onBoardingPage.description,
-                style = MaterialTheme.typography.headlineSmall,
+                style = Typography.labelSmall,
                 textAlign = TextAlign.Center
             )
         }
@@ -156,7 +161,9 @@ fun FinishButton(
             ) {
                 Text(
                     text = stringResource(id = R.string.lets_connect),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    style = Typography.labelMedium
+                        .withSize(15.sp)
+                        .withColor(DarkGray)
                 )
             }
         }

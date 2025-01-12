@@ -34,8 +34,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.util.TestTags
 
 @Composable
@@ -45,9 +50,6 @@ fun StandardTextField(
     hint: String = "",
     maxLength: Int = 400,
     error: String = "",
-    style: TextStyle = TextStyle(
-        color = MaterialTheme.colorScheme.onPrimary
-    ),
     singleLine: Boolean = true,
     maxLines: Int = 1,
     minLines: Int = 1,
@@ -88,7 +90,7 @@ fun StandardTextField(
                 maxLines = maxLines,
                 minLines = minLines,
                 singleLine = singleLine,
-                textStyle = style,
+                textStyle = Typography.labelMedium.withColor(DarkGray),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = keyboardType,
                     imeAction = imeAction
@@ -126,7 +128,7 @@ fun StandardTextField(
                             if(text.isEmpty()) {
                                 Text(
                                     text = hint,
-                                    style = MaterialTheme.typography.displaySmall
+                                    style = Typography.labelMedium.withColor(DarkGray)
                                 )
                             }
                             innerTextField()
@@ -161,7 +163,7 @@ fun StandardTextField(
             if(error.isNotEmpty()) {
                 Text(
                     text = error,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = Typography.labelSmall.withSize(12.sp),
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.End,
                     modifier = Modifier

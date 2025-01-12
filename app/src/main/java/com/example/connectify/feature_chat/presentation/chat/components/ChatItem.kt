@@ -28,11 +28,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.util.vibrate
 import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.domain.model.Chat
@@ -101,24 +104,23 @@ fun ChatItem(
                 ) {
                     Text(
                         text = item.remoteUsername,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
+                        style = Typography.labelLarge,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(SpaceSmall))
                     Text(
-                        text = DateFormatUtil.timestampToFormattedString(item.timestamp, "MMM dd, hh:mm a")
+                        text = DateFormatUtil.timestampToFormattedString(item.timestamp, "MMM dd, hh:mm a"),
+                        style = Typography.labelMedium.withSize(12.sp)
                     )
                 }
                 Spacer(modifier = Modifier.height(SpaceSmall))
                 Text(
                     text = item.lastMessage,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = Typography.labelSmall.withSize(12.sp),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier.heightIn(
-                        min = MaterialTheme.typography.bodySmall.fontSize.value.dp * 2.5f
+                        min = Typography.labelSmall.withSize(12.sp).fontSize.value.dp * 2.5f
                     )
                 )
             }

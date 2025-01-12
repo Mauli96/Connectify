@@ -26,9 +26,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.connectify.R
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.feature_post.presentation.util.CommentFilter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -94,7 +99,7 @@ private fun FilterHeader(
                     CommentFilter.MOST_POPULAR -> R.string.most_popular_comments
                 }
             ),
-            style = MaterialTheme.typography.bodyLarge
+            style = Typography.labelMedium.withSize(14.sp)
         )
         Spacer(modifier = Modifier.width(SpaceSmall))
         Icon(
@@ -156,9 +161,11 @@ private fun FilterMenuItem(
             Text(
                 text = stringResource(id = stringResId),
                 style = if(isSelected) {
-                    MaterialTheme.typography.labelLarge
+                    Typography.labelMedium
+                        .withSize(14.sp)
+                        .withColor(DarkGray)
                 } else {
-                    MaterialTheme.typography.bodyLarge
+                    Typography.labelMedium.withSize(14.sp)
                 }
             )
         },

@@ -32,9 +32,12 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediumSmall
+import com.example.connectify.core.presentation.ui.theme.Quicksand
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.TextWhite
-import com.example.connectify.core.presentation.ui.theme.quicksand
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_activity.presentation.util.ActivityType
 
@@ -97,7 +100,7 @@ fun ActivityItem(
             }
             val annotatedText = buildAnnotatedString {
                 val boldStyle = SpanStyle(
-                    fontFamily = quicksand,
+                    fontFamily = Quicksand,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     color = TextWhite
@@ -122,7 +125,9 @@ fun ActivityItem(
             }
             ClickableText(
                 text = annotatedText,
-                style = MaterialTheme.typography.bodyLarge,
+                style = Typography.labelMedium
+                    .withSize(14.sp)
+                    .withColor(TextWhite),
                 modifier = Modifier.weight(1f),
                 onClick = { offset ->
                     annotatedText.getStringAnnotations(
@@ -151,7 +156,7 @@ fun ActivityItem(
             Text(
                 text = activity.formattedTime,
                 textAlign = TextAlign.Right,
-                style = MaterialTheme.typography.bodySmall
+                style = Typography.labelSmall.withSize(12.sp)
             )
         }
     }

@@ -33,9 +33,13 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.UserItem
+import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.ui.theme.withColor
+import com.example.connectify.core.presentation.ui.theme.withSize
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -82,19 +86,17 @@ fun UserProfileItem(
             ) {
                 Text(
                     text = user.username,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = Typography.labelLarge
                 )
                 if(user.bio.isNotBlank()) {
                     Spacer(modifier = Modifier.height(SpaceSmall))
                     Text(
                         text = user.bio,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = Typography.labelSmall.withSize(12.sp),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
                         modifier = Modifier.heightIn(
-                            min = MaterialTheme.typography.bodySmall.fontSize.value.dp * 2.5f
+                            min = 12.sp.value.dp * 2.5f
                         )
                     )
                 }
@@ -116,9 +118,9 @@ fun UserProfileItem(
                         text = if(isFollowing) {
                             stringResource(id = R.string.unfollow)
                         } else stringResource(id = R.string.follow),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = 12.sp
-                        )
+                        style = Typography.labelMedium
+                            .withSize(12.sp)
+                            .withColor(DarkGray)
                     )
                 }
             }
