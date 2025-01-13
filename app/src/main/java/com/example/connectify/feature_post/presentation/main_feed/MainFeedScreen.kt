@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
+import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -48,6 +49,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Comment
+import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.domain.states.PagingState
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.components.Comment
@@ -63,6 +65,7 @@ import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
+import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
@@ -86,13 +89,9 @@ fun MainFeedScreen(
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val focusRequester = remember {
-        FocusRequester()
-    }
+    val focusRequester = remember { FocusRequester() }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_posts_found))
     val progress by animateLottieCompositionAsState(
@@ -102,9 +101,7 @@ fun MainFeedScreen(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
-        onRefresh = {
-            viewModel.onRefreshPosts()
-        }
+        onRefresh = { viewModel.onRefreshPosts() }
     )
 
     LaunchedEffect(key1 = true) {
@@ -130,143 +127,36 @@ fun MainFeedScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        StandardToolbar(
+        MainFeedToolbar(
             onNavigateUp = onNavigateUp,
-            title = {
-                Text(
-                    text = stringResource(id = R.string.your_feed),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            navActions = {
-                IconButton(
-                    onClick = {
-                        onNavigate(Screen.SearchScreen.route)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search),
-                        contentDescription = stringResource(id = R.string.search_for_users),
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(IconSizeSmall)
-                    )
-                }
-            }
+            onSearchClick = { onNavigate(Screen.SearchScreen.route) }
         )
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .pullRefresh(pullRefreshState)
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures { _, dragAmount ->
-                        if(dragAmount < 1.dp.toPx() && !state.isNavigatedToSearchScreen) {
-                            viewModel.onEvent(MainFeedEvent.NavigatedToSearchScreen)
-                            onNavigate(Screen.SearchScreen.route)
-                        }
-                    }
-                }
+                .swipeToSearch(
+                    isNavigated = state.isNavigatedToSearchScreen,
+                    onEvent = { viewModel.onEvent(MainFeedEvent.OnNavigatedToSearchScreen) },
+                    onNavigate = { onNavigate(Screen.SearchScreen.route) }
+                )
         ) {
             if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = SpaceLargeExtra),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieAnimation(
-                        modifier = Modifier.size(LottieIconSize),
-                        composition = composition,
-                        progress = {
-                            progress
-                        },
-                    )
-                    Text(
-                        text = stringResource(R.string.feed_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }else {
-                ShimmerListPostItem(
-                    isLoadingPost = pagingPostState.isFirstLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = SpaceSmall,
-                            start = SpaceSmall,
-                            end = SpaceSmall
-                        )
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        items(
-                            count = pagingPostState.items.size,
-                            key = { i ->
-                                val post = pagingPostState.items[i]
-                                post.id
-                            }
-                        ) { i ->
-                            val post = pagingPostState.items[i]
-                            if(i >= pagingPostState.items.size - 1 && pagingPostState.items.size >= Constants.DEFAULT_PAGE_SIZE
-                                && !pagingPostState.endReached && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
-                                viewModel.loadNextPosts()
-                            }
-                            Post(
-                                post = post,
-                                imageLoader = imageLoader,
-                                onUsernameClick = {
-                                    onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
-                                },
-                                onLikeClick = {
-                                    viewModel.onEvent(MainFeedEvent.LikedPost(post.id))
-                                },
-                                onCommentClick = {
-                                    viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
-                                    viewModel.onEvent(MainFeedEvent.ShowCommentBottomSheet)
-                                    viewModel.onEvent(MainFeedEvent.LoadComments)
-                                },
-                                onShareClick = {
-                                    context.sendSharePostIntent(post.id)
-                                },
-                                onSaveClick = {
-                                    viewModel.onEvent(MainFeedEvent.SavePost(post.id))
-                                },
-                                onLikedByClick = {
-                                    onNavigate(Screen.PersonListScreen.route + "/${post.id}")
-                                },
-                                onMoreItemClick = {
-                                    viewModel.onEvent(MainFeedEvent.SelectPostId(post.id))
-                                    viewModel.onEvent(MainFeedEvent.SelectPostUsername(post.username, post.isOwnPost))
-                                    viewModel.onEvent(MainFeedEvent.ShowBottomSheet)
-                                },
-                                isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
-                                onDescriptionToggle = {
-                                    viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
-                                }
-                            )
-                            Spacer(modifier = Modifier.height(SpaceSmall))
-                        }
-                        if(pagingPostState.isNextLoading) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = SpaceMedium),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CustomCircularProgressIndicator()
-                                }
-                            }
-                        }
-                    }
-                }
+                EmptyFeedContent(
+                    composition = composition,
+                    progress = progress
+                )
+            } else {
+                PostsList(
+                    pagingPostState = pagingPostState,
+                    imageLoader = imageLoader,
+                    onNavigate = onNavigate,
+                    viewModel = viewModel,
+                    state = state,
+                    context = context
+                )
             }
             CommentSheetContent(
                 pagingCommentState = pagingCommentState,
@@ -286,14 +176,14 @@ fun MainFeedScreen(
                     showDeleteOption = state.isOwnPost == true,
                     bottomSheetState = bottomSheetState,
                     onDismissRequest = {
-                        viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                        viewModel.onEvent(MainFeedEvent.OnDismissBottomSheet)
                     },
                     onDownloadClick = {
-                        viewModel.onEvent(MainFeedEvent.DownloadPost)
-                        viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                        viewModel.onEvent(MainFeedEvent.OnDownloadPost)
+                        viewModel.onEvent(MainFeedEvent.OnDismissBottomSheet)
                     },
                     onCancelClick = {
-                        viewModel.onEvent(MainFeedEvent.DismissBottomSheet)
+                        viewModel.onEvent(MainFeedEvent.OnDismissBottomSheet)
                     }
                 )
             }
@@ -306,11 +196,177 @@ fun MainFeedScreen(
             )
             ConnectivityBanner(
                 networkState = networkState,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
     }
+}
+
+@Composable
+private fun MainFeedToolbar(
+    onNavigateUp: () -> Unit,
+    onSearchClick: () -> Unit
+) {
+    StandardToolbar(
+        onNavigateUp = onNavigateUp,
+        title = {
+            Text(
+                text = stringResource(id = R.string.your_feed),
+                style = Typography.titleLarge
+            )
+        },
+        modifier = Modifier.fillMaxWidth(),
+        navActions = {
+            IconButton(
+                onClick = onSearchClick
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = stringResource(id = R.string.search_for_users),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(IconSizeSmall)
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun EmptyFeedContent(
+    composition: LottieComposition?,
+    progress: Float
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = SpaceLargeExtra),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LottieAnimation(
+            modifier = Modifier.size(LottieIconSize),
+            composition = composition,
+            progress = { progress }
+        )
+        Text(
+            text = stringResource(R.string.feed_empty),
+            style = Typography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun PostsList(
+    pagingPostState: PagingState<Post>,
+    imageLoader: ImageLoader,
+    onNavigate: (String) -> Unit,
+    viewModel: MainFeedViewModel,
+    state: MainFeedState,
+    context: Context
+) {
+    ShimmerListPostItem(
+        isLoadingPost = pagingPostState.isFirstLoading,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = SpaceMedium)
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                count = pagingPostState.items.size,
+                key = { i ->
+                    pagingPostState.items[i].id
+                }
+            ) { i ->
+                val post = pagingPostState.items[i]
+                if(shouldLoadNextPage(i, pagingPostState)) {
+                    viewModel.loadNextPosts()
+                }
+                PostItem(
+                    post = post,
+                    imageLoader = imageLoader,
+                    onNavigate = onNavigate,
+                    viewModel = viewModel,
+                    context = context,
+                    state = state
+                )
+                Spacer(modifier = Modifier.height(SpaceSmall))
+            }
+
+            if(pagingPostState.isNextLoading) {
+                item {
+                    LoadingIndicator()
+                }
+            }
+        }
+    }
+}
+
+private fun shouldLoadNextPage(
+    currentIndex: Int,
+    pagingState: PagingState<Post>
+): Boolean =
+    currentIndex >= pagingState.items.size - 1 &&
+            pagingState.items.size >= Constants.DEFAULT_PAGE_SIZE &&
+            !pagingState.endReached &&
+            !pagingState.isFirstLoading && !pagingState.isNextLoading
+
+@Composable
+private fun LoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = SpaceMedium),
+        contentAlignment = Alignment.Center
+    ) {
+        CustomCircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun PostItem(
+    post: Post,
+    imageLoader: ImageLoader,
+    onNavigate: (String) -> Unit,
+    viewModel: MainFeedViewModel,
+    context: Context,
+    state: MainFeedState
+) {
+    Post(
+        post = post,
+        imageLoader = imageLoader,
+        onUsernameClick = {
+            onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+        },
+        onLikeClick = {
+            viewModel.onEvent(MainFeedEvent.OnLikedPost(post.id))
+        },
+        onCommentClick = {
+            viewModel.onEvent(MainFeedEvent.OnSelectPostId(post.id))
+            viewModel.onEvent(MainFeedEvent.OnShowCommentBottomSheet)
+            viewModel.onEvent(MainFeedEvent.OnLoadComments)
+        },
+        onShareClick = {
+            context.sendSharePostIntent(post.id)
+        },
+        onSaveClick = {
+            viewModel.onEvent(MainFeedEvent.OnSavePost(post.id))
+        },
+        onLikedByClick = {
+            onNavigate(Screen.PersonListScreen.route + "/${post.id}")
+        },
+        onMoreItemClick = {
+            viewModel.onEvent(MainFeedEvent.OnSelectPostId(post.id))
+            viewModel.onEvent(MainFeedEvent.OnSelectPostUsername(post.username, post.isOwnPost))
+            viewModel.onEvent(MainFeedEvent.OnShowBottomSheet)
+        },
+        isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
+        onDescriptionToggle = {
+            viewModel.onEvent(MainFeedEvent.OnDescriptionToggle(post.id))
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -331,7 +387,7 @@ fun CommentSheetContent(
             title = stringResource(R.string.comments),
             bottomSheetState = bottomSheetState,
             onDismissBottomSheet = {
-                viewModel.onEvent(MainFeedEvent.DismissCommentBottomSheet)
+                viewModel.onEvent(MainFeedEvent.OnDismissCommentBottomSheet)
             },
             items = pagingCommentState.items,
             isFirstLoading = pagingCommentState.isFirstLoading,
@@ -342,24 +398,24 @@ fun CommentSheetContent(
             },
             selectedFilter = state.commentFilter,
             onFilterSelected = { filterType ->
-                viewModel.onEvent(MainFeedEvent.ChangeCommentFilter(filterType))
+                viewModel.onEvent(MainFeedEvent.OnChangeCommentFilter(filterType))
             },
             isDropdownMenuExpanded = state.isDropdownMenuVisible,
             onShowDropDownMenu = {
-                viewModel.onEvent(MainFeedEvent.ShowDropDownMenu)
+                viewModel.onEvent(MainFeedEvent.OnShowDropDownMenu)
             },
             onDismissDropdownMenu = {
-                viewModel.onEvent(MainFeedEvent.DismissDropDownMenu)
+                viewModel.onEvent(MainFeedEvent.OnDismissDropDownMenu)
             },
             keyExtractor = { comment ->
                 comment.id
             },
             textFieldState = commentTextFieldState,
             onValueChange = {
-                viewModel.onEvent(MainFeedEvent.EnteredComment(it))
+                viewModel.onEvent(MainFeedEvent.OnEnteredComment(it))
             },
             onSend = {
-                viewModel.onEvent(MainFeedEvent.Comment)
+                viewModel.onEvent(MainFeedEvent.OnComment)
             },
             ownProfilePicture = state.profilePicture ?: "",
             hint = stringResource(R.string.enter_a_comment),
@@ -372,19 +428,32 @@ fun CommentSheetContent(
                 context = context,
                 imageLoader = imageLoader,
                 onLikeClick = {
-                    viewModel.onEvent(MainFeedEvent.LikedComment(comment.id))
+                    viewModel.onEvent(MainFeedEvent.OnLikedComment(comment.id))
                 },
                 onLikedByClick = {
-                    viewModel.onEvent(MainFeedEvent.NavigatedToPersonListScreen)
+                    viewModel.onEvent(MainFeedEvent.OnNavigatedToPersonListScreen)
                     onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                 },
                 onLongPress = {
-                    viewModel.onEvent(MainFeedEvent.SelectComment(comment.id))
+                    viewModel.onEvent(MainFeedEvent.OnSelectComment(comment.id))
                 },
                 onDeleteClick = {
-                    viewModel.onEvent(MainFeedEvent.DeleteComment)
+                    viewModel.onEvent(MainFeedEvent.OnDeleteComment)
                 }
             )
+        }
+    }
+}
+
+fun Modifier.swipeToSearch(
+    isNavigated: Boolean,
+    onEvent: () -> Unit,
+    onNavigate: () -> Unit
+) = pointerInput(Unit) {
+    detectHorizontalDragGestures { _, dragAmount ->
+        if(dragAmount < 1.dp.toPx() && !isNavigated) {
+            onEvent()
+            onNavigate()
         }
     }
 }

@@ -43,7 +43,7 @@ fun Comment(
     onLikeClick: (Boolean) -> Unit = {},
     onLikedByClick: () -> Unit = {},
     onLongPress: () -> Unit = {},
-    onDeleteClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     var isContextMenuVisible by rememberSaveable { mutableStateOf(false) }
     var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
@@ -226,8 +226,8 @@ private fun CommentContextMenu(
 ) {
     AnimatedVisibility(
         visible = isVisible,
-        enter = slideInVertically() + fadeIn(),
-        exit = slideOutVertically() + fadeOut()
+        enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically()
     ) {
         DropdownMenu(
             expanded = isVisible,
@@ -238,7 +238,8 @@ private fun CommentContextMenu(
                 text = {
                     MenuItemContent(
                         iconId = R.drawable.ic_delete,
-                        textId = R.string.delete
+                        textId = R.string.delete,
+                        color = Color.Red
                     )
                 },
                 onClick = onDeleteClick
@@ -259,7 +260,8 @@ private fun CommentContextMenu(
 @Composable
 private fun MenuItemContent(
     iconId: Int,
-    textId: Int
+    textId: Int,
+    color: Color = MaterialTheme.colorScheme.onBackground
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -273,7 +275,7 @@ private fun MenuItemContent(
         Spacer(modifier = Modifier.width(SpaceSmall))
         Text(
             text = stringResource(id = textId),
-            style = Typography.labelSmall
+            style = Typography.labelSmall.withColor(color)
         )
         Spacer(modifier = Modifier.width(SpaceLarge))
     }

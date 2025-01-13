@@ -140,23 +140,23 @@ class MainFeedViewModel @Inject constructor(
 
     fun onEvent(event: MainFeedEvent) {
         when(event) {
-            is MainFeedEvent.LikedPost -> {
+            is MainFeedEvent.OnLikedPost -> {
                 toggleLikeForParent(
                     parentId = event.postId,
                     parentType = ParentType.Post.type
                 )
             }
-            is MainFeedEvent.LikedComment -> {
+            is MainFeedEvent.OnLikedComment -> {
                 toggleLikeForParent(
                     parentId = event.commentId,
                     parentType = ParentType.Comment.type
                 )
             }
-            is MainFeedEvent.LoadComments -> {
+            is MainFeedEvent.OnLoadComments -> {
                 loadInitialComments()
                 getOwnProfilePicture()
             }
-            is MainFeedEvent.Comment -> {
+            is MainFeedEvent.OnComment -> {
                 state.value.selectedPostId?.let { postId ->
                     createComment(
                         postId = postId,
@@ -164,7 +164,7 @@ class MainFeedViewModel @Inject constructor(
                     )
                 }
             }
-            is MainFeedEvent.EnteredComment -> {
+            is MainFeedEvent.OnEnteredComment -> {
                 _commentTextFieldState.update {
                     it.copy(
                         text = event.comment,
@@ -172,17 +172,17 @@ class MainFeedViewModel @Inject constructor(
                     )
                 }
             }
-            is MainFeedEvent.SavePost -> {
+            is MainFeedEvent.OnSavePost -> {
                 toggleSavePost(parentId = event.postId)
             }
-            is MainFeedEvent.SelectPostId -> {
+            is MainFeedEvent.OnSelectPostId -> {
                 _state.update {
                     it.copy(
                         selectedPostId = event.postId
                     )
                 }
             }
-            is MainFeedEvent.SelectPostUsername -> {
+            is MainFeedEvent.OnSelectPostUsername -> {
                 _state.update {
                     it.copy(
                         selectedPostUsername = event.postUsername,
@@ -190,29 +190,29 @@ class MainFeedViewModel @Inject constructor(
                     )
                 }
             }
-            is MainFeedEvent.DeletePost -> {
+            is MainFeedEvent.OnDeletePost -> {
                 _state.value.selectedPostId?.let { postId ->
                     deletePost(postId)
                 }
             }
-            is MainFeedEvent.DownloadPost -> {
+            is MainFeedEvent.OnDownloadPost -> {
                 _state.value.selectedPostId?.let { postId ->
                     getPostDownloadUrl(postId)
                 }
             }
-            is MainFeedEvent.SelectComment -> {
+            is MainFeedEvent.OnSelectComment -> {
                 _state.update {
                     it.copy(
                         selectedCommentId = event.commentId
                     )
                 }
             }
-            is MainFeedEvent.DeleteComment -> {
+            is MainFeedEvent.OnDeleteComment -> {
                 state.value.selectedCommentId?.let { commentId ->
                     deleteComment(commentId)
                 }
             }
-            is MainFeedEvent.NavigatedToSearchScreen -> {
+            is MainFeedEvent.OnNavigatedToSearchScreen -> {
                 _state.update {
                     it.copy(
                         isNavigatedToSearchScreen = true
@@ -220,7 +220,7 @@ class MainFeedViewModel @Inject constructor(
                 }
                 resetHasNavigatedWithDelay()
             }
-            is MainFeedEvent.NavigatedToPersonListScreen -> {
+            is MainFeedEvent.OnNavigatedToPersonListScreen -> {
                 _state.update {
                     it.copy(
                         isNavigatedToPersonListScreen = true
@@ -228,7 +228,7 @@ class MainFeedViewModel @Inject constructor(
                 }
                 resetHasNavigatedWithDelay()
             }
-            is MainFeedEvent.ChangeCommentFilter -> {
+            is MainFeedEvent.OnChangeCommentFilter -> {
                 _state.update {
                     it.copy(
                         commentFilter = event.filterType
@@ -236,42 +236,42 @@ class MainFeedViewModel @Inject constructor(
                 }
                 loadInitialComments()
             }
-            is MainFeedEvent.ShowBottomSheet -> {
+            is MainFeedEvent.OnShowBottomSheet -> {
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = true
                     )
                 }
             }
-            is MainFeedEvent.DismissBottomSheet -> {
+            is MainFeedEvent.OnDismissBottomSheet -> {
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = false
                     )
                 }
             }
-            is MainFeedEvent.ShowCommentBottomSheet -> {
+            is MainFeedEvent.OnShowCommentBottomSheet -> {
                 _state.update {
                     it.copy(
                         isCommentBottomSheetVisible = true
                     )
                 }
             }
-            is MainFeedEvent.DismissCommentBottomSheet -> {
+            is MainFeedEvent.OnDismissCommentBottomSheet -> {
                 _state.update {
                     it.copy(
                         isCommentBottomSheetVisible = false
                     )
                 }
             }
-            is MainFeedEvent.ShowDropDownMenu -> {
+            is MainFeedEvent.OnShowDropDownMenu -> {
                 _state.update {
                     it.copy(
                         isDropdownMenuVisible = true
                     )
                 }
             }
-            is MainFeedEvent.DismissDropDownMenu -> {
+            is MainFeedEvent.OnDismissDropDownMenu -> {
                 _state.update {
                     it.copy(
                         isDropdownMenuVisible = false
