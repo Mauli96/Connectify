@@ -21,10 +21,10 @@ import coil.ImageLoader
 import com.example.connectify.core.presentation.crop_image.CropScreen
 import com.example.connectify.feature_activity.presentation.ActivityScreen
 import com.example.connectify.feature_auth.presentation.login.LoginScreen
-import com.example.connectify.feature_auth.presentation.register.RegisterScreen
 import com.example.connectify.feature_auth.presentation.on_boarding.OnBoardingScreen
 import com.example.connectify.feature_auth.presentation.otp.OtpScreen
 import com.example.connectify.feature_auth.presentation.password.PasswordScreen
+import com.example.connectify.feature_auth.presentation.register.RegisterScreen
 import com.example.connectify.feature_chat.presentation.chat.ChatScreen
 import com.example.connectify.feature_chat.presentation.message.MessageScreen
 import com.example.connectify.feature_post.presentation.create_post.CreatePostScreen

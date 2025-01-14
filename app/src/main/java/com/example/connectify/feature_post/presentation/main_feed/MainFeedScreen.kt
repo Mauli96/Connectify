@@ -72,6 +72,7 @@ import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -450,10 +451,30 @@ fun Modifier.swipeToSearch(
     onEvent: () -> Unit,
     onNavigate: () -> Unit
 ) = pointerInput(Unit) {
-    detectHorizontalDragGestures { _, dragAmount ->
-        if(dragAmount < 1.dp.toPx() && !isNavigated) {
-            onEvent()
-            onNavigate()
+    var totalDragAmount = 0f
+    val minSwipeDistance = 50.dp.toPx()
+    val velocityThreshold = 800f
+
+    detectHorizontalDragGestures(
+        onDragStart = {
+            totalDragAmount = 0f
+        },
+        onDragEnd = {
+            if(abs(totalDragAmount) >= minSwipeDistance && !isNavigated) {
+                onEvent()
+                onNavigate()
+            }
+            totalDragAmount = 0f
+        },
+        onHorizontalDrag = { change, dragAmount ->
+            change.consume()
+            totalDragAmount += dragAmount
+
+            if(abs(dragAmount) > velocityThreshold && !isNavigated) {
+                onEvent()
+                onNavigate()
+            }
         }
-    }
+    )
 }
+

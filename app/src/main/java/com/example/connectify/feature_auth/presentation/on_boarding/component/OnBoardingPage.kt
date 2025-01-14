@@ -26,4 +26,8 @@ sealed class OnBoardingPage(
         title = "Join the Conversation",
         description = "Engage with friends and followers, share ideas, and grow your community."
     )
+
+    companion object {
+        val pages = listOf(First, Second, Third)
+    }
 }

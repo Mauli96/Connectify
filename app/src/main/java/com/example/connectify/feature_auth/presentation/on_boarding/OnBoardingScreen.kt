@@ -44,14 +44,9 @@ fun OnBoardingScreen(
     onSaveOnBoarding: () -> Unit = {},
     onBoardingViewModel: OnBoardingViewModel = hiltViewModel()
 ) {
-    val pages = listOf(
-        OnBoardingPage.First,
-        OnBoardingPage.Second,
-        OnBoardingPage.Third
-    )
     val pagerState = rememberPagerState(
         initialPage = 0,
-        pageCount = { 3 }
+        pageCount = { OnBoardingPage.pages.size }
     )
 
     Column(
@@ -62,11 +57,11 @@ fun OnBoardingScreen(
             state = pagerState,
             verticalAlignment = Alignment.Top
         ) { position ->
-            PagerScreen(onBoardingPage = pages[position])
+            PagerScreen(onBoardingPage = OnBoardingPage.pages[position])
         }
         HorizontalPagerIndicator(
             pagerState = pagerState,
-            pageCount = pages.size,
+            pageCount = OnBoardingPage.pages.size,
             activeColor = MaterialTheme.colorScheme.primary,
             inactiveColor = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
@@ -103,9 +98,7 @@ fun PagerScreen(
                 .fillMaxWidth(0.85f)
                 .fillMaxHeight(0.85f),
             composition = composition,
-            progress = {
-                progress
-            },
+            progress = { progress },
         )
         Column(
             modifier = Modifier
