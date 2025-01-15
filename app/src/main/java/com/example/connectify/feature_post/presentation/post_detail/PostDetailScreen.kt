@@ -257,6 +257,7 @@ fun PostDetailScreen(
             }
             SendTextField(
                 state = commentTextFieldState,
+                imageLoader = imageLoader,
                 onValueChange = {
                     viewModel.onEvent(PostDetailEvent.EnteredComment(it))
                 },

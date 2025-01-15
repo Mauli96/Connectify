@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -116,13 +115,11 @@ fun ChatScreen(
                         LottieAnimation(
                             modifier = Modifier.size(LottieIconSize),
                             composition = composition,
-                            progress = {
-                                progress
-                            },
+                            progress = { progress }
                         )
                         Text(
                             text = stringResource(R.string.no_chats_found),
-                            style = Typography.bodyMedium,
+                            style = Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }

@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -45,7 +46,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
@@ -226,13 +227,12 @@ fun CreatePostScreen(
                                 modifier = Modifier.size(IconSizeMedium)
                             )
                             state.imageUri?.let { uri ->
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        model = uri,
-                                        imageLoader = imageLoader
-                                    ),
+                                AsyncImage(
+                                    model = uri,
                                     contentDescription = stringResource(id = R.string.post_image),
-                                    modifier = Modifier.matchParentSize()
+                                    imageLoader = imageLoader,
+                                    modifier = Modifier.matchParentSize(),
+                                    contentScale = ContentScale.Crop
                                 )
                             }
                         }

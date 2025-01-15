@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
@@ -78,15 +78,12 @@ fun BannerSection(
     BoxWithConstraints(
         modifier = modifier
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = bannerUrl,
-                imageLoader = imageLoader
-            ),
+        AsyncImage(
+            model = bannerUrl,
             contentDescription = stringResource(id = R.string.banner_image),
-            contentScale = ContentScale.Crop,
-            modifier = imageModifier
-                .fillMaxSize()
+            imageLoader = imageLoader,
+            modifier = imageModifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
         Box(
             modifier = Modifier
@@ -244,13 +241,12 @@ fun BannerSection(
         ) {
             topSkills.forEach { skill ->
                 Spacer(modifier = Modifier.width(SpaceMedium))
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = skill.imageUrl,
-                        imageLoader = imageLoader
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.height(iconSize)
+                AsyncImage(
+                    model = skill.imageUrl,
+                    contentDescription = stringResource(R.string.select_top_3_skills),
+                    imageLoader = imageLoader,
+                    modifier = Modifier.height(iconSize),
+                    contentScale = ContentScale.Crop
                 )
             }
         }

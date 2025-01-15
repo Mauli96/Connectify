@@ -98,7 +98,7 @@ fun PagerScreen(
                 .fillMaxWidth(0.85f)
                 .fillMaxHeight(0.85f),
             composition = composition,
-            progress = { progress },
+            progress = { progress }
         )
         Column(
             modifier = Modifier

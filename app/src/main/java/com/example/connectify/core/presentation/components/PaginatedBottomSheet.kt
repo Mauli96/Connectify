@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -54,6 +55,7 @@ import com.example.connectify.feature_post.presentation.util.CommentFilter
 @Composable
 fun <T> PaginatedBottomSheet(
     title: String,
+    imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     bottomSheetState: SheetState,
     onDismissBottomSheet: () -> Unit = {},
@@ -133,6 +135,7 @@ fun <T> PaginatedBottomSheet(
 
                 SendTextField(
                     state = textFieldState,
+                    imageLoader = imageLoader,
                     onValueChange = onValueChange,
                     onSend = onSend,
                     ownProfilePicture = ownProfilePicture,
@@ -202,7 +205,7 @@ private fun EmptyStateContent(
         )
         Text(
             text = stringResource(R.string.no_comments_yet),
-            style = Typography.bodyMedium,
+            style = Typography.labelSmall,
             textAlign = TextAlign.Center
         )
     }

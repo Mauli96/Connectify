@@ -1,6 +1,5 @@
 package com.example.connectify.feature_post.presentation.save_post
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -118,13 +116,11 @@ fun SavedPostScreen(
                         LottieAnimation(
                             modifier = Modifier.size(LottieIconSize),
                             composition = composition,
-                            progress = {
-                                progress
-                            },
+                            progress = { progress }
                         )
                         Text(
                             text = stringResource(R.string.no_saved_post),
-                            style = Typography.bodyMedium,
+                            style = Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -190,12 +186,10 @@ fun PostImageItem(
     post: Post,
     onPostImageClick: () -> Unit = {}
 ) {
-    Image(
-        painter = rememberAsyncImagePainter(
-            model = post.imageUrl,
-            imageLoader = imageLoader
-        ),
+    AsyncImage(
+        model = post.imageUrl,
         contentDescription = stringResource(R.string.post_image),
+        imageLoader = imageLoader,
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp)

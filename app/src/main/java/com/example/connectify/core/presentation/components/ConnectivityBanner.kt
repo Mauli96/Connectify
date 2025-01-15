@@ -102,7 +102,7 @@ fun ConnectivityBanner(
                 Spacer(modifier = Modifier.width(SpaceSmall))
                 Text(
                     text = message,
-                    style = Typography.bodyMedium
+                    style = Typography.labelSmall
                 )
             }
         }

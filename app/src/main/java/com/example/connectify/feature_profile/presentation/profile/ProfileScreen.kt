@@ -2,7 +2,6 @@ package com.example.connectify.feature_profile.presentation.profile
 
 import android.content.Context
 import android.util.Base64
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -55,7 +54,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -262,7 +261,7 @@ fun ProfileScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_posts_for_profile),
-                            style = Typography.bodyMedium,
+                            style = Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -389,12 +388,10 @@ fun ProfileScreen(
                         onNavigateUp()
                     }
                 )
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = profile.profilePictureUrl,
-                        imageLoader = imageLoader
-                    ),
-                    contentDescription = stringResource(id = R.string.profile),
+                AsyncImage(
+                    model = profile.profilePictureUrl,
+                    contentDescription = stringResource(R.string.profile),
+                    imageLoader = imageLoader,
                     modifier = Modifier
                         .align(CenterHorizontally)
                         .graphicsLayer {
@@ -542,6 +539,7 @@ fun CommentSheetContent(
             onDismissBottomSheet = {
                 viewModel.onEvent(ProfileEvent.DismissBottomSheet)
             },
+            imageLoader = imageLoader,
             items = pagingCommentState.items,
             isFirstLoading = pagingCommentState.isFirstLoading,
             isNextLoading = pagingCommentState.isNextLoading,

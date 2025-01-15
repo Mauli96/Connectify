@@ -161,9 +161,9 @@ fun MainFeedScreen(
             }
             CommentSheetContent(
                 pagingCommentState = pagingCommentState,
-                imageLoader = imageLoader,
                 onNavigate = onNavigate,
                 context = context,
+                imageLoader = imageLoader,
                 viewModel = viewModel,
                 focusRequester = focusRequester,
                 bottomSheetState = bottomSheetState,
@@ -251,7 +251,7 @@ private fun EmptyFeedContent(
         )
         Text(
             text = stringResource(R.string.feed_empty),
-            style = Typography.bodyMedium,
+            style = Typography.labelSmall,
             textAlign = TextAlign.Center
         )
     }
@@ -374,9 +374,9 @@ private fun PostItem(
 @Composable
 fun CommentSheetContent(
     pagingCommentState: PagingState<Comment>,
-    imageLoader: ImageLoader,
     onNavigate: (String) -> Unit,
     context: Context,
+    imageLoader: ImageLoader,
     viewModel: MainFeedViewModel,
     focusRequester: FocusRequester,
     bottomSheetState: SheetState,
@@ -390,6 +390,7 @@ fun CommentSheetContent(
             onDismissBottomSheet = {
                 viewModel.onEvent(MainFeedEvent.OnDismissCommentBottomSheet)
             },
+            imageLoader = imageLoader,
             items = pagingCommentState.items,
             isFirstLoading = pagingCommentState.isFirstLoading,
             isNextLoading = pagingCommentState.isNextLoading,

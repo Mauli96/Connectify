@@ -2,7 +2,6 @@ package com.example.connectify.core.presentation.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +36,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Post
 import com.example.connectify.core.presentation.ui.theme.DarkGray
@@ -98,15 +97,14 @@ fun Post(
                             )
                         }
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = post.profilePictureUrl,
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = stringResource(id = R.string.profile_image),
+                    AsyncImage(
+                        model = post.profilePictureUrl,
+                        contentDescription = stringResource(R.string.profile_image),
+                        imageLoader = imageLoader,
                         modifier = Modifier
                             .size(ProfilePictureSizeExtraSmall)
-                            .clip(CircleShape)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.width(SpaceSmall))
                     Box(
@@ -138,17 +136,15 @@ fun Post(
                         }
                 )
             }
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = post.imageUrl,
-                    imageLoader = imageLoader
-                ),
+            AsyncImage(
+                model = post.imageUrl,
                 contentDescription = stringResource(id = R.string.post_image),
-                contentScale = ContentScale.Crop,
+                imageLoader = imageLoader,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(4f / 5f)
-                    .clip(MaterialTheme.shapes.large)
+                    .clip(MaterialTheme.shapes.large),
+                contentScale = ContentScale.Crop
             )
             Column(
                 modifier = Modifier

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -113,13 +112,11 @@ fun ActivityScreen(
                         LottieAnimation(
                             modifier = Modifier.size(LottieIconSize),
                             composition = composition,
-                            progress = {
-                                progress
-                            },
+                            progress = { progress },
                         )
                         Text(
                             text = stringResource(R.string.no_activity),
-                            style = Typography.bodyMedium,
+                            style = Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }

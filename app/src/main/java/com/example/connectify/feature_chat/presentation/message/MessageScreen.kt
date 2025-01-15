@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -37,14 +35,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -150,15 +147,13 @@ fun MessageScreen(
                 showBackArrow = true,
                 title = {
                     Row {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = decodedRemoteUserProfilePictureUrl,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = null,
+                        AsyncImage(
+                            model = decodedRemoteUserProfilePictureUrl,
+                            contentDescription = stringResource(R.string.profile_image),
+                            imageLoader = imageLoader,
                             modifier = Modifier
                                 .size(ProfilePictureSizeMediumSmall)
-                                .clip(CircleShape)
+                                .clip(CircleShape),
                         )
                         Spacer(modifier = Modifier.width(SpaceMedium))
                         Column {
@@ -206,7 +201,7 @@ fun MessageScreen(
                         )
                         Text(
                             text = stringResource(R.string.no_messages_found),
-                            style = Typography.bodyMedium,
+                            style = Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -270,6 +265,7 @@ fun MessageScreen(
             }
             SendTextField(
                 state = messageTextFieldState,
+                imageLoader = imageLoader,
                 canSendMessage = state.canSendMessage,
                 onValueChange = {
                     viewModel.onEvent(MessageEvent.EnteredMessage(it))

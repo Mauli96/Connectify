@@ -1,7 +1,6 @@
 package com.example.connectify.feature_chat.presentation.chat.components
 
 import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,12 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -41,8 +41,6 @@ import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.domain.model.Chat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun ChatItem(
@@ -83,12 +81,10 @@ fun ChatItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = item.remoteUserProfilePictureUrl,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = null,
+            AsyncImage(
+                model = item.remoteUserProfilePictureUrl,
+                contentDescription = stringResource(R.string.profile_image),
+                imageLoader = imageLoader,
                 modifier = Modifier
                     .size(ProfilePictureSizeSmall)
                     .clip(CircleShape)

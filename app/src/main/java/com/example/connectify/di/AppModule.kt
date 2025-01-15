@@ -4,8 +4,13 @@ import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import androidx.multidex.BuildConfig
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.request.CachePolicy
+import coil.util.DebugLogger
 import com.example.connectify.core.data.connectivity.AndroidConnectivityObserver
 import com.example.connectify.core.data.connectivity.ConnectivityObserver
 import com.example.connectify.core.domain.repository.ProfileRepository
@@ -64,11 +69,32 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideImageLoader(app: Application): ImageLoader {
-        return ImageLoader.Builder(app)
+    fun provideImageLoader(
+        context: Application
+    ): ImageLoader {
+        return ImageLoader.Builder(context)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .memoryCache {
+                MemoryCache.Builder(context)
+                    .maxSizePercent(0.2)
+                    .strongReferencesEnabled(true)
+                    .build()
+            }
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .diskCache {
+                DiskCache.Builder()
+                    .maxSizePercent(0.1)
+                    .directory(context.cacheDir.resolve("image_cache"))
+                    .build()
+            }
             .crossfade(true)
             .components {
                 add(SvgDecoder.Factory(true))
+            }
+            .apply {
+                if(BuildConfig.DEBUG) {
+                    logger(DebugLogger())
+                }
             }
             .build()
     }

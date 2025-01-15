@@ -1,6 +1,5 @@
 package com.example.connectify.feature_activity.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +27,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.Activity
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeMediumSmall
@@ -66,12 +65,10 @@ fun ActivityItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = activity.profilePictureUrl,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = stringResource(id = R.string.profile_image),
+            AsyncImage(
+                model = activity.profilePictureUrl,
+                imageLoader = imageLoader,
+                contentDescription = stringResource(R.string.profile_image),
                 modifier = Modifier
                     .size(ProfilePictureSizeMediumSmall)
                     .clip(CircleShape)

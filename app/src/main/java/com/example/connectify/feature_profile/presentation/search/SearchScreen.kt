@@ -183,13 +183,11 @@ fun SearchScreen(
                         LottieAnimation(
                             modifier = Modifier.size(LottieIconSize),
                             composition = composition,
-                            progress = {
-                                progress
-                            },
+                            progress = { progress },
                         )
                         Text(
                             text = stringResource(R.string.no_user_found),
-                            style = Typography.bodyMedium,
+                            style = Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }

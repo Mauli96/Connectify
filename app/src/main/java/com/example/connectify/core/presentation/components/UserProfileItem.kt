@@ -1,6 +1,5 @@
 package com.example.connectify.core.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,12 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.UserItem
 import com.example.connectify.core.presentation.ui.theme.DarkGray
@@ -68,12 +66,10 @@ fun UserProfileItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = user.profilePictureUrl,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = null,
+            AsyncImage(
+                model = user.profilePictureUrl,
+                imageLoader = imageLoader,
+                contentDescription = stringResource(R.string.profile_image),
                 modifier = Modifier
                     .size(ProfilePictureSizeSmall)
                     .clip(CircleShape)

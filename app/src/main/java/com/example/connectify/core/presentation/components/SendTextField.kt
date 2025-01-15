@@ -25,17 +25,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil.ImageLoader
+import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.ui.theme.DarkGray
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
-import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.ProfilePictureSizeExtraSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
@@ -45,6 +45,7 @@ import com.example.connectify.core.presentation.ui.theme.withColor
 @Composable
 fun SendTextField(
     modifier: Modifier = Modifier,
+    imageLoader: ImageLoader,
     state: StandardTextFieldState,
     onValueChange: (String) -> Unit,
     ownProfilePicture: String = "",
@@ -91,14 +92,14 @@ fun SendTextField(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.width(12.dp))
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = ownProfilePicture
-                        ),
-                        contentDescription = null,
+                    AsyncImage(
+                        model = ownProfilePicture,
+                        contentDescription = stringResource(R.string.profile_image),
+                        imageLoader = imageLoader,
                         modifier = Modifier
                             .size(ProfilePictureSizeExtraSmall)
-                            .clip(CircleShape)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Box(Modifier.weight(1f)) {

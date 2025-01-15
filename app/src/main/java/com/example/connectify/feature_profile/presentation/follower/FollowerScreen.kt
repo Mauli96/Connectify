@@ -111,13 +111,11 @@ fun FollowerScreen(
                         LottieAnimation(
                             modifier = Modifier.size(LottieIconSize),
                             composition = composition,
-                            progress = {
-                                progress
-                            },
+                            progress = { progress }
                         )
                         Text(
                             text = stringResource(R.string.no_followers),
-                            style =Typography.bodyMedium,
+                            style =Typography.labelSmall,
                             textAlign = TextAlign.Center
                         )
                     }
