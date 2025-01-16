@@ -20,13 +20,13 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.presentation.util.CommentError
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -65,8 +65,8 @@ class PostDetailViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     init {
         savedStateHandle.get<String>("postId")?.let { postId ->
@@ -108,7 +108,7 @@ class PostDetailViewModel @Inject constructor(
             }
         },
         onError = { uiText ->
-            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+            _eventFlow.send(UiEvent.ShowSnackbar(uiText))
         }
     )
 
@@ -245,7 +245,7 @@ class PostDetailViewModel @Inject constructor(
                     _profilePictureState.value = result.data.toString()
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -261,14 +261,14 @@ class PostDetailViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> {
                     postDownloader.downloadFile(result.data.toString())
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_downloaded_post
                         ))
                     )
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -288,14 +288,14 @@ class PostDetailViewModel @Inject constructor(
                             post = null
                         )
                     }
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_post
                         ))
                     )
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -317,14 +317,14 @@ class PostDetailViewModel @Inject constructor(
                             }
                         )
                     }
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_comment
                         ))
                     )
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -353,11 +353,11 @@ class PostDetailViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> {
                     if(isSaved) {
-                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                        _eventFlow.send(UiEvent.ShowSnackbar(
                             uiText = UiText.StringResource(R.string.successfully_unsaved_post)
                         ))
                     } else {
-                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                        _eventFlow.send(UiEvent.ShowSnackbar(
                             uiText = UiText.StringResource(R.string.successfully_saved_post)
                         ))
                     }
@@ -470,7 +470,7 @@ class PostDetailViewModel @Inject constructor(
             )
             when(result) {
                 is Resource.Success -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = UiText.StringResource(R.string.comment_posted)
                     ))
                     _commentState.update {
@@ -487,7 +487,7 @@ class PostDetailViewModel @Inject constructor(
                     loadInitialComments()
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                     _commentState.update {
@@ -523,7 +523,7 @@ class PostDetailViewModel @Inject constructor(
                             isLoadingPost = false
                         )
                     }
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )

@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -38,10 +36,10 @@ import com.example.connectify.core.presentation.components.UserProfileItem
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
-import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterialApi
 @Composable
@@ -64,18 +62,14 @@ fun FollowingScreen(
         iterations = LottieConstants.IterateForever
     )
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        event.uiText.asString(context)
-                    )
-                }
-                else -> {
-                    null
-                }
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    event.uiText.asString(context)
+                )
             }
+            else -> {}
         }
     }
 

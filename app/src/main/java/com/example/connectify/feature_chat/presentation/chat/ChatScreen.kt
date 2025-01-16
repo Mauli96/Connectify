@@ -17,7 +17,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -42,11 +41,11 @@ import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_chat.presentation.chat.components.ChatItem
-import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,18 +67,14 @@ fun ChatScreen(
         iterations = LottieConstants.IterateForever
     )
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
-                    )
-                }
-                else -> {
-                    null
-                }
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
             }
+            else -> {}
         }
     }
 

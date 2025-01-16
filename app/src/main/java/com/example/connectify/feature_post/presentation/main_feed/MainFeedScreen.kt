@@ -66,12 +66,12 @@ import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.sendSharePostIntent
-import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -105,19 +105,15 @@ fun MainFeedScreen(
         onRefresh = { viewModel.onRefreshPosts() }
     )
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context),
-                        actionLabel = "VIEW"
-                    )
-                }
-                else -> {
-                    null
-                }
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context),
+                    actionLabel = "VIEW"
+                )
             }
+            else -> {}
         }
     }
 

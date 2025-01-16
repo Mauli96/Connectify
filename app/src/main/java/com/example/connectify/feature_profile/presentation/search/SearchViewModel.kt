@@ -12,13 +12,13 @@ import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import com.example.connectify.feature_profile.domain.util.ProfileConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,8 +40,8 @@ class SearchViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     private var searchJob: Job? = null
 
@@ -89,7 +89,7 @@ class SearchViewModel @Inject constructor(
                             }
                         )
                     }
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                 }
@@ -122,7 +122,7 @@ class SearchViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(result.uiText ?: UiText.unknownError())
                     )
                     _state.update {

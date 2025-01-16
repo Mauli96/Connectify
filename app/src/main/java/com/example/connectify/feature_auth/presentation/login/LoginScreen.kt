@@ -37,7 +37,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
@@ -50,6 +53,7 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.presentation.ui.theme.withSize
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -60,7 +64,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LoginScreen(
     snackbarHostState: SnackbarHostState,
@@ -86,25 +89,19 @@ fun LoginScreen(
         viewModel.onEvent(LoginEvent.OnSignIn(result))
     }
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    keyboardController?.hide()
-                    GlobalScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context)
-                        )
-                    }
-                }
-                is UiEvent.OnLogin -> {
-                    keyboardController?.hide()
-                    onLogin()
-                }
-                else -> {
-                    null
-                }
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                keyboardController?.hide()
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
             }
+            is UiEvent.OnLogin -> {
+                keyboardController?.hide()
+                onLogin()
+            }
+            else -> null
         }
     }
 

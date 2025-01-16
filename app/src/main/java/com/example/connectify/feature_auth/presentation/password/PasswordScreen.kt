@@ -41,16 +41,13 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.presentation.ui.theme.withSize
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
 import com.example.connectify.feature_auth.presentation.util.AuthError
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun PasswordScreen(
     snackbarHostState: SnackbarHostState,
@@ -66,25 +63,19 @@ fun PasswordScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    keyboardController?.hide()
-                    GlobalScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context)
-                        )
-                    }
-                }
-                is UiEvent.Navigate -> {
-                    keyboardController?.hide()
-                    onNavigate(event.route)
-                }
-                else -> {
-                    null
-                }
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                keyboardController?.hide()
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
             }
+            is UiEvent.Navigate -> {
+                keyboardController?.hide()
+                onNavigate(event.route)
+            }
+            else -> null
         }
     }
 

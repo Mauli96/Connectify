@@ -26,6 +26,7 @@ import com.example.connectify.core.presentation.components.CustomCircularProgres
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.components.UserProfileItem
 import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
@@ -45,18 +46,20 @@ fun PersonListScreen(
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    event.uiText.asString(context)
+                )
+            }
+            else -> {}
+        }
+    }
+
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        event.uiText.asString(context)
-                    )
-                }
-                else -> {
-                    null
-                }
-            }
+
         }
     }
 

@@ -13,12 +13,12 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.models.SignInResult
 import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,8 +43,8 @@ class LoginViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     fun onEvent(event: LoginEvent) {
         when(event) {
@@ -79,7 +79,7 @@ class LoginViewModel @Inject constructor(
                     }
                     is SignInResult.Cancelled -> {
                         viewModelScope.launch {
-                            _eventFlow.emit(
+                            _eventFlow.send(
                                 UiEvent.ShowSnackbar(
                                     UiText.StringResource(R.string.login_canceled)
                                 )
@@ -88,7 +88,7 @@ class LoginViewModel @Inject constructor(
                     }
                     is SignInResult.Failure -> {
                         viewModelScope.launch {
-                            _eventFlow.emit(
+                            _eventFlow.send(
                                 UiEvent.ShowSnackbar(
                                     UiText.StringResource(R.string.login_failed)
                                 )
@@ -97,7 +97,7 @@ class LoginViewModel @Inject constructor(
                     }
                     is SignInResult.NoCredentials -> {
                         viewModelScope.launch {
-                            _eventFlow.emit(
+                            _eventFlow.send(
                                 UiEvent.ShowSnackbar(
                                     UiText.StringResource(R.string.no_credentials)
                                 )
@@ -150,12 +150,12 @@ class LoginViewModel @Inject constructor(
             }
             when(loginResult.result) {
                 is Resource.Success -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             UiText.StringResource(R.string.success_login)
                         )
                     )
-                    _eventFlow.emit(UiEvent.OnLogin)
+                    _eventFlow.send(UiEvent.OnLogin)
                     _loginState.update {
                         it.copy(isLoading = false)
                     }
@@ -163,7 +163,7 @@ class LoginViewModel @Inject constructor(
                     _passwordState.value = PasswordTextFieldState()
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = loginResult.result.uiText ?: UiText.unknownError()
                         )

@@ -62,16 +62,13 @@ import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.presentation.ui.theme.withSize
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun CreatePostScreen(
     imageLoader: ImageLoader,
@@ -129,23 +126,23 @@ fun CreatePostScreen(
         }
     }
 
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
+            }
+            is UiEvent.Navigate -> {
+                onNavigate(event.route)
+            }
+            else -> {}
+        }
+    }
+
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    GlobalScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context)
-                        )
-                    }
-                }
-                is UiEvent.Navigate -> {
-                    onNavigate(event.route)
-                }
-                else -> {
-                    null
-                }
-            }
+
         }
     }
 

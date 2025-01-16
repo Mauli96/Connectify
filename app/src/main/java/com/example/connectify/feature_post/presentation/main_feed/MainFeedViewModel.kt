@@ -23,14 +23,14 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import com.example.connectify.feature_post.presentation.util.CommentError
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,8 +66,8 @@ class MainFeedViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     private val postPaginator = DefaultPaginator(
         onFirstLoadUpdated = { isFirstLoading ->
@@ -96,7 +96,7 @@ class MainFeedViewModel @Inject constructor(
             }
         },
         onError = { uiText ->
-            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+            _eventFlow.send(UiEvent.ShowSnackbar(uiText))
         }
     )
 
@@ -134,7 +134,7 @@ class MainFeedViewModel @Inject constructor(
             }
         },
         onError = { uiText ->
-            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+            _eventFlow.send(UiEvent.ShowSnackbar(uiText))
         }
     )
 
@@ -356,14 +356,14 @@ class MainFeedViewModel @Inject constructor(
                             selectedPostId = null
                         )
                     }
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_post
                         ))
                     )
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -379,14 +379,14 @@ class MainFeedViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> {
                     postDownloader.downloadFile(result.data.toString())
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_downloaded_post
                         ))
                     )
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -408,7 +408,7 @@ class MainFeedViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -490,13 +490,13 @@ class MainFeedViewModel @Inject constructor(
             val post = pagingPostState.value.items.find { it.id == parentId }
             if(post != null) {
                if(post.isSaved) {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_saved_post
                         ))
                     )
                 } else {
-                   _eventFlow.emit(
+                   _eventFlow.send(
                        UiEvent.ShowSnackbar(UiText.StringResource(
                            R.string.successfully_unsaved_post
                        ))
@@ -536,7 +536,7 @@ class MainFeedViewModel @Inject constructor(
                     loadInitialComments()
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                     _state.update {
@@ -566,14 +566,14 @@ class MainFeedViewModel @Inject constructor(
                             selectedCommentId = null
                         )
                     }
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(UiText.StringResource(
                             R.string.successfully_deleted_comment
                         ))
                     )
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )

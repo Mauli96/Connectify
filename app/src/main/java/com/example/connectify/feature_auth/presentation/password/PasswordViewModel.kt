@@ -11,10 +11,12 @@ import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.use_case.ForgotPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,8 +36,8 @@ class PasswordViewModel @Inject constructor(
     private val _confirmPasswordState = MutableStateFlow(PasswordTextFieldState())
     val confirmPasswordState = _confirmPasswordState.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     init {
         val email = savedStateHandle.get<String>("email") ?: ""
@@ -120,12 +122,12 @@ class PasswordViewModel @Inject constructor(
             }
             when(passwordResult.result) {
                 is Resource.Success -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             UiText.StringResource(R.string.password_changed_successfully)
                         )
                     )
-                    _eventFlow.emit(UiEvent.Navigate(Screen.LoginScreen.route))
+                    _eventFlow.send(UiEvent.Navigate(Screen.LoginScreen.route))
                     _state.update {
                         it.copy(
                             isUpdatingPassword = false
@@ -133,7 +135,7 @@ class PasswordViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = passwordResult.result.uiText ?: UiText.unknownError()
                         )

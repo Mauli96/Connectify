@@ -10,12 +10,12 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.util.DefaultPaginator
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,8 +36,8 @@ class SavedPostViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     private val postPaginator = DefaultPaginator(
         onFirstLoadUpdated = { isFirstLoading ->
@@ -66,7 +66,7 @@ class SavedPostViewModel @Inject constructor(
             }
         },
         onError = { uiText ->
-            _eventFlow.emit(UiEvent.ShowSnackbar(uiText))
+            _eventFlow.send(UiEvent.ShowSnackbar(uiText))
         }
     )
 

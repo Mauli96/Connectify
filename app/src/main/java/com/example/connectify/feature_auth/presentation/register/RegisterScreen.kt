@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,18 +48,14 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.presentation.ui.theme.withSize
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_auth.data.credential_manager.AccountManager
 import com.example.connectify.feature_auth.presentation.util.AuthError
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun RegisterScreen(
     onNavigate: (String) -> Unit = {},
@@ -81,31 +76,25 @@ fun RegisterScreen(
         AccountManager(context as ComponentActivity)
     }
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    keyboardController?.hide()
-                    GlobalScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = event.uiText.asString(context)
-                        )
-                    }
-                }
-                is UiEvent.Navigate -> {
-                    onNavigate(event.route)
-                }
-                is UiEvent.OnRegister -> {
-                    onRegister()
-                    accountManager.signUp(
-                        email = emailState.text,
-                        password = passwordState.text
-                    )
-                }
-                else -> {
-                    null
-                }
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                keyboardController?.hide()
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
             }
+            is UiEvent.Navigate -> {
+                onNavigate(event.route)
+            }
+            is UiEvent.OnRegister -> {
+                onRegister()
+                accountManager.signUp(
+                    email = emailState.text,
+                    password = passwordState.text
+                )
+            }
+            else -> null
         }
     }
 

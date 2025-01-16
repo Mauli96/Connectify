@@ -13,13 +13,13 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_profile.domain.models.UpdateProfileData
 import com.example.connectify.feature_profile.domain.use_case.ProfileUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -59,8 +59,8 @@ class EditProfileViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     init {
         savedStateHandle.get<String>("userId")?.let { userId ->
@@ -130,7 +130,7 @@ class EditProfileViewModel @Inject constructor(
                             _editProfileState.update {
                                 it.copy(
                                     selectedSkills = result.data ?: kotlin.run {
-                                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                                        _eventFlow.send(UiEvent.ShowSnackbar(
                                             uiText = result.uiText ?: UiText.unknownError()
                                         ))
                                         return@launch
@@ -139,7 +139,7 @@ class EditProfileViewModel @Inject constructor(
                             }
                         }
                         is Resource.Error -> {
-                            _eventFlow.emit(UiEvent.ShowSnackbar(
+                            _eventFlow.send(UiEvent.ShowSnackbar(
                                 uiText = result.uiText ?: UiText.unknownError()
                             ))
                         }
@@ -175,7 +175,7 @@ class EditProfileViewModel @Inject constructor(
                     _editProfileState.update {
                         it.copy(
                             skills = result.data ?: kotlin.run {
-                                _eventFlow.emit(
+                                _eventFlow.send(
                                     UiEvent.ShowSnackbar(
                                         uiText = UiText.StringResource(R.string.error_couldnt_load_skills)
                                     )
@@ -186,7 +186,7 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                     return@launch
@@ -206,7 +206,7 @@ class EditProfileViewModel @Inject constructor(
             when(result) {
                 is Resource.Success -> {
                     val profile = result.data ?: kotlin.run {
-                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                        _eventFlow.send(UiEvent.ShowSnackbar(
                                 uiText = UiText.StringResource(R.string.error_couldnt_load_profile)
                         ))
                         return@launch
@@ -254,7 +254,7 @@ class EditProfileViewModel @Inject constructor(
                             isLoading = false
                         )
                     }
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                     return@launch
@@ -284,13 +284,13 @@ class EditProfileViewModel @Inject constructor(
             )
             when(result) {
                 is Resource.Success -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = UiText.StringResource(R.string.updated_profile)
                     ))
-                    _eventFlow.emit(UiEvent.NavigateUp)
+                    _eventFlow.send(UiEvent.NavigateUp)
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                 }

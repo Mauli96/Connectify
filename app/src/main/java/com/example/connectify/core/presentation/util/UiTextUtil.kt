@@ -3,7 +3,6 @@ package com.example.connectify.core.presentation.util
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.example.connectify.R
 import com.example.connectify.core.util.UiText
 
 @Composable

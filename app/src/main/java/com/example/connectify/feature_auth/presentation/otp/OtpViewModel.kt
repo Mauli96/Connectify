@@ -11,11 +11,13 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.use_case.GenerateOtpUseCase
 import com.example.connectify.feature_auth.domain.use_case.VerifyOtpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +34,8 @@ class OtpViewModel @Inject constructor(
     private val _emailState = MutableStateFlow(StandardTextFieldState())
     val emailState = _emailState.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     fun onEvent(event: OtpEvent) {
         when(event) {
@@ -99,7 +101,7 @@ class OtpViewModel @Inject constructor(
 
             when(otpResult.result) {
                 is Resource.Success -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             UiText.StringResource(R.string.otp_generated)
                         )
@@ -112,7 +114,7 @@ class OtpViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = otpResult.result.uiText ?: UiText.unknownError()
                         )
@@ -171,7 +173,11 @@ class OtpViewModel @Inject constructor(
 
             if(isValid == true) {
                 delay(1000)
-                _eventFlow.emit(UiEvent.Navigate(Screen.PasswordScreen.route + "/${emailState.value.text}"))
+                _eventFlow.send(
+                    UiEvent.Navigate(
+                        route = Screen.PasswordScreen.route + "/${emailState.value.text}"
+                    )
+                )
             }
         }
     }

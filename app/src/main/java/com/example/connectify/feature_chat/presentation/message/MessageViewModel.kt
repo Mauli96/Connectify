@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -64,8 +66,8 @@ class MessageViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     private val viewModelJob = SupervisorJob()
     private val viewModelCoroutine = CoroutineScope(Dispatchers.IO + viewModelJob)
@@ -93,7 +95,7 @@ class MessageViewModel @Inject constructor(
             } ?: Resource.Error(UiText.unknownError())
         },
         onError = { errorUiText ->
-            _eventFlow.emit(UiEvent.ShowSnackbar(errorUiText))
+            _eventFlow.send(UiEvent.ShowSnackbar(errorUiText))
         },
         onSuccess = { messages, firstPage ->
             _pagingState.update {
@@ -213,7 +215,7 @@ class MessageViewModel @Inject constructor(
                     _profilePictureState.value = result.data.toString()
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )
@@ -242,7 +244,7 @@ class MessageViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = result.uiText ?: UiText.unknownError()
                         )

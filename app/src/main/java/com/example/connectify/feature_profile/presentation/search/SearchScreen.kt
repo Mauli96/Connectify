@@ -52,11 +52,11 @@ import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.presentation.util.showKeyboard
 import com.example.connectify.core.util.Screen
-import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterialApi
 @Composable
@@ -82,23 +82,19 @@ fun SearchScreen(
     )
 
     LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
-                    )
-                }
-                else -> {
-                    null
-                }
-            }
-        }
-    }
-
-    LaunchedEffect(key1 = true) {
         context.showKeyboard()
         focusRequester.requestFocus()
+    }
+
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
+            }
+            else -> {}
+        }
     }
 
     Box(

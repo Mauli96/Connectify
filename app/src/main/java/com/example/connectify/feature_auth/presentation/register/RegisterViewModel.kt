@@ -13,12 +13,14 @@ import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_auth.domain.use_case.LoginUseCase
 import com.example.connectify.feature_auth.domain.use_case.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,8 +49,8 @@ class RegisterViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     fun onEvent(event: RegisterEvent) {
         when(event) {
@@ -133,12 +135,12 @@ class RegisterViewModel @Inject constructor(
                         email = emailState.value.text,
                         password = passwordState.value.text
                     )
-                    _eventFlow.emit(UiEvent.OnRegister)
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             UiText.StringResource(R.string.success_registeration)
                         )
                     )
+                    _eventFlow.send(UiEvent.OnRegister)
                     _registerState.update {
                         it.copy(
                             isLoading = false
@@ -149,7 +151,7 @@ class RegisterViewModel @Inject constructor(
                     _passwordState.value = PasswordTextFieldState()
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(
+                    _eventFlow.send(
                         UiEvent.ShowSnackbar(
                             uiText = registerResult.result.uiText ?: UiText.unknownError()
                         )

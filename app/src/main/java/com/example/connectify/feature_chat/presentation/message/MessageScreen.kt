@@ -61,13 +61,13 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.presentation.ui.theme.withSize
+import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Constants
 import com.example.connectify.feature_activity.presentation.util.DateFormatUtil
 import com.example.connectify.feature_chat.presentation.message.components.OwnMessage
 import com.example.connectify.feature_chat.presentation.message.components.RemoteMessage
-import kotlinx.coroutines.flow.collectLatest
 import okio.ByteString.Companion.decodeBase64
 import java.nio.charset.Charset
 
@@ -105,21 +105,6 @@ fun MessageScreen(
         iterations = LottieConstants.IterateForever
     )
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.uiText.asString(context)
-                    )
-                }
-                else -> {
-                    null
-                }
-            }
-        }
-    }
-
     LaunchedEffect(key1 = pagingState) {
         viewModel.messageReceived.collect { event ->
             when(event) {
@@ -130,6 +115,17 @@ fun MessageScreen(
                     lazyListState.scrollToItem(0)
                 }
             }
+        }
+    }
+
+    ObserveAsEvents(viewModel.eventFlow) { event ->
+        when(event) {
+            is UiEvent.ShowSnackbar -> {
+                snackbarHostState.showSnackbar(
+                    message = event.uiText.asString(context)
+                )
+            }
+            else -> {}
         }
     }
 

@@ -14,12 +14,12 @@ import com.example.connectify.core.util.Screen
 import com.example.connectify.core.util.UiText
 import com.example.connectify.feature_post.domain.use_case.PostUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -46,8 +46,8 @@ class CreatePostViewModel @Inject constructor(
         connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
 
     fun onEvent(event: CreatePostEvent) {
         when(event) {
@@ -100,15 +100,15 @@ class CreatePostViewModel @Inject constructor(
                     try {
                         notificationManager.notify(1, notificationBuilder.build())
                     } catch(e: SecurityException) {
-                        _eventFlow.emit(UiEvent.ShowSnackbar(
+                        _eventFlow.send(UiEvent.ShowSnackbar(
                             uiText = UiText.StringResource(R.string.notification_permission_denied)
                         ))
                     }
 
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = UiText.StringResource(R.string.post_created)
                     ))
-                    _eventFlow.emit(UiEvent.Navigate(Screen.MainFeedScreen.route))
+                    _eventFlow.send(UiEvent.Navigate(Screen.MainFeedScreen.route))
                     _descriptionState.value = StandardTextFieldState()
                     _state.update {
                         it.copy(
@@ -118,7 +118,7 @@ class CreatePostViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _eventFlow.emit(UiEvent.ShowSnackbar(
+                    _eventFlow.send(UiEvent.ShowSnackbar(
                         uiText = result.uiText ?: UiText.unknownError()
                     ))
                     _state.update {
