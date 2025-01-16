@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,17 +34,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
+import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
+import com.example.connectify.core.domain.states.StandardTextFieldState
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
 import com.example.connectify.core.presentation.components.StandardSearchField
 import com.example.connectify.core.presentation.components.UserProfileItem
-import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
@@ -75,9 +73,7 @@ fun SearchScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 
-    val focusRequester = remember {
-        FocusRequester()
-    }
+    val focusRequester = remember { FocusRequester() }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.no_result_found))
     val progress by animateLottieCompositionAsState(
@@ -111,86 +107,24 @@ fun SearchScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = SpaceMedium,
-                        end = SpaceSmall
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {
-                        keyboardController?.hide()
-                        onNavigateUp()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(IconSizeMedium)
-                    )
-                }
-                Spacer(modifier = Modifier.width(SpaceSmall))
-                StandardSearchField(
-                    query = searchFieldState.text,
-                    onQueryChanged = {
-                        viewModel.onEvent(SearchEvent.Query(it))
-                    },
-                    focusRequester = focusRequester,
-                    placeholderText = stringResource(id = R.string.search_for_user),
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_search),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.background,
-                            modifier = Modifier.size(IconSizeSmall)
-                        )
-                    },
-                    trailingIcon = {
-                        if(searchFieldState.text.isNotEmpty()) {
-                            IconButton(
-                                onClick = {
-                                    viewModel.onEvent(SearchEvent.OnToggleSearch(""))
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Close,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.background,
-                                    modifier = Modifier.size(IconSizeMedium)
-                                )
-                            }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            SearchHeader(
+                state = searchFieldState,
+                onNavigateUp = {
+                    keyboardController?.hide()
+                    onNavigateUp()
+                },
+                focusRequester = focusRequester,
+                onQueryChanged = { viewModel.onEvent(SearchEvent.OnQuery(it)) },
+                onClearSearch = { viewModel.onEvent(SearchEvent.OnToggleSearch("")) }
+            )
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 if(state.userItems.isEmpty() && searchFieldState.text.isNotEmpty() && !state.isLoading) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = SpaceLargeExtra),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        LottieAnimation(
-                            modifier = Modifier.size(LottieIconSize),
-                            composition = composition,
-                            progress = { progress },
-                        )
-                        Text(
-                            text = stringResource(R.string.no_user_found),
-                            style = Typography.labelSmall,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    NoResultsFound(
+                        composition = composition,
+                        progress = progress
+                    )
                 } else {
                     LazyColumn(
                         modifier = Modifier
@@ -204,7 +138,7 @@ fun SearchScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 isFollowing = user.isFollowing,
                                 onActionItemClick = {
-                                    viewModel.onEvent(SearchEvent.ToggleFollow(user.userId))
+                                    viewModel.onEvent(SearchEvent.OnToggleFollow(user.userId))
                                 },
                                 onItemClick = {
                                     keyboardController?.hide()
@@ -216,8 +150,7 @@ fun SearchScreen(
                 }
                 ConnectivityBanner(
                     networkState = networkState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
+                    modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
         }
@@ -226,5 +159,88 @@ fun SearchScreen(
                 modifier = Modifier.align(Center)
             )
         }
+    }
+}
+
+@Composable
+private fun SearchHeader(
+    state: StandardTextFieldState,
+    onNavigateUp: () -> Unit,
+    focusRequester: FocusRequester,
+    onQueryChanged: (String) -> Unit,
+    onClearSearch: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = SpaceMedium, end = SpaceSmall),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = onNavigateUp
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_back),
+                contentDescription = stringResource(R.string.navigate_back),
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.size(IconSizeSmall)
+            )
+        }
+        Spacer(modifier = Modifier.width(SpaceSmall))
+        StandardSearchField(
+            query = state.text,
+            onQueryChanged = onQueryChanged,
+            focusRequester = focusRequester,
+            placeholderText = stringResource(id = R.string.search_for_user),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.size(IconSizeSmall)
+                )
+            },
+            trailingIcon = {
+                if(state.text.isNotEmpty()) {
+                    IconButton(
+                        onClick = onClearSearch
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_cancel),
+                            contentDescription = stringResource(R.string.clear),
+                            tint = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.size(IconSizeSmall)
+                        )
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun NoResultsFound(
+    composition: LottieComposition?,
+    progress: Float
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = SpaceLargeExtra),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LottieAnimation(
+            modifier = Modifier.size(LottieIconSize),
+            composition = composition,
+            progress = { progress }
+        )
+        Text(
+            text = stringResource(R.string.no_user_found),
+            style = Typography.labelSmall,
+            textAlign = TextAlign.Center
+        )
     }
 }

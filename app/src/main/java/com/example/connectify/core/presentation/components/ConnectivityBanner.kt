@@ -47,9 +47,7 @@ fun ConnectivityBanner(
     modifier: Modifier = Modifier
 ) {
 
-    var showBanner by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var showBanner by rememberSaveable { mutableStateOf(false) }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.internet))
     val progress by animateLottieCompositionAsState(
@@ -57,7 +55,7 @@ fun ConnectivityBanner(
         iterations = LottieConstants.IterateForever
     )
 
-    val message = when (networkState) {
+    val message = when(networkState) {
         NetworkConnectionState.Available -> stringResource(R.string.back_online)
         NetworkConnectionState.Unavailable -> stringResource(R.string.no_internet_connection)
     }
@@ -69,7 +67,7 @@ fun ConnectivityBanner(
     LaunchedEffect(networkState) {
         if(networkState == NetworkConnectionState.Unavailable) {
             showBanner = true
-        }else if (networkState == NetworkConnectionState.Available) {
+        } else if(networkState == NetworkConnectionState.Available) {
             delay(2000)
             showBanner = false
         }
@@ -95,9 +93,7 @@ fun ConnectivityBanner(
                 LottieAnimation(
                     modifier = Modifier.size(IconSizeMediumSmall),
                     composition = composition,
-                    progress = {
-                        progress
-                    },
+                    progress = { progress }
                 )
                 Spacer(modifier = Modifier.width(SpaceSmall))
                 Text(

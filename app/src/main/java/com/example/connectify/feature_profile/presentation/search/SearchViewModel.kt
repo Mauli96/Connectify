@@ -47,10 +47,10 @@ class SearchViewModel @Inject constructor(
 
     fun onEvent(event: SearchEvent) {
         when(event) {
-            is SearchEvent.Query -> {
+            is SearchEvent.OnQuery -> {
                 searchUser(event.query)
             }
-            is SearchEvent.ToggleFollow -> {
+            is SearchEvent.OnToggleFollow -> {
                 toggleFollowStateForUser(event.userId)
             }
             is SearchEvent.OnToggleSearch -> {
@@ -122,13 +122,9 @@ class SearchViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _searchFieldState.update {
-                        it.copy(
-                            error = SearchError(
-                                message = result.uiText ?: UiText.unknownError()
-                            )
-                        )
-                    }
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(result.uiText ?: UiText.unknownError())
+                    )
                     _state.update {
                         it.copy(
                             isLoading = false

@@ -37,7 +37,7 @@ class KtorRealtimeMessagingClient(
         }
         return flow {
             session = client.webSocketSession {
-                url("ws://192.168.0.102:8001/api/chat/websocket")
+                url("ws://192.168.0.103:8001/api/chat/websocket")
                 headers.append("Authorization", "Bearer $token")
             }
             val wsServerMessage = session!!

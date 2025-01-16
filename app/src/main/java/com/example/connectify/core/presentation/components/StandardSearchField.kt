@@ -28,7 +28,7 @@ fun StandardSearchField(
     placeholderText: String,
     focusRequester: FocusRequester,
     leadingIcon: (@Composable () -> Unit)? = null,
-    trailingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null
 ) {
 
     BasicTextField(
@@ -44,8 +44,8 @@ fun StandardSearchField(
             .height(40.dp)
             .focusRequester(focusRequester = focusRequester)
             .background(
-                MaterialTheme.colorScheme.onBackground,
-                MaterialTheme.shapes.medium
+                color = MaterialTheme.colorScheme.onBackground,
+                shape = MaterialTheme.shapes.medium
             ),
         decorationBox = { innerTextField ->
             Row(
@@ -57,7 +57,9 @@ fun StandardSearchField(
                     leadingIcon()
                     Spacer(modifier = Modifier.width(10.dp))
                 }
-                Box(Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
                     if(query.isEmpty()) {
                         Text(
                             text = placeholderText,
