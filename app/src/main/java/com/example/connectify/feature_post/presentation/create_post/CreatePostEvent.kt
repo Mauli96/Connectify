@@ -2,11 +2,11 @@ package com.example.connectify.feature_post.presentation.create_post
 
 import android.net.Uri
 
-sealed class CreatePostEvent {
-    data class EnterDescription(val value: String): CreatePostEvent()
-    data class PickImage(val uri: Uri?): CreatePostEvent()
-    data class CropImage(val uri: Uri?): CreatePostEvent()
-    object OnNavigatingToCrop: CreatePostEvent()
-    object OnNavigatingToBackFromCrop: CreatePostEvent()
-    object PostImage: CreatePostEvent()
+sealed interface CreatePostEvent {
+    data class OnEnterDescription(val value: String): CreatePostEvent
+    data class OnPickImage(val uri: Uri?): CreatePostEvent
+    data class OnCropImage(val uri: Uri?): CreatePostEvent
+    data object OnNavigatingToCrop: CreatePostEvent
+    data object OnNavigatingToBackFromCrop: CreatePostEvent
+    data object OnPostImage: CreatePostEvent
 }

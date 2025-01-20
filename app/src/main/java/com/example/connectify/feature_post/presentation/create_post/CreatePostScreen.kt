@@ -2,11 +2,13 @@ package com.example.connectify.feature_post.presentation.create_post
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,12 +28,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -50,10 +53,12 @@ import coil.compose.AsyncImage
 import com.example.connectify.R
 import com.example.connectify.core.presentation.components.ConnectivityBanner
 import com.example.connectify.core.presentation.components.CustomCircularProgressIndicator
+import com.example.connectify.core.presentation.components.PulsatingLoadingText
 import com.example.connectify.core.presentation.components.StandardOutlinedTextField
 import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.crop_image.cropview.CropType
 import com.example.connectify.core.presentation.ui.theme.DarkGray
+import com.example.connectify.core.presentation.ui.theme.GreenAccent
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
 import com.example.connectify.core.presentation.ui.theme.IconSizeSmall
 import com.example.connectify.core.presentation.ui.theme.SpaceLarge
@@ -67,7 +72,6 @@ import com.example.connectify.core.presentation.util.UiEvent
 import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_post.presentation.util.PostDescriptionError
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CreatePostScreen(
@@ -83,52 +87,31 @@ fun CreatePostScreen(
     val descriptionState by viewModel.descriptionState.collectAsStateWithLifecycle()
     val navigatorState by viewModel.navigationState.collectAsState()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        uri?.let {
+    val galleryLauncher = rememberImagePicker(
+        onImageSelected = { uri ->
             viewModel.onEvent(CreatePostEvent.OnNavigatingToCrop)
-            val encodedUri = Uri.encode(uri.toString())
-            navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.POST_PICTURE.name}") {
-                launchSingleTop = true
-                popUpTo(Screen.CreatePostScreen.route) {
-                    saveState = true
-                }
-            }
+            navigateToCropScreen(navController, uri)
         }
-    }
+    )
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(key1 = navController) {
-        val observer = LifecycleEventObserver { _, event ->
-            if(event == Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(CreatePostEvent.OnNavigatingToBackFromCrop)
-                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")?.let { encodedUri ->
-                    try {
-                        val decodedUri = Uri.parse(Uri.decode(encodedUri))
-                        viewModel.onEvent(CreatePostEvent.CropImage(decodedUri))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+    HandleNavigationResults(
+        navController = navController,
+        lifecycleOwner = lifecycleOwner,
+        viewModel = viewModel,
+        onImageCropped = { uri ->
+            viewModel.onEvent(CreatePostEvent.OnCropImage(uri))
         }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")
-        }
-    }
+    )
 
     ObserveAsEvents(viewModel.eventFlow) { event ->
         when(event) {
             is UiEvent.ShowSnackbar -> {
+                keyboardController?.hide()
                 snackbarHostState.showSnackbar(
                     message = event.uiText.asString(context)
                 )
@@ -137,12 +120,6 @@ fun CreatePostScreen(
                 onNavigate(event.route)
             }
             else -> {}
-        }
-    }
-
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-
         }
     }
 
@@ -155,45 +132,14 @@ fun CreatePostScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                StandardToolbar(
+                CreatePostToolbar(
                     onNavigateUp = onNavigateUp,
-                    showClose = true,
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.create_a_new_post),
-                            style = Typography.titleLarge
-                        )
-                    },
-                    navActions = {
-                        Button(
-                            onClick = {
-                                keyboardController?.hide()
-                                viewModel.onEvent(CreatePostEvent.PostImage)
-                            },
-                            modifier = Modifier
-                                .padding(end = SpaceMedium)
-                                .height(30.dp),
-                            contentPadding = PaddingValues(horizontal = SpaceSmall, vertical = 0.dp)
-                        ) {
-                            if(state.isPosting) {
-                                CustomCircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(IconSizeSmall)
-                                )
-                            } else {
-                                Text(
-                                    text = stringResource(id = R.string.post),
-                                    style = Typography.labelMedium
-                                        .withSize(15.sp)
-                                        .withColor(DarkGray)
-                                )
-                            }
-                        }
-                    }
+                    isPosting = state.isPosting,
+                    onPost = { viewModel.onEvent(CreatePostEvent.OnPostImage) }
                 )
+
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Column(
                         modifier = Modifier
@@ -241,7 +187,7 @@ fun CreatePostScreen(
                         StandardOutlinedTextField(
                             text = descriptionState.text,
                             onValueChange = {
-                                viewModel.onEvent(CreatePostEvent.EnterDescription(it))
+                                viewModel.onEvent(CreatePostEvent.OnEnterDescription(it))
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = false,
@@ -257,11 +203,108 @@ fun CreatePostScreen(
                     }
                     ConnectivityBanner(
                         networkState = networkState,
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
+                        modifier = Modifier.align(Alignment.TopCenter)
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun rememberImagePicker(
+    onImageSelected: (Uri) -> Unit
+): ActivityResultLauncher<PickVisualMediaRequest> {
+    return rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let(onImageSelected)
+    }
+}
+
+@Composable
+private fun HandleNavigationResults(
+    navController: NavHostController,
+    lifecycleOwner: LifecycleOwner,
+    viewModel: CreatePostViewModel,
+    onImageCropped: (Uri) -> Unit
+) {
+    DisposableEffect(key1 = navController) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.onEvent(CreatePostEvent.OnNavigatingToBackFromCrop)
+                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")?.let { encodedUri ->
+                    try {
+                        val decodedUri = Uri.parse(Uri.decode(encodedUri))
+                        onImageCropped(decodedUri)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")
+        }
+    }
+}
+
+@Composable
+private fun CreatePostToolbar(
+    onNavigateUp: () -> Unit,
+    isPosting: Boolean,
+    onPost: () -> Unit
+) {
+    StandardToolbar(
+        onNavigateUp = onNavigateUp,
+        showClose = true,
+        title = {
+            Text(
+                text = stringResource(id = R.string.create_a_new_post),
+                style = Typography.titleLarge
+            )
+        },
+        navActions = {
+            if(isPosting) {
+                CustomCircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(end = SpaceMedium)
+                        .size(IconSizeSmall)
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.post),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = GreenAccent
+                    ),
+                    modifier = Modifier
+                        .padding(end = SpaceSmall)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    onPost()
+                                }
+                            )
+                        }
+                )
+            }
+        }
+    )
+}
+
+private fun navigateToCropScreen(
+    navController: NavHostController,
+    uri: Uri
+) {
+    val encodedUri = Uri.encode(uri.toString())
+    navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.POST_PICTURE.name}") {
+        launchSingleTop = true
+        popUpTo(Screen.CreatePostScreen.route) {
+            saveState = true
         }
     }
 }

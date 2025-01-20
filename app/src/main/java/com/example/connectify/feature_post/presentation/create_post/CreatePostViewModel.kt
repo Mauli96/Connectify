@@ -42,8 +42,7 @@ class CreatePostViewModel @Inject constructor(
     private val _descriptionState = MutableStateFlow(StandardTextFieldState())
     val descriptionState = _descriptionState.asStateFlow()
 
-    val networkState: StateFlow<NetworkConnectionState> =
-        connectivityObserver.networkConnection
+    val networkState: StateFlow<NetworkConnectionState> = connectivityObserver.networkConnection
             .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
 
     private val _eventFlow = Channel<UiEvent>()
@@ -51,21 +50,21 @@ class CreatePostViewModel @Inject constructor(
 
     fun onEvent(event: CreatePostEvent) {
         when(event) {
-            is CreatePostEvent.EnterDescription -> {
+            is CreatePostEvent.OnEnterDescription -> {
                 _descriptionState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is CreatePostEvent.PickImage -> {
+            is CreatePostEvent.OnPickImage -> {
                 _state.update {
                     it.copy(
                         imageUri = event.uri
                     )
                 }
             }
-            is CreatePostEvent.CropImage -> {
+            is CreatePostEvent.OnCropImage -> {
                 _state.update {
                     it.copy(
                         imageUri = event.uri
@@ -78,7 +77,7 @@ class CreatePostViewModel @Inject constructor(
             is CreatePostEvent.OnNavigatingToBackFromCrop -> {
                 _navigationState.value = false
             }
-            is CreatePostEvent.PostImage -> {
+            is CreatePostEvent.OnPostImage -> {
                 postImage()
             }
         }
@@ -98,7 +97,7 @@ class CreatePostViewModel @Inject constructor(
             when(result) {
                 is Resource.Success ->{
                     try {
-                        notificationManager.notify(1, notificationBuilder.build())
+                        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
                     } catch(e: SecurityException) {
                         _eventFlow.send(UiEvent.ShowSnackbar(
                             uiText = UiText.StringResource(R.string.notification_permission_denied)
@@ -129,5 +128,9 @@ class CreatePostViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val NOTIFICATION_ID = 1
     }
 }
