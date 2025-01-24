@@ -13,10 +13,14 @@ import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.example.connectify.core.data.connectivity.AndroidConnectivityObserver
 import com.example.connectify.core.data.connectivity.ConnectivityObserver
+import com.example.connectify.core.data.repository.ImageRepositoryImpl
+import com.example.connectify.core.domain.repository.ImageRepository
 import com.example.connectify.core.domain.repository.ProfileRepository
 import com.example.connectify.core.domain.use_case.GetOwnProfilePictureUseCase
 import com.example.connectify.core.domain.use_case.GetOwnUserIdUseCase
 import com.example.connectify.core.domain.use_case.GetPostDownloadUrlUseCase
+import com.example.connectify.core.domain.use_case.LoadImageUseCase
+import com.example.connectify.core.domain.use_case.CompressImageUseCase
 import com.example.connectify.core.util.CommentLiker
 import com.example.connectify.core.util.Constants
 import com.example.connectify.core.util.DefaultCommentLiker
@@ -145,5 +149,26 @@ object AppModule {
     @Singleton
     fun provideGetPostDownloadUrlUseCase(postRepository: PostRepository): GetPostDownloadUrlUseCase {
         return GetPostDownloadUrlUseCase(postRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageRepository(
+        @ApplicationContext context: Context,
+        imageLoader: ImageLoader
+    ): ImageRepository {
+        return ImageRepositoryImpl(context, imageLoader)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoadImageUseCase(repository: ImageRepository): LoadImageUseCase {
+        return LoadImageUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCompressImageUseCase(repository: ImageRepository): CompressImageUseCase {
+        return CompressImageUseCase(repository)
     }
 }

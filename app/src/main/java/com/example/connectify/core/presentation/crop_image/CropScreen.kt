@@ -1,7 +1,8 @@
 package com.example.connectify.core.presentation.crop_image
 
-import android.app.Activity
 import android.net.Uri
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,11 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,7 +41,6 @@ import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceMediumLarge
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
-import kotlinx.coroutines.launch
 
 @Composable
 fun CropScreen(
@@ -53,9 +51,6 @@ fun CropScreen(
 
     lateinit var imageCrop: ImageCrop
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current as Activity
-    val scope = rememberCoroutineScope()
-    viewModel.getBitmapFromUrl(context)
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -63,45 +58,13 @@ fun CropScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            StandardToolbar(
-                onNavigateUp = onClose,
-                showClose = true,
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.move_and_scale),
-                        style = Typography.titleLarge
-                    )
-                },
-                navActions = {
-                    if(state.isSavingMedia) {
-                        CustomCircularProgressIndicator(
-                            modifier = Modifier
-                                .padding(end = SpaceSmall)
-                                .size(IconSizeSmall)
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.apply),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                color = GreenAccent
-                            ),
-                            modifier = Modifier
-                                .padding(end = SpaceSmall)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            viewModel.onEvent(CropEvents.CropImageBitmap(imageCrop.onCrop()))
-                                            scope.launch {
-                                                state.cropImageBitmap?.let { bm ->
-                                                    viewModel.saveMediaToStorage(bm) { uri ->
-                                                        onNavigateUp(Uri.encode(uri.toString()))
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    )
-                                }
-                        )
+            CropToolbar(
+                isSaving = state.isSavingMedia,
+                onClose = onClose,
+                onApply = {
+                    viewModel.onEvent(CropEvents.OnCropImageBitmap(imageCrop.onCrop()))
+                    viewModel.saveImage { uri ->
+                        onNavigateUp(Uri.encode(uri.toString()))
                     }
                 }
             )
@@ -145,52 +108,125 @@ fun CropScreen(
             }
         }
 
-        Row(
+        CropControls(
+            currentCropType = state.cropType,
+            onCropTypeChanged = { newType ->
+                viewModel.onEvent(CropEvents.OnChangeCropType(newType))
+                if(newType == CropType.RESET_PICTURE) {
+                    imageCrop.resetView()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .padding(
                     start = SpaceMedium,
                     end = SpaceMedium
-                ),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            ItemIcon(
-                painterResource(id = R.drawable.ic_full_crop),
-                description = stringResource(R.string.full_crop),
-                cropType = CropType.FULL_PICTURE,
-                currentCropType = state.cropType
-            ) {
-                viewModel.onEvent(CropEvents.ChangeCropType(CropType.FULL_PICTURE))
-            }
+                )
+        )
+    }
+}
 
-            ItemIcon(
-                painter = painterResource(id = R.drawable.ic_post_crop),
-                description = stringResource(R.string.post_crop),
-                cropType = CropType.POST_PICTURE,
-                currentCropType = state.cropType
-            ) {
-                viewModel.onEvent(CropEvents.ChangeCropType(CropType.POST_PICTURE))
-            }
-
-            ItemIcon(
-                painter = painterResource(id = R.drawable.ic_profile_crop),
-                description = stringResource(R.string.profile_crop),
-                cropType = CropType.PROFILE_PICTURE,
-                currentCropType = state.cropType
-            ) {
-                viewModel.onEvent(CropEvents.ChangeCropType(CropType.PROFILE_PICTURE))
-            }
-
-            ItemIcon(
-                painterResource(id = R.drawable.ic_reset),
-                description = stringResource(R.string.reset_crop),
-                cropType = CropType.RESET_PICTURE,
-                currentCropType = state.cropType
-            ) {
-                viewModel.onEvent(CropEvents.ChangeCropType(CropType.RESET_PICTURE))
-                imageCrop.resetView()
+@Composable
+private fun CropToolbar(
+    isSaving: Boolean,
+    onClose: () -> Unit,
+    onApply: () -> Unit
+) {
+    StandardToolbar(
+        onNavigateUp = onClose,
+        showClose = true,
+        title = {
+            Text(
+                text = stringResource(id = R.string.move_and_scale),
+                style = Typography.titleLarge
+            )
+        },
+        navActions = {
+            if(isSaving) {
+                CustomCircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(end = SpaceMedium)
+                        .size(IconSizeSmall)
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.apply),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = GreenAccent
+                    ),
+                    modifier = Modifier
+                        .padding(end = SpaceSmall)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    onApply()
+                                }
+                            )
+                        }
+                )
             }
         }
+    )
+}
+
+@Composable
+private fun CropControls(
+    modifier: Modifier,
+    currentCropType: CropType,
+    onCropTypeChanged: (CropType) -> Unit
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        CropControlItem(
+            iconRes = R.drawable.ic_full_crop,
+            description = R.string.full_crop,
+            cropType = CropType.FULL_PICTURE,
+            currentCropType = currentCropType,
+            onCropTypeChanged = onCropTypeChanged
+        )
+
+        CropControlItem(
+            iconRes = R.drawable.ic_post_crop,
+            description = R.string.post_crop,
+            cropType = CropType.POST_PICTURE,
+            currentCropType = currentCropType,
+            onCropTypeChanged = onCropTypeChanged
+        )
+
+        CropControlItem(
+            iconRes = R.drawable.ic_profile_crop,
+            description = R.string.profile_crop,
+            cropType = CropType.PROFILE_PICTURE,
+            currentCropType = currentCropType,
+            onCropTypeChanged = onCropTypeChanged
+        )
+
+        CropControlItem(
+            iconRes = R.drawable.ic_reset,
+            description = R.string.reset_crop,
+            cropType = CropType.RESET_PICTURE,
+            currentCropType = currentCropType,
+            onCropTypeChanged = onCropTypeChanged
+        )
     }
+}
+
+@Composable
+private fun CropControlItem(
+    @DrawableRes iconRes: Int,
+    @StringRes description: Int,
+    cropType: CropType,
+    currentCropType: CropType,
+    onCropTypeChanged: (CropType) -> Unit
+) {
+    ItemIcon(
+        painter = painterResource(id = iconRes),
+        description = stringResource(description),
+        cropType = cropType,
+        currentCropType = currentCropType,
+        onClick = { onCropTypeChanged(cropType) }
+    )
 }

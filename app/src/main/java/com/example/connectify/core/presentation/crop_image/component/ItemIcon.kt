@@ -65,7 +65,5 @@ fun ItemIcon(
         } else {
             Box(modifier = Modifier.size(SpaceSmall))
         }
-
     }
-
 }
