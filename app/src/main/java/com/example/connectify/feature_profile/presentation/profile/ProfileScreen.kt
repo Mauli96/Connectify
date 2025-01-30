@@ -24,11 +24,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -55,6 +57,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -88,6 +91,8 @@ import com.example.connectify.core.util.sendSharePostIntent
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.presentation.profile.components.BannerSection
 import com.example.connectify.feature_profile.presentation.profile.components.ProfileHeaderSection
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +103,7 @@ fun ProfileScreen(
     onNavigateUp: () -> Unit = {},
     onLogout: () -> Unit = {},
     profilePictureSize: Dp = ProfilePictureSizeLarge,
-    viewModel: ProfileViewModel = hiltViewModel(),
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -110,13 +115,9 @@ fun ProfileScreen(
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
 
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val focusRequester = remember {
-        FocusRequester()
-    }
+    val focusRequester = remember { FocusRequester() }
 
     val iconHorizontalCenterLength =
         (LocalConfiguration.current.screenWidthDp.dp.toPx() / 4f -
@@ -193,8 +194,7 @@ fun ProfileScreen(
             .nestedScroll(nestedScrollConnection)
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             state = lazyListState
         ) {
             item {
@@ -225,7 +225,7 @@ fun ProfileScreen(
                             onNavigate(Screen.FollowerScreen.route + "/${profile.userId}")
                         },
                         onFollowClick = {
-                            viewModel.onEvent(ProfileEvent.ToggleFollowStateForUser(profile.userId))
+                            viewModel.onEvent(ProfileEvent.OnToggleFollowStateForUser(profile.userId))
                         },
                         onMessageClick = {
                             val encodedProfilePictureUrl = Base64.encodeToString(profile.profilePictureUrl.encodeToByteArray(), 0)
@@ -241,26 +241,10 @@ fun ProfileScreen(
             }
             if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                 item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = SpaceLarge),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        LottieAnimation(
-                            modifier = Modifier.size(LottieIconSize),
-                            composition = composition,
-                            progress = {
-                                progress
-                            },
-                        )
-                        Text(
-                            text = stringResource(R.string.no_posts_for_profile),
-                            style = Typography.labelSmall,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    EmptyProfileContent(
+                        composition = composition,
+                        progress = progress
+                    )
                 }
             } else {
                 items(
@@ -279,26 +263,26 @@ fun ProfileScreen(
                         post = post,
                         imageLoader = imageLoader,
                         onLikeClick = {
-                            viewModel.onEvent(ProfileEvent.LikedPost(post.id))
+                            viewModel.onEvent(ProfileEvent.OnLikedPost(post.id))
                         },
                         onCommentClick = {
-                            viewModel.onEvent(ProfileEvent.SelectPostId(post.id))
-                            viewModel.onEvent(ProfileEvent.ShowBottomSheet)
-                            viewModel.onEvent(ProfileEvent.LoadComments)
+                            viewModel.onEvent(ProfileEvent.OnSelectPostId(post.id))
+                            viewModel.onEvent(ProfileEvent.OnShowBottomSheet)
+                            viewModel.onEvent(ProfileEvent.OnLoadComments)
                         },
                         onShareClick = {
                             context.sendSharePostIntent(post.id)
                         },
                         onSaveClick = {
-                            viewModel.onEvent(ProfileEvent.SavePost(post.id))
+                            viewModel.onEvent(ProfileEvent.OnSavePost(post.id))
                         },
                         onLikedByClick = {
                             onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                         },
                         onMoreItemClick = {
-                            viewModel.onEvent(ProfileEvent.SelectPostId(post.id))
-                            viewModel.onEvent(ProfileEvent.SelectPostUsername(post.username, post.isOwnPost))
-                            viewModel.onEvent(ProfileEvent.ShowDeleteSheet)
+                            viewModel.onEvent(ProfileEvent.OnSelectPostId(post.id))
+                            viewModel.onEvent(ProfileEvent.OnSelectPostUsername(post.username, post.isOwnPost))
+                            viewModel.onEvent(ProfileEvent.OnShowDeleteSheet)
                         },
                         isDescriptionVisible = state.isDescriptionVisible[post.id] ?: false,
                         onDescriptionToggle = {
@@ -322,8 +306,7 @@ fun ProfileScreen(
             }
         }
         Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
+            modifier = Modifier.align(Alignment.TopCenter)
         ) {
             state.profile?.let { profile ->
                 BannerSection(
@@ -355,12 +338,12 @@ fun ProfileScreen(
                     shouldShowLinkedIn = !profile.linkedInUrl.isNullOrBlank(),
                     bannerUrl = profile.bannerUrl,
                     isOwnProfile = profile.isOwnProfile,
-                    expanded = state.isDropdownMenuVisible,
+                    isDropdownMenuVisible = state.isDropdownMenuVisible,
                     onShowDropDownMenu = {
-                        viewModel.onEvent(ProfileEvent.ShowDropDownMenu)
+                        viewModel.onEvent(ProfileEvent.OnShowDropDownMenu)
                     },
                     onDismissDropdownMenu = {
-                        viewModel.onEvent(ProfileEvent.DisMissDropDownMenu)
+                        viewModel.onEvent(ProfileEvent.OnDisMissDropDownMenu)
                     },
                     onGitHubClick = {
                         context.openUrlInBrowser(profile.gitHubUrl ?: return@BannerSection)
@@ -378,11 +361,9 @@ fun ProfileScreen(
                         onNavigate(Screen.SavedPostScreen.route)
                     },
                     onLogoutClick = {
-                        viewModel.onEvent(ProfileEvent.ShowLogoutDialog)
+                        viewModel.onEvent(ProfileEvent.OnShowLogoutDialog)
                     },
-                    onNavigateUp = {
-                        onNavigateUp()
-                    }
+                    onNavigateUp = onNavigateUp
                 )
                 AsyncImage(
                     model = profile.profilePictureUrl,
@@ -429,78 +410,26 @@ fun ProfileScreen(
                 showDownloadOption = true,
                 showDeleteOption = state.isOwnPost == true,
                 onDismissRequest = {
-                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.OnDismissDeleteSheet)
                 },
                 onDownloadClick = {
-                    viewModel.onEvent(ProfileEvent.DownloadPost)
-                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.OnDownloadPost)
+                    viewModel.onEvent(ProfileEvent.OnDismissDeleteSheet)
                 },
                 onDeleteClick = {
-                    viewModel.onEvent(ProfileEvent.DeletePost)
-                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.OnDeletePost)
+                    viewModel.onEvent(ProfileEvent.OnDismissDeleteSheet)
                 },
                 onCancelClick = {
-                    viewModel.onEvent(ProfileEvent.DismissDeleteSheet)
+                    viewModel.onEvent(ProfileEvent.OnDismissDeleteSheet)
                 }
             )
         }
         if(state.isLogoutDialogVisible) {
-            Dialog(
-                onDismissRequest = {
-                viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
-            }) {
-                Column(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.background,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .padding(SpaceMedium)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.log_out),
-                        style = Typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(SpaceSmall))
-                    Text(
-                        text = stringResource(id = R.string.log_out_of_your_account),
-                        style = Typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(SpaceLarge))
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.align(End)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.cancel),
-                            style = Typography.labelMedium,
-                            modifier = Modifier
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
-                                        }
-                                    )
-                                }
-                        )
-                        Spacer(modifier = Modifier.width(SpaceMedium))
-                        Text(
-                            text = stringResource(id = R.string.log_out),
-                            style = Typography.labelMedium.withColor(Color.Red),
-                            modifier = Modifier
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            viewModel.onEvent(ProfileEvent.DismissLogoutDialog)
-                                            viewModel.onEvent(ProfileEvent.Logout)
-                                            onLogout()
-                                        }
-                                    )
-                                }
-                        )
-                    }
-                }
-            }
+            LogoutDialog(
+                viewModel = viewModel,
+                onLogout = onLogout
+            )
         }
         ConnectivityBanner(
             networkState = networkState,
@@ -512,6 +441,31 @@ fun ProfileScreen(
                 modifier = Modifier.align(Center)
             )
         }
+    }
+}
+
+@Composable
+private fun EmptyProfileContent(
+    composition: LottieComposition?,
+    progress: Float
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = SpaceLarge),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = CenterHorizontally
+    ) {
+        LottieAnimation(
+            modifier = Modifier.size(LottieIconSize),
+            composition = composition,
+            progress = { progress },
+        )
+        Text(
+            text = stringResource(R.string.no_posts_for_profile),
+            style = Typography.labelSmall,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -533,7 +487,7 @@ fun CommentSheetContent(
             title = stringResource(R.string.comments),
             bottomSheetState = bottomSheetState,
             onDismissBottomSheet = {
-                viewModel.onEvent(ProfileEvent.DismissBottomSheet)
+                viewModel.onEvent(ProfileEvent.OnDismissBottomSheet)
             },
             imageLoader = imageLoader,
             items = pagingCommentState.items,
@@ -545,24 +499,24 @@ fun CommentSheetContent(
             },
             selectedFilter = state.commentFilter,
             onFilterSelected = { filterType ->
-                viewModel.onEvent(ProfileEvent.ChangeCommentFilter(filterType))
+                viewModel.onEvent(ProfileEvent.OnChangeCommentFilter(filterType))
             },
             isDropdownMenuExpanded = state.isFilterMenuVisible,
             onShowDropDownMenu = {
-                viewModel.onEvent(ProfileEvent.ShowFilterMenu)
+                viewModel.onEvent(ProfileEvent.OnShowFilterMenu)
             },
             onDismissDropdownMenu = {
-                viewModel.onEvent(ProfileEvent.DismissFilterMenu)
+                viewModel.onEvent(ProfileEvent.OnDismissFilterMenu)
             },
             keyExtractor = { comment ->
                 comment.id
             },
             textFieldState = commentTextFieldState,
             onValueChange = {
-                viewModel.onEvent(ProfileEvent.EnteredComment(it))
+                viewModel.onEvent(ProfileEvent.OnEnteredComment(it))
             },
             onSend = {
-                viewModel.onEvent(ProfileEvent.Comment)
+                viewModel.onEvent(ProfileEvent.OnComment)
             },
             ownProfilePicture = state.profilePicture ?: "",
             hint = stringResource(R.string.enter_a_comment),
@@ -575,19 +529,86 @@ fun CommentSheetContent(
                 context = context,
                 imageLoader = imageLoader,
                 onLikeClick = {
-                    viewModel.onEvent(ProfileEvent.LikedComment(comment.id))
+                    viewModel.onEvent(ProfileEvent.OnLikedComment(comment.id))
                 },
                 onLikedByClick = {
-                    viewModel.onEvent(ProfileEvent.NavigatedToPersonListScreen)
+                    viewModel.onEvent(ProfileEvent.OnNavigatedToPersonListScreen)
                     onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                 },
                 onLongPress = {
-                    viewModel.onEvent(ProfileEvent.SelectComment(comment.id))
+                    viewModel.onEvent(ProfileEvent.OnSelectComment(comment.id))
                 },
                 onDeleteClick = {
-                    viewModel.onEvent(ProfileEvent.DeleteComment)
+                    viewModel.onEvent(ProfileEvent.OnDeleteComment)
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun LogoutDialog(
+    viewModel: ProfileViewModel,
+    onLogout: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+
+    Dialog(
+        onDismissRequest = {
+            viewModel.onEvent(ProfileEvent.OnDismissLogoutDialog)
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.medium
+                )
+                .padding(SpaceMedium)
+        ) {
+            Text(
+                text = stringResource(id = R.string.log_out),
+                style = Typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(SpaceSmall))
+            Text(
+                text = stringResource(id = R.string.log_out_of_your_account),
+                style = Typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(SpaceMedium))
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.align(End)
+            ) {
+                TextButton(
+                    onClick = {
+                        viewModel.onEvent(ProfileEvent.OnDismissLogoutDialog)
+                    },
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                Spacer(modifier = Modifier.width(SpaceSmall))
+                TextButton(
+                    onClick = {
+                        viewModel.onEvent(ProfileEvent.OnDismissLogoutDialog)
+                        scope.launch {
+                            viewModel.onEvent(ProfileEvent.OnLogout)
+                            onLogout()
+                        }
+                    },
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.log_out),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.Red
+                    )
+                }
+            }
         }
     }
 }

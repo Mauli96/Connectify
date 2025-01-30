@@ -176,26 +176,26 @@ class ProfileViewModel @Inject constructor(
 
     fun onEvent(event: ProfileEvent) {
         when(event) {
-            is ProfileEvent.ToggleFollowStateForUser -> {
+            is ProfileEvent.OnToggleFollowStateForUser -> {
                 toggleFollowStateForUser(event.userId)
             }
-            is ProfileEvent.LikedPost -> {
+            is ProfileEvent.OnLikedPost -> {
                 toggleLikeForParent(
                     parentId = event.postId,
                     parentType = ParentType.Post.type
                 )
             }
-            is ProfileEvent.LikedComment -> {
+            is ProfileEvent.OnLikedComment -> {
                 toggleLikeForParent(
                     parentId = event.commentId,
                     parentType = ParentType.Comment.type
                 )
             }
-            is ProfileEvent.LoadComments -> {
+            is ProfileEvent.OnLoadComments -> {
                 loadInitialComments()
                 getOwnProfilePicture()
             }
-            is ProfileEvent.Comment -> {
+            is ProfileEvent.OnComment -> {
                 state.value.selectedPostId?.let { postId ->
                     createComment(
                         postId = postId,
@@ -203,7 +203,7 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
-            is ProfileEvent.EnteredComment -> {
+            is ProfileEvent.OnEnteredComment -> {
                 _commentTextFieldState.update {
                     it.copy(
                         text = event.comment,
@@ -211,17 +211,17 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
-            is ProfileEvent.SavePost -> {
+            is ProfileEvent.OnSavePost -> {
                 toggleSavePost(parentId = event.postId)
             }
-            is ProfileEvent.SelectPostId -> {
+            is ProfileEvent.OnSelectPostId -> {
                 _state.update {
                     it.copy(
                         selectedPostId = event.postId
                     )
                 }
             }
-            is ProfileEvent.SelectPostUsername -> {
+            is ProfileEvent.OnSelectPostUsername -> {
                 _state.update {
                     it.copy(
                         selectedPostUsername = event.postUsername,
@@ -229,29 +229,29 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
-            is ProfileEvent.DeletePost -> {
+            is ProfileEvent.OnDeletePost -> {
                 _state.value.selectedPostId?.let { postId ->
                     deletePost(postId)
                 }
             }
-            is ProfileEvent.DownloadPost -> {
+            is ProfileEvent.OnDownloadPost -> {
                 _state.value.selectedPostId?.let { postId ->
                     getPostDownloadUrl(postId)
                 }
             }
-            is ProfileEvent.SelectComment -> {
+            is ProfileEvent.OnSelectComment -> {
                 _state.update {
                     it.copy(
                         selectedCommentId = event.commentId
                     )
                 }
             }
-            is ProfileEvent.DeleteComment -> {
+            is ProfileEvent.OnDeleteComment -> {
                 state.value.selectedCommentId?.let { commentId ->
                     deleteComment(commentId)
                 }
             }
-            is ProfileEvent.ChangeCommentFilter -> {
+            is ProfileEvent.OnChangeCommentFilter -> {
                 _state.update {
                     it.copy(
                         commentFilter = event.filterType
@@ -259,70 +259,70 @@ class ProfileViewModel @Inject constructor(
                 }
                 loadInitialComments()
             }
-            is ProfileEvent.ShowDeleteSheet -> {
+            is ProfileEvent.OnShowDeleteSheet -> {
                 _state.update {
                     it.copy(
                         isDeleteSheetVisible = true
                     )
                 }
             }
-            is ProfileEvent.DismissDeleteSheet -> {
+            is ProfileEvent.OnDismissDeleteSheet -> {
                 _state.update {
                     it.copy(
                         isDeleteSheetVisible = false
                     )
                 }
             }
-            is ProfileEvent.ShowBottomSheet -> {
+            is ProfileEvent.OnShowBottomSheet -> {
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = true
                     )
                 }
             }
-            is ProfileEvent.DismissBottomSheet -> {
+            is ProfileEvent.OnDismissBottomSheet -> {
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = false
                     )
                 }
             }
-            is ProfileEvent.ShowFilterMenu -> {
+            is ProfileEvent.OnShowFilterMenu -> {
                 _state.update {
                     it.copy(
                         isFilterMenuVisible = true
                     )
                 }
             }
-            is ProfileEvent.DismissFilterMenu -> {
+            is ProfileEvent.OnDismissFilterMenu -> {
                 _state.update {
                     it.copy(
                         isFilterMenuVisible = false
                     )
                 }
             }
-            is ProfileEvent.ShowDropDownMenu -> {
+            is ProfileEvent.OnShowDropDownMenu -> {
                 _state.update {
                     it.copy(
                         isDropdownMenuVisible = true
                     )
                 }
             }
-            is ProfileEvent.DisMissDropDownMenu -> {
+            is ProfileEvent.OnDisMissDropDownMenu -> {
                 _state.update {
                     it.copy(
                         isDropdownMenuVisible = false
                     )
                 }
             }
-            is ProfileEvent.ShowLogoutDialog -> {
+            is ProfileEvent.OnShowLogoutDialog -> {
                 _state.update {
                     it.copy(
                         isLogoutDialogVisible = true
                     )
                 }
             }
-            is ProfileEvent.DismissLogoutDialog -> {
+            is ProfileEvent.OnDismissLogoutDialog -> {
                 _state.update {
                     it.copy(
                         isLogoutDialogVisible = false
@@ -339,7 +339,7 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
             }
-            is ProfileEvent.NavigatedToPersonListScreen -> {
+            is ProfileEvent.OnNavigatedToPersonListScreen -> {
                 _state.update {
                     it.copy(
                         isNavigatedToPersonListScreen = true
@@ -347,7 +347,7 @@ class ProfileViewModel @Inject constructor(
                 }
                 resetHasNavigatedWithDelay()
             }
-            is ProfileEvent.Logout -> {
+            is ProfileEvent.OnLogout -> {
                 profileUseCases.logout()
             }
         }

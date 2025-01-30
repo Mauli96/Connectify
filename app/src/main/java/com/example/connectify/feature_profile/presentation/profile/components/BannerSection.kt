@@ -1,5 +1,7 @@
 package com.example.connectify.feature_profile.presentation.profile.components
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -47,6 +50,13 @@ import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
 import com.example.connectify.core.util.toPx
 import com.example.connectify.feature_profile.domain.models.Skill
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+object BannerSectionConstants {
+    val DIVIDER_THICKNESS = 0.5.dp
+    val DROPDOWN_SHADOW = 20.dp
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +68,7 @@ fun BannerSection(
     leftIconModifier: Modifier = Modifier,
     rightIconModifier: Modifier = Modifier,
     bannerUrl: String? = null,
-    expanded: Boolean = false,
+    isDropdownMenuVisible: Boolean = false,
     onShowDropDownMenu: () -> Unit,
     onDismissDropdownMenu: () -> Unit,
     topSkills: List<Skill> = emptyList(),
@@ -72,7 +82,7 @@ fun BannerSection(
     onLogoutClick: () -> Unit = {},
     onGitHubClick: () -> Unit = {},
     onInstagramClick: () -> Unit = {},
-    onLinkedInClick: () -> Unit = {},
+    onLinkedInClick: () -> Unit = {}
 ) {
 
     BoxWithConstraints(
@@ -85,101 +95,15 @@ fun BannerSection(
             modifier = imageModifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.TopEnd)
-                .padding(end = SpaceSmall)
-        ) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    onDismissDropdownMenu()
-                },
-                modifier = Modifier
-                    .shadow(20.dp)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Spacer(modifier = Modifier.width(SpaceSmall))
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_edit),
-                                contentDescription = stringResource(id = R.string.edit_profile),
-                                modifier = Modifier.size(IconSizeSmall)
-                            )
-                            Spacer(modifier = Modifier.width(SpaceSmall))
-                            Text(
-                                text = stringResource(id = R.string.edit_profile),
-                                style = Typography.labelMedium
-                            )
-                            Spacer(modifier = Modifier.width(SpaceLarge))
-                        }
-                    },
-                    onClick = {
-                        onDismissDropdownMenu()
-                        onEditClick()
-                    }
-                )
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Spacer(modifier = Modifier.width(SpaceSmall))
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_unsave),
-                                contentDescription = stringResource(id = R.string.saved),
-                                modifier = Modifier.size(IconSizeSmall)
-                            )
-                            Spacer(modifier = Modifier.width(SpaceSmall))
-                            Text(
-                                text = stringResource(id = R.string.saved),
-                                style = Typography.labelMedium
-                            )
-                            Spacer(modifier = Modifier.width(SpaceLarge))
-                        }
-                    },
-                    onClick = {
-                        onDismissDropdownMenu()
-                        onSavedClick()
-                    }
-                )
-                HorizontalDivider(
-                    thickness = 0.5.dp,
-                    color = HintGray,
-                    modifier = Modifier.padding(start = SpaceMediumLarge)
-                )
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Spacer(modifier = Modifier.width(SpaceSmall))
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_logout),
-                                contentDescription = stringResource(id = R.string.log_out),
-                                modifier = Modifier.size(IconSizeSmall),
-                                tint = Color.Red
-                            )
-                            Spacer(modifier = Modifier.width(SpaceSmall))
-                            Text(
-                                text = stringResource(id = R.string.log_out),
-                                style = Typography.labelMedium.withColor(Color.Red)
-                            )
-                            Spacer(modifier = Modifier.width(SpaceLarge))
-                        }
-                    },
-                    onClick = {
-                        onDismissDropdownMenu()
-                        onLogoutClick()
-                    }
-                )
-            }
-        }
+
+        ProfileDropdownMenu(
+            expanded = isDropdownMenuVisible,
+            onDismiss = onDismissDropdownMenu,
+            onEditClick = onEditClick,
+            onSavedClick = onSavedClick,
+            onLogoutClick = onLogoutClick
+        )
+
         TopAppBar(
             title = { /*TODO*/ },
             navigationIcon = {
@@ -293,5 +217,99 @@ fun BannerSection(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ProfileDropdownMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    onEditClick: () -> Unit,
+    onSavedClick: () -> Unit,
+    onLogoutClick: () -> Unit
+) {
+
+    val scope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.TopEnd)
+            .padding(end = SpaceSmall)
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = onDismiss,
+            modifier = Modifier
+                .shadow(BannerSectionConstants.DROPDOWN_SHADOW)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            DropdownMenuItem(
+                text = { MenuItemContent(icon = R.drawable.ic_edit, text = R.string.edit_profile) },
+                onClick = {
+                    onDismiss()
+                    scope.launch {
+                        delay(50)
+                        onEditClick()
+                    }
+                }
+            )
+
+            DropdownMenuItem(
+                text = { MenuItemContent(icon = R.drawable.ic_unsave, text = R.string.saved) },
+                onClick = {
+                    onDismiss()
+                    scope.launch {
+                        delay(50)
+                        onSavedClick()
+                    }
+                }
+            )
+
+            HorizontalDivider(
+                thickness = BannerSectionConstants.DIVIDER_THICKNESS,
+                color = HintGray,
+                modifier = Modifier.padding(start = SpaceMediumLarge)
+            )
+
+            DropdownMenuItem(
+                text = {
+                    MenuItemContent(
+                        icon = R.drawable.ic_logout,
+                        text = R.string.log_out,
+                        tint = Color.Red
+                    )
+                },
+                onClick = {
+                    onDismiss()
+                    onLogoutClick()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun MenuItemContent(
+    @DrawableRes icon: Int,
+    @StringRes text: Int,
+    tint: Color = MaterialTheme.colorScheme.onBackground
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Spacer(modifier = Modifier.width(SpaceSmall))
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = stringResource(text),
+            modifier = Modifier.size(IconSizeSmall),
+            tint = tint
+        )
+        Spacer(modifier = Modifier.width(SpaceSmall))
+        Text(
+            text = stringResource(text),
+            style = Typography.labelMedium.withColor(tint)
+        )
+        Spacer(modifier = Modifier.width(SpaceLarge))
     }
 }

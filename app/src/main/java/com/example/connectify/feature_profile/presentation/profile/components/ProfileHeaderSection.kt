@@ -30,8 +30,7 @@ fun ProfileHeaderSection(
     onMessageClick: () -> Unit = {}
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(

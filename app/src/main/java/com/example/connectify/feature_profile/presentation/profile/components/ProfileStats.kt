@@ -47,17 +47,13 @@ fun ProfileStats(
             ProfileNumber(
                 number = user.followerCount,
                 text = stringResource(id = R.string.followers),
-                onClick = {
-                    onFollowerClick()
-                }
+                onClick = onFollowerClick
             )
             Spacer(modifier = Modifier.width(SpaceLarge))
             ProfileNumber(
                 number = user.followingCount,
                 text = stringResource(id = R.string.following),
-                onClick = {
-                    onFollowingClick()
-                }
+                onClick = onFollowingClick
             )
             Spacer(modifier = Modifier.width(SpaceLarge))
             ProfileNumber(
