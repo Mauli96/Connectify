@@ -2,6 +2,7 @@ package com.example.connectify.feature_profile.presentation.edit_profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -11,6 +12,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +40,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -44,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -68,9 +74,8 @@ import com.example.connectify.core.presentation.util.asString
 import com.example.connectify.core.util.Screen
 import com.example.connectify.feature_profile.presentation.edit_profile.components.Chip
 import com.example.connectify.feature_profile.presentation.util.EditProfileError
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.MainAxisAlignment
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditProfileScreen(
     snackbarHostState: SnackbarHostState,
@@ -88,75 +93,38 @@ fun EditProfileScreen(
     val instagramTextFieldState by viewModel.instagramTextFieldState.collectAsStateWithLifecycle()
     val linkedInTextFieldState by viewModel.linkedInTextFieldState.collectAsStateWithLifecycle()
     val bioState by viewModel.bioState.collectAsStateWithLifecycle()
-    val cropState by viewModel.cropState.collectAsState()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val cropState by viewModel.cropState.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
-    val bannerImageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        uri?.let {
+    val bannerImageLauncher = rememberImagePicker(
+        onImageSelected = { uri ->
             viewModel.onEvent(EditProfileEvent.OnNavigatingToCrop(CropType.FULL_PICTURE))
-            val encodedUri = Uri.encode(uri.toString())
-            navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.BANNER_PICTURE.name}") {
-                launchSingleTop = true
-                popUpTo(Screen.EditProfileScreen.route) {
-                    saveState = true
-                }
-            }
+            navigateToCropScreenWithBannerPicture(navController, uri)
         }
-    }
+    )
 
-    val profilePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        uri?.let {
+    val profilePictureLauncher = rememberImagePicker(
+        onImageSelected = { uri ->
             viewModel.onEvent(EditProfileEvent.OnNavigatingToCrop(CropType.PROFILE_PICTURE))
-            val encodedUri = Uri.encode(uri.toString())
-            navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.PROFILE_PICTURE.name}") {
-                launchSingleTop = true
-                popUpTo(Screen.EditProfileScreen.route) {
-                    saveState = true
-                }
-            }
+            navigateToCropScreenWithProfilePicture(navController, uri)
         }
-    }
+    )
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(key1 = navController) {
-        val observer = LifecycleEventObserver { _, event ->
-            if(event == Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(EditProfileEvent.OnNavigatingToBackFromCrop)
-                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")?.let { encodedUri ->
-                    try {
-                        val decodedUri = Uri.parse(Uri.decode(encodedUri))
-                        when(cropState.cropType) {
-                            CropType.PROFILE_PICTURE -> {
-                                viewModel.onEvent(EditProfileEvent.CropProfilePicture(decodedUri))
-                            }
-                            else -> {
-                                viewModel.onEvent(EditProfileEvent.CropBannerImage(decodedUri))
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")
-        }
-    }
+    HandleNavigationResults(
+        navController = navController,
+        lifecycleOwner = lifecycleOwner,
+        viewModel = viewModel,
+        cropState = cropState
+    )
 
     ObserveAsEvents(viewModel.eventFlow) { event ->
         when(event) {
             is UiEvent.ShowSnackbar -> {
+                keyboardController?.hide()
                 snackbarHostState.showSnackbar(
                     message = event.uiText.asString(context)
                 )
@@ -178,40 +146,10 @@ fun EditProfileScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                StandardToolbar(
+                EditProfileToolbar(
                     onNavigateUp = onNavigateUp,
-                    showBackArrow = true,
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.edit_your_profile),
-                            style = Typography.titleLarge
-                        )
-                    },
-                    navActions = {
-                        if(editProfileState.isUpdating) {
-                            CustomCircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(end = SpaceSmall)
-                                    .size(IconSizeSmall)
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(R.string.save),
-                                style = Typography.titleLarge.copy(
-                                    color = GreenAccent
-                                ),
-                                modifier = Modifier
-                                    .padding(end = SpaceSmall)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onTap = {
-                                                viewModel.onEvent(EditProfileEvent.UpdateProfile)
-                                            }
-                                        )
-                                    }
-                            )
-                        }
-                    }
+                    viewModel = viewModel,
+                    editProfileState = editProfileState
                 )
 
                 Box(
@@ -265,7 +203,7 @@ fun EditProfileScreen(
                                 },
                                 onValueChange = {
                                     viewModel.onEvent(
-                                        EditProfileEvent.EnteredUsername(it)
+                                        EditProfileEvent.OnEnteredUsername(it)
                                     )
                                 }
                             )
@@ -286,7 +224,7 @@ fun EditProfileScreen(
                                 },
                                 onValueChange = {
                                     viewModel.onEvent(
-                                        EditProfileEvent.EnteredGitHubUrl(it)
+                                        EditProfileEvent.OnEnteredGitHubUrl(it)
                                     )
                                 }
                             )
@@ -307,7 +245,7 @@ fun EditProfileScreen(
                                 },
                                 onValueChange = {
                                     viewModel.onEvent(
-                                        EditProfileEvent.EnteredInstagramUrl(it)
+                                        EditProfileEvent.OnEnteredInstagramUrl(it)
                                     )
                                 }
                             )
@@ -328,7 +266,7 @@ fun EditProfileScreen(
                                 },
                                 onValueChange = {
                                     viewModel.onEvent(
-                                        EditProfileEvent.EnteredLinkedInUrl(it)
+                                        EditProfileEvent.OnEnteredLinkedInUrl(it)
                                     )
                                 }
                             )
@@ -352,7 +290,7 @@ fun EditProfileScreen(
                                 minLines = 3,
                                 onValueChange = {
                                     viewModel.onEvent(
-                                        EditProfileEvent.EnteredBio(it)
+                                        EditProfileEvent.OnEnteredBio(it)
                                     )
                                 }
                             )
@@ -368,16 +306,15 @@ fun EditProfileScreen(
                             Spacer(modifier = Modifier.height(SpaceLarge))
                             FlowRow(
                                 modifier = Modifier.fillMaxWidth(),
-                                mainAxisAlignment = MainAxisAlignment.Center,
-                                mainAxisSpacing = SpaceMedium,
-                                crossAxisSpacing = SpaceMedium
+                                horizontalArrangement = Arrangement.spacedBy(SpaceMedium, Alignment.CenterHorizontally),
+                                verticalArrangement = Arrangement.spacedBy(SpaceMedium, Alignment.CenterVertically),
                             ) {
                                 editProfileState.skills.forEach { skill ->
                                     Chip(
                                         text = skill.name,
                                         selected = skill in viewModel.editProfileState.value.selectedSkills,
                                         onChipClick = {
-                                            viewModel.onEvent(EditProfileEvent.SetSkillSelected(skill))
+                                            viewModel.onEvent(EditProfileEvent.OnSetSkillSelected(skill))
                                         }
                                     )
                                 }
@@ -386,8 +323,7 @@ fun EditProfileScreen(
                     }
                     ConnectivityBanner(
                         networkState = networkState,
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
+                        modifier = Modifier.align(Alignment.TopCenter)
                     )
                 }
             }
@@ -441,5 +377,123 @@ fun BannerEditSection(
                     onProfilePictureClick()
                 }
         )
+    }
+}
+
+@Composable
+private fun EditProfileToolbar(
+    onNavigateUp: () -> Unit,
+    viewModel: EditProfileViewModel,
+    editProfileState: EditProfileState
+) {
+    StandardToolbar(
+        onNavigateUp = onNavigateUp,
+        showBackArrow = true,
+        title = {
+            Text(
+                text = stringResource(id = R.string.edit_your_profile),
+                style = Typography.titleLarge
+            )
+        },
+        navActions = {
+            if(editProfileState.isUpdating) {
+                CustomCircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(end = SpaceMedium)
+                        .size(IconSizeSmall)
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.save),
+                    style = Typography.titleLarge.copy(
+                        color = GreenAccent
+                    ),
+                    modifier = Modifier
+                        .padding(end = SpaceSmall)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    viewModel.onEvent(EditProfileEvent.OnUpdateProfile)
+                                }
+                            )
+                        }
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun HandleNavigationResults(
+    navController: NavHostController,
+    lifecycleOwner: LifecycleOwner,
+    viewModel: EditProfileViewModel,
+    cropState: CropPictureState
+) {
+    DisposableEffect(key1 = navController) {
+        val observer = LifecycleEventObserver { _, event ->
+            if(event == Lifecycle.Event.ON_RESUME) {
+                viewModel.onEvent(EditProfileEvent.OnNavigatingToBackFromCrop)
+                navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")?.let { encodedUri ->
+                    try {
+                        val decodedUri = Uri.parse(Uri.decode(encodedUri))
+                        when(cropState.cropType) {
+                            CropType.PROFILE_PICTURE -> {
+                                viewModel.onEvent(EditProfileEvent.OnCropProfilePicture(decodedUri))
+                            }
+                            else -> {
+                                viewModel.onEvent(EditProfileEvent.OnCropBannerImage(decodedUri))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("imageUri")
+        }
+    }
+}
+
+@Composable
+private fun rememberImagePicker(
+    onImageSelected: (Uri) -> Unit
+): ActivityResultLauncher<PickVisualMediaRequest> {
+    return rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let(onImageSelected)
+    }
+}
+
+private fun navigateToCropScreenWithBannerPicture(
+    navController: NavHostController,
+    uri: Uri
+) {
+    val encodedUri = Uri.encode(uri.toString())
+    navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.BANNER_PICTURE.name}") {
+        launchSingleTop = true
+        popUpTo(Screen.EditProfileScreen.route) {
+            saveState = true
+        }
+    }
+}
+
+private fun navigateToCropScreenWithProfilePicture(
+    navController: NavHostController,
+    uri: Uri
+) {
+    val encodedUri = Uri.encode(uri.toString())
+    navController.navigate("${Screen.CropScreen.route}/$encodedUri?cropType=${CropType.PROFILE_PICTURE.name}") {
+        launchSingleTop = true
+        popUpTo(Screen.EditProfileScreen.route) {
+            saveState = true
+        }
     }
 }

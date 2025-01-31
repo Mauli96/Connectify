@@ -70,56 +70,56 @@ class EditProfileViewModel @Inject constructor(
 
     fun onEvent(event: EditProfileEvent) {
         when(event) {
-            is EditProfileEvent.EnteredUsername -> {
+            is EditProfileEvent.OnEnteredUsername -> {
                 _usernameState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is EditProfileEvent.EnteredGitHubUrl -> {
+            is EditProfileEvent.OnEnteredGitHubUrl -> {
                 _githubTextFieldState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is EditProfileEvent.EnteredInstagramUrl -> {
+            is EditProfileEvent.OnEnteredInstagramUrl -> {
                 _instagramTextFieldState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is EditProfileEvent.EnteredLinkedInUrl -> {
+            is EditProfileEvent.OnEnteredLinkedInUrl -> {
                 _linkedInTextFieldState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is EditProfileEvent.EnteredBio -> {
+            is EditProfileEvent.OnEnteredBio -> {
                 _bioState.update {
                     it.copy(
                         text = event.value
                     )
                 }
             }
-            is EditProfileEvent.CropBannerImage -> {
+            is EditProfileEvent.OnCropBannerImage -> {
                 _editProfileState.update {
                     it.copy(
                         bannerUri = event.uri
                     )
                 }
             }
-            is EditProfileEvent.CropProfilePicture -> {
+            is EditProfileEvent.OnCropProfilePicture -> {
                 _editProfileState.update {
                     it.copy(
                         profileUri = event.uri
                     )
                 }
             }
-            is EditProfileEvent.SetSkillSelected -> {
+            is EditProfileEvent.OnSetSkillSelected -> {
                 val result = profileUseCases.setSkillUseCase(
                     selectedSkill = editProfileState.value.selectedSkills,
                     skillToToggle = event.skill
@@ -161,7 +161,7 @@ class EditProfileViewModel @Inject constructor(
                     )
                 }
             }
-            is EditProfileEvent.UpdateProfile -> {
+            is EditProfileEvent.OnUpdateProfile -> {
                 updateProfile()
             }
         }

@@ -432,14 +432,14 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun getProfile(userId: String) {
+    fun getProfile(userId: String?) {
         viewModelScope.launch {
             _state.update {
                 it.copy(
                     isLoading = true
                 )
             }
-            val result = profileUseCases.getProfile(userId = userId)
+            val result = profileUseCases.getProfile(userId = userId ?: getOwnUserId())
             when(result) {
                 is Resource.Success -> {
                     _state.update {
