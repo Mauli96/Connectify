@@ -1,5 +1,5 @@
 package com.example.connectify.feature_profile.presentation.follower
 
-sealed class FollowerEvent {
-    data class ToggleFollowStateForUser(val userId: String): FollowerEvent()
+sealed interface FollowerEvent {
+    data class OnToggleFollowStateForUser(val userId: String): FollowerEvent
 }

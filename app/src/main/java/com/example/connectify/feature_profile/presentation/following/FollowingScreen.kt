@@ -74,12 +74,10 @@ fun FollowingScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             StandardToolbar(
                 onNavigateUp = onNavigateUp,
@@ -92,8 +90,7 @@ fun FollowingScreen(
                 }
             )
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 if(state.users.isEmpty() && !state.isLoading) {
                     Column(
@@ -130,7 +127,7 @@ fun FollowingScreen(
                                     onNavigate(Screen.ProfileScreen.route + "?userId=${user.userId}")
                                 },
                                 onActionItemClick = {
-                                    viewModel.onEvent(FollowingEvent.ToggleFollowStateForUser(user.userId))
+                                    viewModel.onEvent(FollowingEvent.OnToggleFollowStateForUser(user.userId))
                                 },
                                 ownUserId = ownUserId
                             )
@@ -139,8 +136,7 @@ fun FollowingScreen(
                 }
                 ConnectivityBanner(
                     networkState = networkState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
+                    modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
         }

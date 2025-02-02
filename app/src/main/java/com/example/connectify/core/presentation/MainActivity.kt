@@ -3,9 +3,9 @@ package com.example.connectify.core.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
             }
         }
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             ConnectifyTheme {
                 Surface(
@@ -80,12 +79,13 @@ class MainActivity : ComponentActivity() {
                 )
             },
             modifier = Modifier.fillMaxSize()
-        ) {
+        ) { paddingValues ->
             Navigation(
                 navController = navController,
                 snackbarHostState = snackbarHostState,
                 imageLoader = imageLoader,
-                startDestination = startDestination
+                startDestination = startDestination,
+                modifier = Modifier.padding(paddingValues)
             )
         }
     }

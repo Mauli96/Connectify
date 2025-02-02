@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +43,7 @@ import com.example.connectify.core.presentation.components.StandardToolbar
 import com.example.connectify.core.presentation.ui.theme.LottieIconSize
 import com.example.connectify.core.presentation.ui.theme.SpaceLargeExtra
 import com.example.connectify.core.presentation.ui.theme.SpaceMedium
+import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.util.ObserveAsEvents
 import com.example.connectify.core.presentation.util.UiEvent
@@ -78,12 +81,10 @@ fun SavedPostScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             StandardToolbar(
                 onNavigateUp = onNavigateUp,
@@ -99,6 +100,7 @@ fun SavedPostScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(horizontal = SpaceSmall)
             ) {
                 if(pagingPostState.items.isEmpty() && !pagingPostState.isFirstLoading && !pagingPostState.isNextLoading) {
                     Column(
@@ -162,8 +164,7 @@ fun SavedPostScreen(
                 }
                 ConnectivityBanner(
                     networkState = networkState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
+                    modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
         }
@@ -188,6 +189,7 @@ fun PostImageItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp)
+            .clip(MaterialTheme.shapes.large)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {

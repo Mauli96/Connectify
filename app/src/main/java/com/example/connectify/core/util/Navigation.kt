@@ -10,6 +10,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -44,14 +45,16 @@ fun Navigation(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     imageLoader: ImageLoader,
-    startDestination: String
+    startDestination: String,
+    modifier: Modifier = Modifier
 ) {
 
     val animationDuration = 300
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
         composable(
             route = Screen.OnBoardingScreen.route,
@@ -340,6 +343,7 @@ fun Navigation(
             )
         ) {
             ProfileScreen(
+                userId = it.arguments?.getString("userId"),
                 onNavigate = navController::navigate,
                 onNavigateUp = navController::navigateUp,
                 onLogout = {

@@ -29,13 +29,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.connectify.R
 import com.example.connectify.core.presentation.ui.theme.GreenAccent
 import com.example.connectify.core.presentation.ui.theme.IconSizeMedium
-import com.example.connectify.core.presentation.ui.theme.SpaceMedium
 import com.example.connectify.core.presentation.ui.theme.SpaceSmall
 import com.example.connectify.core.presentation.ui.theme.Typography
 import com.example.connectify.core.presentation.ui.theme.withColor
@@ -54,6 +52,7 @@ fun CustomSnackbarHost(
         val successLoginText = stringResource(R.string.success_login)
         val createPostText = stringResource(R.string.post_created)
         val savePostText = stringResource(R.string.successfully_saved_post)
+        val updateProfileText = stringResource(R.string.updated_profile)
         val successDownload = stringResource(R.string.successfully_downloaded_post)
         val unSavePostText = stringResource(R.string.successfully_unsaved_post)
         val deletePostText = stringResource(R.string.successfully_deleted_post)
@@ -68,6 +67,7 @@ fun CustomSnackbarHost(
             message.contains(successRegisterationText, ignoreCase = true) ||
                     message.contains(successLoginText, ignoreCase = true) ||
                     message.contains(createPostText, ignoreCase = true) ||
+                    message.contains(updateProfileText, ignoreCase = true) ||
                     message.contains(savePostText, ignoreCase = true) ||
                     message.contains(successDownload, ignoreCase = true) -> R.raw.success
             message.contains(unSavePostText, ignoreCase = true) ||
@@ -82,13 +82,8 @@ fun CustomSnackbarHost(
     }
 ) {
 
-    val currentSnackbarData by rememberUpdatedState(
-        newValue = snackbarHostState.currentSnackbarData
-    )
-
-    var isVisible by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var isVisible by rememberSaveable { mutableStateOf(false) }
+    val currentSnackbarData by rememberUpdatedState(newValue = snackbarHostState.currentSnackbarData)
 
     LaunchedEffect(currentSnackbarData) {
         if(currentSnackbarData != null) {
@@ -115,7 +110,7 @@ fun CustomSnackbarHost(
             val showAction = snackbarData.visuals.message.contains(stringResource(R.string.successfully_saved_post), ignoreCase = true)
 
             Snackbar(
-                modifier = Modifier.padding(SpaceMedium),
+                modifier = Modifier.padding(SpaceSmall),
                 shape = MaterialTheme.shapes.medium,
                 containerColor = Color(0xff322f2f),
                 contentColor = MaterialTheme.colorScheme.onBackground,
@@ -128,9 +123,7 @@ fun CustomSnackbarHost(
                         LottieAnimation(
                             modifier = Modifier.size(IconSizeMedium),
                             composition = composition,
-                            progress = {
-                                progress
-                            }
+                            progress = { progress }
                         )
                         Text(
                             text = snackbarData.visuals.message,

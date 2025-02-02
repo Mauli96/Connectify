@@ -54,7 +54,7 @@ class FollowerViewModel @Inject constructor(
 
     fun onEvent(event: FollowerEvent) {
         when(event) {
-            is FollowerEvent.ToggleFollowStateForUser -> {
+            is FollowerEvent.OnToggleFollowStateForUser -> {
                 toggleFollowStateForUser(event.userId)
             }
         }

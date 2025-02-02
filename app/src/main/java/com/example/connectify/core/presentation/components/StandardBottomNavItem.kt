@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,14 +44,13 @@ fun RowScope.StandardBottomNavItem(
     onClick: () -> Unit
 ) {
 
-    if (alertCount != null && alertCount < 0) {
+    if(alertCount != null && alertCount < 0) {
         throw IllegalArgumentException("Alert count can't be negative")
     }
     val lineLength = animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = 300
-        ), label = ""
+        animationSpec = tween(durationMillis = 300),
+        label = "LineLengthAnimation"
     )
 
     NavigationBarItem(
@@ -72,17 +70,14 @@ fun RowScope.StandardBottomNavItem(
         icon = {
             Box(
                 modifier = Modifier
-                    .size(
-                        width = 40.dp,
-                        height = 50.dp
-                    )
+                    .size(width = 40.dp, height = 50.dp)
                     .padding(
                         start = SpaceSmall,
                         end = SpaceSmall,
                         bottom = SpaceMedium
                     )
                     .drawBehind {
-                        if (lineLength.value > 0f) {
+                        if(lineLength.value > 0f) {
                             drawLine(
                                 color = if (selected) selectedColor
                                 else unselectedColor,
@@ -100,7 +95,7 @@ fun RowScope.StandardBottomNavItem(
                         }
                     }
             ) {
-                if (icon != null) {
+                if(icon != null) {
                     Icon(
                         painter = icon,
                         contentDescription = contentDescription,
@@ -111,7 +106,7 @@ fun RowScope.StandardBottomNavItem(
                         else unselectedColor
                     )
                 }
-                if (alertCount != null) {
+                if(alertCount != null) {
                     val alertText = if (alertCount > 99) {
                         "99+"
                     } else {

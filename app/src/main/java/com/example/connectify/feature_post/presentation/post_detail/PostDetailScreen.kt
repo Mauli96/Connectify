@@ -67,14 +67,12 @@ fun PostDetailScreen(
     val commentState by viewModel.commentState.collectAsStateWithLifecycle()
     val profilePictureState by viewModel.profilePictureState.collectAsStateWithLifecycle()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val focusRequester = remember { FocusRequester() }
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    val context = LocalContext.current
-
-    val focusRequester = remember {
-        FocusRequester()
-    }
 
     ObserveAsEvents(viewModel.eventFlow) { event ->
         when(event) {
@@ -114,14 +112,11 @@ fun PostDetailScreen(
             ) {
                 item {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.background)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Spacer(modifier = Modifier.height(SpaceSmall))
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize()
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             Column(
                                 modifier = Modifier
@@ -136,9 +131,10 @@ fun PostDetailScreen(
                                         imageLoader = imageLoader,
                                         onUsernameClick = {
                                             onNavigate(Screen.ProfileScreen.route + "?userId=${post.userId}")
+                                            println("The post useId : ${post.userId}")
                                         },
                                         onLikeClick = {
-                                            viewModel.onEvent(PostDetailEvent.LikePost)
+                                            viewModel.onEvent(PostDetailEvent.OnLikePost)
                                         },
                                         onCommentClick = {
                                             context.showKeyboard()
@@ -148,14 +144,14 @@ fun PostDetailScreen(
                                             context.sendSharePostIntent(post.id)
                                         },
                                         onSaveClick = {
-                                            viewModel.onEvent(PostDetailEvent.SavePost(post.id))
+                                            viewModel.onEvent(PostDetailEvent.OnSavePost(post.id))
                                         },
                                         onLikedByClick = {
                                             onNavigate(Screen.PersonListScreen.route + "/${post.id}")
                                         },
                                         onMoreItemClick = {
-                                            viewModel.onEvent(PostDetailEvent.SelectPostUsername(post.username, post.isOwnPost))
-                                            viewModel.onEvent(PostDetailEvent.ShowBottomSheet)
+                                            viewModel.onEvent(PostDetailEvent.OnSelectPostUsername(post.username, post.isOwnPost))
+                                            viewModel.onEvent(PostDetailEvent.OnShowBottomSheet)
                                         },
                                         isDescriptionVisible = state.isDescriptionVisible,
                                         onDescriptionToggle = {
@@ -171,18 +167,18 @@ fun PostDetailScreen(
                                     showDeleteOption = state.isOwnPost == true,
                                     bottomSheetState = bottomSheetState,
                                     onDismissRequest = {
-                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                        viewModel.onEvent(PostDetailEvent.OnDismissBottomSheet)
                                     },
                                     onDownloadClick = {
-                                        viewModel.onEvent(PostDetailEvent.DownloadPost)
-                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                        viewModel.onEvent(PostDetailEvent.OnDownloadPost)
+                                        viewModel.onEvent(PostDetailEvent.OnDismissBottomSheet)
                                     },
                                     onDeleteClick = {
-                                        viewModel.onEvent(PostDetailEvent.DeletePost)
-                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                        viewModel.onEvent(PostDetailEvent.OnDeletePost)
+                                        viewModel.onEvent(PostDetailEvent.OnDismissBottomSheet)
                                     },
                                     onCancelClick = {
-                                        viewModel.onEvent(PostDetailEvent.DismissBottomSheet)
+                                        viewModel.onEvent(PostDetailEvent.OnDismissBottomSheet)
                                     }
                                 )
                             }
@@ -194,14 +190,14 @@ fun PostDetailScreen(
                         CommentFilterDropdown(
                             expanded = state.isDropdownExpanded,
                             onShowDropDownMenu = {
-                                viewModel.onEvent(PostDetailEvent.ShowDropDownMenu)
+                                viewModel.onEvent(PostDetailEvent.OnShowDropDownMenu)
                             },
                             onDismissDropdownMenu = {
-                                viewModel.onEvent(PostDetailEvent.DismissDropDownMenu)
+                                viewModel.onEvent(PostDetailEvent.OnDismissDropDownMenu)
                             },
                             selectedFilter = commentState.commentFilter,
                             onFilterSelected = { filterType ->
-                                viewModel.onEvent(PostDetailEvent.ChangeCommentFilter(filterType))
+                                viewModel.onEvent(PostDetailEvent.OnChangeCommentFilter(filterType))
                             }
                         )
                     }
@@ -224,16 +220,16 @@ fun PostDetailScreen(
                         context = context,
                         imageLoader = imageLoader,
                         onLikeClick = {
-                            viewModel.onEvent(PostDetailEvent.LikeComment(comment.id))
+                            viewModel.onEvent(PostDetailEvent.OnLikeComment(comment.id))
                         },
                         onLikedByClick = {
                             onNavigate(Screen.PersonListScreen.route + "/${comment.id}")
                         },
                         onLongPress = {
-                            viewModel.onEvent(PostDetailEvent.SelectComment(comment.id))
+                            viewModel.onEvent(PostDetailEvent.OnSelectComment(comment.id))
                         },
                         onDeleteClick = {
-                            viewModel.onEvent(PostDetailEvent.DeleteComment)
+                            viewModel.onEvent(PostDetailEvent.OnDeleteComment)
                         }
                     )
                 }
@@ -254,10 +250,10 @@ fun PostDetailScreen(
                 state = commentTextFieldState,
                 imageLoader = imageLoader,
                 onValueChange = {
-                    viewModel.onEvent(PostDetailEvent.EnteredComment(it))
+                    viewModel.onEvent(PostDetailEvent.OnEnteredComment(it))
                 },
                 onSend = {
-                    viewModel.onEvent(PostDetailEvent.Comment)
+                    viewModel.onEvent(PostDetailEvent.OnComment)
                 },
                 ownProfilePicture = profilePictureState,
                 hint = stringResource(id = R.string.enter_a_comment),

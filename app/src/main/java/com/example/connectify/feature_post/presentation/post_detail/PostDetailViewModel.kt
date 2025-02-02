@@ -114,7 +114,7 @@ class PostDetailViewModel @Inject constructor(
 
     fun onEvent(event: PostDetailEvent) {
         when(event) {
-            is PostDetailEvent.LikePost -> {
+            is PostDetailEvent.OnLikePost -> {
                 val isLiked = state.value.post?.isLiked == true
                 toggleLikeForParent(
                     parentId = state.value.post?.id ?: return,
@@ -122,13 +122,13 @@ class PostDetailViewModel @Inject constructor(
                     isLiked = isLiked
                 )
             }
-            is PostDetailEvent.Comment -> {
+            is PostDetailEvent.OnComment -> {
                 createComment(
                     postId = savedStateHandle.get<String>("postId") ?: "",
                     comment = commentTextFieldState.value.text
                 )
             }
-            is PostDetailEvent.LikeComment -> {
+            is PostDetailEvent.OnLikeComment -> {
                 val isLiked = pagingCommentState.value.items.find {
                     it.id == event.commentId
                 }?.isLiked == true
@@ -138,7 +138,7 @@ class PostDetailViewModel @Inject constructor(
                     isLiked = isLiked
                 )
             }
-            is PostDetailEvent.EnteredComment -> {
+            is PostDetailEvent.OnEnteredComment -> {
                 _commentTextFieldState.update {
                     it.copy(
                         text = event.comment,
@@ -146,14 +146,14 @@ class PostDetailViewModel @Inject constructor(
                     )
                 }
             }
-            is PostDetailEvent.SavePost -> {
+            is PostDetailEvent.OnSavePost -> {
                 val isSaved = state.value.post?.isSaved == true
                 toggleSavePost(
                     parentId = event.postId,
                     isSaved = isSaved
                 )
             }
-            is PostDetailEvent.SelectPostUsername -> {
+            is PostDetailEvent.OnSelectPostUsername -> {
                 _state.update {
                     it.copy(
                         selectedPostUsername = event.postUsername,
@@ -161,17 +161,17 @@ class PostDetailViewModel @Inject constructor(
                     )
                 }
             }
-            is PostDetailEvent.DownloadPost -> {
+            is PostDetailEvent.OnDownloadPost -> {
                 getPostDownloadUrl(savedStateHandle.get<String>("postId") ?: "")
             }
-            is PostDetailEvent.SelectComment -> {
+            is PostDetailEvent.OnSelectComment -> {
                 _state.update {
                     it.copy(
                         selectedCommentId = event.commentId
                     )
                 }
             }
-            is PostDetailEvent.ChangeCommentFilter -> {
+            is PostDetailEvent.OnChangeCommentFilter -> {
                 _commentState.update {
                     it.copy(
                         commentFilter = event.filterType
@@ -179,10 +179,10 @@ class PostDetailViewModel @Inject constructor(
                 }
                 loadInitialComments()
             }
-            is PostDetailEvent.DeletePost -> {
+            is PostDetailEvent.OnDeletePost -> {
                 deletePost(savedStateHandle.get<String>("postId") ?: "")
             }
-            is PostDetailEvent.DeleteComment -> {
+            is PostDetailEvent.OnDeleteComment -> {
                 _state.value.selectedCommentId?.let { commentId ->
                     deleteComment(commentId)
                 }
@@ -194,28 +194,28 @@ class PostDetailViewModel @Inject constructor(
                     )
                 }
             }
-            is PostDetailEvent.ShowBottomSheet -> {
+            is PostDetailEvent.OnShowBottomSheet -> {
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = true
                     )
                 }
             }
-            is PostDetailEvent.DismissBottomSheet -> {
+            is PostDetailEvent.OnDismissBottomSheet -> {
                 _state.update {
                     it.copy(
                         isBottomSheetVisible = false
                     )
                 }
             }
-            is PostDetailEvent.ShowDropDownMenu -> {
+            is PostDetailEvent.OnShowDropDownMenu -> {
                 _state.update {
                     it.copy(
                         isDropdownExpanded = true
                     )
                 }
             }
-            is PostDetailEvent.DismissDropDownMenu -> {
+            is PostDetailEvent.OnDismissDropDownMenu -> {
                 _state.update {
                     it.copy(
                         isDropdownExpanded = false

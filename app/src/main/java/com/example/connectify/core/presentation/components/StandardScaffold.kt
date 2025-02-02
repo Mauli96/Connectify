@@ -1,23 +1,21 @@
 package com.example.connectify.core.presentation.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.connectify.R
 import com.example.connectify.core.domain.models.BottomNavItem
-import com.example.connectify.core.presentation.ui.theme.HintGray
 import com.example.connectify.core.util.Screen
 
 @Composable
@@ -53,7 +51,7 @@ fun StandardScaffold(
             contentDescription = "Profile"
         )
     ),
-    content: @Composable () -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
@@ -66,15 +64,26 @@ fun StandardScaffold(
                         .fillMaxWidth()
                         .height(60.dp)
                         .drawBehind {
-                            drawLine(
-                                color = HintGray,
-                                start = Offset(0f, 0f),
-                                end = Offset(size.width, 0f),
-                                strokeWidth = 1.dp.toPx()
-                            )
+                            drawIntoCanvas { canvas ->
+                                val paint = android.graphics.Paint().apply {
+                                    color = android.graphics.Color.BLACK
+                                    setShadowLayer(
+                                        36f,
+                                        0f,
+                                        12f,
+                                        android.graphics.Color.argb(150, 0, 0, 0)
+                                    )
+                                }
+                                canvas.nativeCanvas.drawRect(
+                                    0f,
+                                    0f,
+                                    size.width,
+                                    size.height,
+                                    paint
+                                )
+                            }
                         },
-                    containerColor = MaterialTheme.colorScheme.background,
-                    tonalElevation = 50.dp
+                    containerColor = MaterialTheme.colorScheme.background
                 ) {
                     bottomNavItem.forEachIndexed { _, bottomNavItem ->
                         StandardBottomNavItem(
@@ -92,13 +101,7 @@ fun StandardScaffold(
                 }
             }
         }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-        ) {
-            content()
-        }
+    ) { paddingValues  ->
+        content(paddingValues)
     }
 }

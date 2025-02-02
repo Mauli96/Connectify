@@ -93,6 +93,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    userId: String? = null,
     snackbarHostState: SnackbarHostState,
     imageLoader: ImageLoader,
     onNavigate: (String) -> Unit = {},
@@ -179,7 +180,7 @@ fun ProfileScreen(
     }
 
     LaunchedEffect(key1 = state.isNavigatedToPersonListScreen, key2 = true) {
-        viewModel.getProfile(userId = null)
+        viewModel.getProfile(userId = userId)
         if(state.isNavigatedToPersonListScreen) {
             bottomSheetState.hide()
         }

@@ -80,11 +80,6 @@ class ProfileViewModel @Inject constructor(
     private val _eventFlow = Channel<UiEvent>()
     val eventFlow = _eventFlow.receiveAsFlow()
 
-    init {
-        val userId = savedStateHandle.get<String>("userId") ?: getOwnUserId()
-        getProfile(userId)
-    }
-
     private val postPaginator = DefaultPaginator(
         onFirstLoadUpdated = { isFirstLoading ->
             _pagingPostState.update {

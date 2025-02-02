@@ -30,32 +30,25 @@ fun StandardToolbar(
         title = title,
         modifier = modifier,
         navigationIcon = {
-            if(showBackArrow) {
-                IconButton(
-                    onClick = {
-                        onNavigateUp()
+            when {
+                showBackArrow -> {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_back),
+                            contentDescription = stringResource(id = R.string.back),
+                            modifier = Modifier.size(IconSizeSmall)
+                        )
                     }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back),
-                        contentDescription = stringResource(id = R.string.back),
-                        modifier = Modifier.size(IconSizeSmall)
-                    )
                 }
-            } else if(showClose) {
-                IconButton(
-                    onClick = {
-                        onNavigateUp()
+                showClose -> {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_cancel),
+                            contentDescription = stringResource(id = R.string.close),
+                            modifier = Modifier.size(IconSizeSmall)
+                        )
                     }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_cancel),
-                        contentDescription = stringResource(id = R.string.close),
-                        modifier = Modifier.size(IconSizeSmall)
-                    )
                 }
-            } else {
-                null
             }
         },
         actions = navActions,
