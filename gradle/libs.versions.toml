@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.12.0"
 animation = "1.7.6"
 coilCompose = "2.7.0"
 coilSvg = "2.7.0"

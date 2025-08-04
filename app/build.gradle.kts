@@ -9,15 +9,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.connectify"
-    compileSdk = 35
+    namespace = "com.connectify.android"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.connectify"
+        applicationId = "com.connectify.android"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 36
+        versionCode = 3
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

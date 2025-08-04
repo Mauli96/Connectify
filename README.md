@@ -30,7 +30,7 @@ Connectify is a modern social network application. It offers a seamless user exp
 <div>
   <pre>
     <code>
-      com.example.connectify
+      com.connectify.android
       ├── core            # Contains shared code such as utilities, constants, or base classes
       │   └── util
       ├── data            # Contains repository implementations and data source classes

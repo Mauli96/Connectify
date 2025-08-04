@@ -1,0 +1,173 @@
+package com.connectify.android.feature_auth.presentation.register
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.connectify.android.R
+import com.connectify.android.core.data.connectivity.ConnectivityObserver
+import com.connectify.android.core.domain.states.NetworkConnectionState
+import com.connectify.android.core.domain.states.PasswordTextFieldState
+import com.connectify.android.core.domain.states.StandardTextFieldState
+import com.connectify.android.core.presentation.util.UiEvent
+import com.connectify.android.core.util.Resource
+import com.connectify.android.core.util.UiText
+import com.connectify.android.feature_auth.domain.use_case.LoginUseCase
+import com.connectify.android.feature_auth.domain.use_case.RegisterUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase,
+    private val loginUseCase: LoginUseCase,
+    private val connectivityObserver: ConnectivityObserver
+) : ViewModel() {
+
+    private val _emailState = MutableStateFlow(StandardTextFieldState())
+    val emailState = _emailState.asStateFlow()
+
+    private val _usernameState = MutableStateFlow(StandardTextFieldState())
+    val usernameState = _usernameState.asStateFlow()
+
+    private val _passwordState = MutableStateFlow(PasswordTextFieldState())
+    val passwordState = _passwordState.asStateFlow()
+
+    private val _registerState = MutableStateFlow(RegisterState())
+    val registerState = _registerState.asStateFlow()
+
+    val networkState: StateFlow<NetworkConnectionState> =
+        connectivityObserver.networkConnection
+            .stateIn(viewModelScope, SharingStarted.Lazily, NetworkConnectionState.Available)
+
+    private val _eventFlow = Channel<UiEvent>()
+    val eventFlow = _eventFlow.receiveAsFlow()
+
+    fun onEvent(event: RegisterEvent) {
+        when(event) {
+            is RegisterEvent.OnEnteredUsername -> {
+                _usernameState.update {
+                    it.copy(
+                        text = event.value
+                    )
+                }
+            }
+            is RegisterEvent.OnEnteredEmail -> {
+                _emailState.update {
+                    it.copy(
+                        text = event.value
+                    )
+                }
+            }
+            is RegisterEvent.OnEnteredPassword -> {
+                _passwordState.update {
+                    it.copy(
+                        text = event.value
+                    )
+                }
+            }
+            is RegisterEvent.OnTogglePasswordVisibility -> {
+                _passwordState.update {
+                    it.copy(
+                        isPasswordVisible = !passwordState.value.isPasswordVisible
+                    )
+                }
+            }
+            is RegisterEvent.OnRegister -> {
+                register()
+            }
+        }
+    }
+
+    private fun register() {
+        viewModelScope.launch {
+            _usernameState.update {
+                it.copy(error = null)
+            }
+            _emailState.update {
+                it.copy(error = null)
+            }
+            _passwordState.update {
+                it.copy(error = null)
+            }
+            _registerState.update {
+                it.copy(isLoading = true)
+            }
+
+            val registerResult = registerUseCase(
+                email = emailState.value.text,
+                username = usernameState.value.text,
+                password = passwordState.value.text
+            )
+            if(registerResult.emailError != null) {
+                _emailState.update {
+                    it.copy(
+                        error = registerResult.emailError
+                    )
+                }
+            }
+            if(registerResult.usernameError != null) {
+                _usernameState.update {
+                    it.copy(
+                        error = registerResult.usernameError
+                    )
+                }
+            }
+            if(registerResult.passwordError != null) {
+                _passwordState.update {
+                    it.copy(
+                        error = registerResult.passwordError
+                    )
+                }
+            }
+            when(registerResult.result) {
+                is Resource.Success -> {
+                    val loginResult = loginUseCase(
+                        email = emailState.value.text,
+                        password = passwordState.value.text
+                    )
+                    _eventFlow.send(
+                        UiEvent.ShowSnackbar(
+                            UiText.StringResource(R.string.success_registeration)
+                        )
+                    )
+                    _eventFlow.send(UiEvent.OnRegister)
+                    _registerState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    _usernameState.value = StandardTextFieldState()
+                    _emailState.value = StandardTextFieldState()
+                    _passwordState.value = PasswordTextFieldState()
+                }
+                is Resource.Error -> {
+                    _eventFlow.send(
+                        UiEvent.ShowSnackbar(
+                            uiText = registerResult.result.uiText ?: UiText.unknownError()
+                        )
+                    )
+                    _registerState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+                null -> {
+                    _registerState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

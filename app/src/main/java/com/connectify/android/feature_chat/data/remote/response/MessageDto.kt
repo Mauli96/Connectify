@@ -1,0 +1,24 @@
+package com.connectify.android.feature_chat.data.remote.response
+
+import com.connectify.android.feature_activity.presentation.util.DateFormatUtil
+import com.connectify.android.feature_chat.domain.model.Message
+
+data class MessageDto(
+    val fromId: String,
+    val toId: String,
+    val text: String,
+    val timestamp: Long,
+    val chatId: String?,
+    val id: String
+) {
+    fun toMessage(): Message {
+        return Message(
+            fromId = fromId,
+            toId = toId,
+            text = text,
+            formattedTime = DateFormatUtil.timestampToFormattedString(timestamp, "hh:mm a"),
+            chatId = chatId,
+            id = id
+        )
+    }
+}
