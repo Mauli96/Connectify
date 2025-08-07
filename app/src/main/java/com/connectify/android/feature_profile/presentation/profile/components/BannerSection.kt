@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.connectify.android.R
 import com.connectify.android.core.presentation.ui.theme.HintGray
 import com.connectify.android.core.presentation.ui.theme.IconSizeSmall
@@ -157,9 +158,9 @@ fun BannerSection(
 
         Row(
             modifier = leftIconModifier
+                .height(iconSize)
                 .align(Alignment.BottomStart)
-                .padding(SpaceSmall),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(SpaceSmall)
         ) {
             topSkills.forEachIndexed { index, skill ->
                 if (index > 0) {
@@ -169,8 +170,7 @@ fun BannerSection(
                     model = skill.imageUrl,
                     contentDescription = stringResource(R.string.select_top_3_skills),
                     imageLoader = imageLoader,
-                    modifier = Modifier.size(IconSizeSmall),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier.height(iconSize)
                 )
             }
         }

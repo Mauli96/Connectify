@@ -53,7 +53,7 @@ class SearchViewModel @Inject constructor(
             is SearchEvent.OnToggleFollow -> {
                 toggleFollowStateForUser(event.userId)
             }
-            is SearchEvent.OnToggleSearch -> {
+            is SearchEvent.OnClearSearch -> {
                 searchUser(event.query)
             }
         }

@@ -322,6 +322,13 @@ class PostDetailViewModel @Inject constructor(
                             R.string.successfully_deleted_comment
                         ))
                     )
+                    _state.update {
+                        it.copy(
+                            post = it.post?.copy(
+                                commentCount = (it.post.commentCount - 1).coerceAtLeast(0)
+                            )
+                        )
+                    }
                 }
                 is Resource.Error -> {
                     _eventFlow.send(
@@ -485,6 +492,14 @@ class PostDetailViewModel @Inject constructor(
                         )
                     }
                     loadInitialComments()
+
+                    _state.update {
+                        it.copy(
+                            post = it.post?.copy(
+                                commentCount = it.post.commentCount + 1
+                            )
+                        )
+                    }
                 }
                 is Resource.Error -> {
                     _eventFlow.send(UiEvent.ShowSnackbar(

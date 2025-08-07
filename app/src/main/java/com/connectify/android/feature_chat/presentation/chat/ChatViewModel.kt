@@ -71,7 +71,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun loadChats() {
+    fun loadChats() {
         viewModelScope.launch {
             _state.update {
                 it.copy(

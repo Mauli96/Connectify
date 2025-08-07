@@ -59,6 +59,13 @@ fun ActivityItem(
                 modifier = Modifier
                     .size(ProfilePictureSizeMediumSmall)
                     .clip(CircleShape)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                onNavigate(Screen.ProfileScreen.route + "?userId=${activity.userId}")
+                            }
+                        )
+                    }
             )
 
             Spacer(modifier = Modifier.width(SpaceSmall))

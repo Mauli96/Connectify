@@ -82,6 +82,7 @@ fun SearchScreen(
     )
 
     LaunchedEffect(key1 = true) {
+        viewModel.onEvent(SearchEvent.OnQuery(searchFieldState.text))
         context.showKeyboard()
         focusRequester.requestFocus()
     }
@@ -111,7 +112,7 @@ fun SearchScreen(
                 },
                 focusRequester = focusRequester,
                 onQueryChanged = { viewModel.onEvent(SearchEvent.OnQuery(it)) },
-                onClearSearch = { viewModel.onEvent(SearchEvent.OnToggleSearch("")) }
+                onClearSearch = { viewModel.onEvent(SearchEvent.OnClearSearch("")) }
             )
             Box(
                 modifier = Modifier.fillMaxSize()

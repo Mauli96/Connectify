@@ -534,6 +534,7 @@ class MainFeedViewModel @Inject constructor(
                         )
                     }
                     loadInitialComments()
+                    updateCommentCountForPost(postId = postId, increment = true)
                 }
                 is Resource.Error -> {
                     _eventFlow.send(UiEvent.ShowSnackbar(
@@ -571,6 +572,9 @@ class MainFeedViewModel @Inject constructor(
                             R.string.successfully_deleted_comment
                         ))
                     )
+                    state.value.selectedPostId?.let { postId ->
+                        updateCommentCountForPost(postId = postId, increment = false)
+                    }
                 }
                 is Resource.Error -> {
                     _eventFlow.send(
@@ -580,6 +584,24 @@ class MainFeedViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun updateCommentCountForPost(postId: String, increment: Boolean) {
+        _pagingPostState.update { currentState ->
+            currentState.copy(
+                items = currentState.items.map { post ->
+                    if (post.id == postId) {
+                        post.copy(
+                            commentCount = if (increment) {
+                                post.commentCount + 1
+                            } else {
+                                (post.commentCount - 1).coerceAtLeast(0)
+                            }
+                        )
+                    } else post
+                }
+            )
         }
     }
 }
