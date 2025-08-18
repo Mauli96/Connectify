@@ -1,5 +1,7 @@
 # Connectify
 
+[👉 Download on Google Play](https://play.google.com/store/apps/details?id=com.connectify.android)
+
 Connectify is a modern social network application. It offers a seamless user experience for connecting, sharing, and discovering content. Built using cutting-edge technologies like Kotlin, Jetpack Compose, Ktor for the backend, and MongoDB as the database, Connectify is designed for performance, scalability, and user engagement.
 
 ## Features
