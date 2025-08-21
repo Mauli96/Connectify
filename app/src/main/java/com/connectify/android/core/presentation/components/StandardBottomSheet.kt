@@ -42,6 +42,7 @@ private data class BottomSheetAction(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StandardBottomSheet(
+    modifier: Modifier = Modifier,
     title: String,
     bottomSheetState: SheetState,
     showDownloadOption: Boolean = false,
@@ -50,7 +51,6 @@ fun StandardBottomSheet(
     onDownloadClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
